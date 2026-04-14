@@ -64,7 +64,7 @@ tailwind.config = {
 
     <div class="flex flex-wrap gap-2 flex-shrink-0">
       <button onclick="modalMovimiento()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
-        <span class="material-symbols-outlined text-[16px]">add_comment</span> Nuevo Movimiento
+        <span class="material-symbols-outlined text-[16px]">add_comment</span> Nueva Actividad
       </button>
       <button onclick="document.getElementById('file-input-det').click()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
         <span class="material-symbols-outlined text-[16px]">upload_file</span> Subir Documento
@@ -144,12 +144,12 @@ tailwind.config = {
       <!-- Timeline -->
       <div id="panel-timeline" class="bg-surface-container-low rounded-xl p-7 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-28 h-28 bg-primary/5 rounded-bl-full pointer-events-none"></div>
-        <h3 class="font-headline font-bold text-on-surface mb-7">Ciclo de Vida — Movimientos</h3>
+        <h3 class="font-headline font-bold text-on-surface mb-7">Ciclo de Vida — Actividades</h3>
         <div class="relative pl-8 space-y-10 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[2px] before:bg-primary-container" id="timeline-list"></div>
         <div class="mt-8 pt-5 border-t border-outline-variant/10">
           <button onclick="modalMovimiento()" class="flex items-center gap-2 text-primary text-sm font-bold hover:underline">
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
-            Registrar nuevo movimiento
+            Registrar nueva actividad
           </button>
         </div>
       </div>
@@ -390,7 +390,7 @@ function guardarObs() {
 
 // ── Modal nuevo movimiento ─────────────────────────────────────────────────
 function modalMovimiento() {
-  SACO_UI.showModal('Registrar Movimiento', `
+  SACO_UI.showModal('Registrar Nueva Actividad', `
     <div class="space-y-4">
       <div>
         <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Tipo de Movimiento</label>
