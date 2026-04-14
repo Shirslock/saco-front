@@ -269,8 +269,51 @@ const CAUSAS_PENALES = [
   },
 ];
 
+// Usuarios demo — 8 perfiles para selección de rol en demo
+const USUARIOS = [
+  { id: 'ALJ',     nombre: 'Alejandra López',      iniciales: 'AL', rol: 'REFERENTE',     area: null,      cargo: 'Referente SACO' },
+  { id: 'ADM',     nombre: 'Marcela Suárez',        iniciales: 'MS', rol: 'ADMINISTRATIVO', area: null,     cargo: 'Administrativo Mesa' },
+  { id: 'COORD_C', nombre: 'Pablo Sbarbati',         iniciales: 'PS', rol: 'COORDINADOR',   area: 'CIVIL',   cargo: 'Coordinador Civil' },
+  { id: 'COORD_L', nombre: 'Rodrigo Molinelli',      iniciales: 'RM', rol: 'COORDINADOR',   area: 'LABORAL', cargo: 'Coordinador Laboral' },
+  { id: 'COORD_P', nombre: 'Gustavo Desideri',       iniciales: 'GD', rol: 'COORDINADOR',   area: 'PENAL',   cargo: 'Coordinador Penal' },
+  { id: 'ABOG_C',  nombre: 'Dr. Alejandro Rossi',    iniciales: 'AR', rol: 'ABOGADO',       area: 'CIVIL',   cargo: 'Abogado Civil' },
+  { id: 'ABOG_L',  nombre: 'Dr. Hernán Blanco',      iniciales: 'HB', rol: 'ABOGADO',       area: 'LABORAL', cargo: 'Abogado Laboral' },
+  { id: 'ABOG_P',  nombre: 'Dr. Marcos Gallo',       iniciales: 'MG', rol: 'ABOGADO',       area: 'PENAL',   cargo: 'Abogado Penal' },
+];
+
+// Accesos por rol — nav visible, permisos y página de inicio
+const ROL_ACCESOS = {
+  REFERENTE: {
+    nav: ['dashboard-mesa','bandeja-abogado','area-civil','area-laboral','gestion-penal','alta-expediente','reports'],
+    puedeReasignar: true, verTodaBandeja: true, inicio: 'dashboard-mesa',
+  },
+  ADMINISTRATIVO: {
+    nav: ['dashboard-mesa','alta-expediente','bandeja-abogado'],
+    puedeReasignar: false, verTodaBandeja: false, inicio: 'dashboard-mesa',
+  },
+  COORDINADOR: {
+    CIVIL:   { nav: ['dashboard-mesa','bandeja-abogado','area-civil','alta-expediente','reports'],    puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-civil'    },
+    LABORAL: { nav: ['dashboard-mesa','bandeja-abogado','area-laboral','alta-expediente','reports'],  puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-laboral'  },
+    PENAL:   { nav: ['dashboard-mesa','bandeja-abogado','gestion-penal','alta-expediente','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'gestion-penal' },
+  },
+  ABOGADO: {
+    CIVIL:   { nav: ['bandeja-abogado','area-civil','alta-expediente'],    puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    LABORAL: { nav: ['bandeja-abogado','area-laboral','alta-expediente'],  puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    PENAL:   { nav: ['bandeja-abogado','gestion-penal','alta-expediente'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+  },
+};
+
+function getAccesos(usuario) {
+  if (!usuario) return ROL_ACCESOS.REFERENTE;
+  const r = ROL_ACCESOS[usuario.rol];
+  if (!r) return ROL_ACCESOS.REFERENTE;
+  if (usuario.area && r[usuario.area]) return r[usuario.area];
+  return r;
+}
+
 window.SACO = {
   TIPOS_GESTION, LINEAS_FERROVIARIAS, ABOGADOS, ESTADOS,
   QUEUE_MESA, EXPEDIENTES_ABOGADO, EXPEDIENTE_DETALLE,
   CARTA_SUCESO_QUEUE, CAUSAS_PENALES,
+  USUARIOS, ROL_ACCESOS, CURRENT_USER: null, getAccesos,
 };

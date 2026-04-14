@@ -148,10 +148,35 @@ tailwind.config = {
 <script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
+(function initUser() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+})();
+
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('bandeja-abogado');
 document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Mi Bandeja', 'Mi Bandeja');
 
-let data = [...window.SACO.EXPEDIENTES_ABOGADO];
+function getExpedientesFiltrados() {
+  const u = window.SACO.CURRENT_USER;
+  if (!u) return [...window.SACO.EXPEDIENTES_ABOGADO];
+  const accesos = window.SACO.getAccesos(u);
+  if (accesos.verTodaBandeja) return [...window.SACO.EXPEDIENTES_ABOGADO];
+  return window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.abogado === u.nombre);
+}
+
+function updateSubtitle() {
+  const u = window.SACO.CURRENT_USER;
+  const subtitleEl = document.getElementById('subtitle');
+  if (!subtitleEl) return;
+  const total = getExpedientesFiltrados().length;
+  if (u && window.SACO.getAccesos(u).verTodaBandeja) {
+    subtitleEl.innerHTML = `Visualizando <strong id="total-count">${total}</strong> expedientes activos de todo el equipo.`;
+  } else {
+    subtitleEl.innerHTML = `Gestionando <strong id="total-count">${total}</strong> expedientes activos.`;
+  }
+}
+
+let data = getExpedientesFiltrados();
 let currentTab = 'activos';
 
 function setTab(tab) {
@@ -167,7 +192,7 @@ function applyFilters() {
   const search = document.getElementById('search-input').value.toLowerCase();
   const urgente = document.getElementById('f-urgente').checked;
 
-  let filtered = window.SACO.EXPEDIENTES_ABOGADO.filter(e => {
+  let filtered = getExpedientesFiltrados().filter(e => {
     if (currentTab === 'cumplidos' && e.estado !== 'CUMPLIDO') return false;
     if (currentTab === 'urgentes' && e.prioridad !== 'ALTA') return false;
     if (currentTab === 'activos' && e.estado === 'CUMPLIDO') return false;
@@ -257,12 +282,21 @@ function renderDocsGDE() {
 renderAreaFilter();
 renderDocsGDE();
 renderTabla(data);
-document.getElementById('total-count').textContent = data.length;
+updateSubtitle();
 
-SACO_SYNC.syncListen(({ type }) => {
+SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'EXPEDIENTE_ASIGNADO' || type === 'ESTADO_CAMBIADO') {
+    data = getExpedientesFiltrados();
     applyFilters();
     SACO_UI.showToast('Bandeja actualizada desde otra pestaña.', 'info');
+  }
+  if (type === 'USUARIO_CAMBIADO') {
+    if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+    document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('bandeja-abogado');
+    if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
+    data = getExpedientesFiltrados();
+    applyFilters();
+    updateSubtitle();
   }
 });
 </script>

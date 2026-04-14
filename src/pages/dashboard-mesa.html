@@ -174,6 +174,11 @@ tailwind.config = {
 <script src="../components/shared.js"></script>
 <script>
 // ── Mount shared components ────────────────────────────────────────────────
+(function initUser() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+})();
+
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('dashboard-mesa');
 document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Mesa SACO — Dashboard', 'Mesa SACO');
 
@@ -376,11 +381,16 @@ function renderMetricas() {
 renderMetricas();
 renderQueue(currentQueue);
 
-SACO_SYNC.syncListen(({ type }) => {
+SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'QUEUE_ACTUALIZADA' || type === 'EXPEDIENTE_ASIGNADO') {
     currentQueue = [...window.SACO.QUEUE_MESA];
     renderQueue(currentQueue);
     renderMetricas();
+  }
+  if (type === 'USUARIO_CAMBIADO') {
+    if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+    document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('dashboard-mesa');
+    if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
   }
 });
 </script>

@@ -1,11 +1,5 @@
 // ── Shared Components — SACO Sovereign Ledger ─────────────────────────────
 
-// Detecta la página actual por filename
-function currentPage() {
-  const p = location.pathname.split('/').pop().replace('.html','');
-  return p || 'dashboard-mesa';
-}
-
 // Badge de estado
 function estadoBadge(code, label) {
   const map = {
@@ -36,18 +30,40 @@ function areaBadge(area) {
   return `<span class="text-[10px] font-bold px-2 py-0.5 rounded ${map[area]||''}">${area}</span>`;
 }
 
+// ── Avatar color por rol ────────────────────────────────────────────────────
+function _avatarCls(rol) {
+  const map = {
+    REFERENTE:      'bg-primary text-white',
+    ADMINISTRATIVO: 'bg-secondary text-white',
+    COORDINADOR:    'bg-tertiary-container text-on-tertiary-fixed',
+    ABOGADO:        'bg-surface-container-high text-on-surface',
+  };
+  return map[rol] || 'bg-surface-container text-on-surface-variant';
+}
+
 // ── Sidebar ────────────────────────────────────────────────────────────────
 function renderSidebar(activePage) {
-  const nav = [
-    { key: 'dashboard-mesa', icon: 'assignment',    label: 'Mesa SACO',     href: 'dashboard-mesa.html' },
-    { key: 'bandeja-abogado',icon: 'inbox',          label: 'Mi Bandeja',    href: 'bandeja-abogado.html' },
-    { key: 'area-civil',     icon: 'gavel',          label: 'Área Civil',    href: 'area-civil.html' },
-    { key: 'area-laboral',   icon: 'work',           label: 'Área Laboral',  href: 'area-laboral.html' },
-    { key: 'gestion-penal',  icon: 'policy',         label: 'Área Penal',    href: 'gestion-penal.html' },
-    { key: 'alta-expediente',icon: 'create_new_folder', label: 'Nuevo Expediente', href: 'alta-expediente.html' },
-    { key: 'detalle-expediente', icon: 'folder_open', label: 'Expedientes',  href: 'bandeja-abogado.html' },
-    { key: 'reports',        icon: 'analytics',      label: 'Previsión',     href: '#' },
+  window._sacoPageKey = activePage;
+
+  const allNav = [
+    { key: 'dashboard-mesa',     icon: 'assignment',        label: 'Mesa SACO',        href: 'dashboard-mesa.html' },
+    { key: 'bandeja-abogado',    icon: 'inbox',             label: 'Mi Bandeja',       href: 'bandeja-abogado.html' },
+    { key: 'area-civil',         icon: 'gavel',             label: 'Área Civil',       href: 'area-civil.html' },
+    { key: 'area-laboral',       icon: 'work',              label: 'Área Laboral',     href: 'area-laboral.html' },
+    { key: 'gestion-penal',      icon: 'policy',            label: 'Área Penal',       href: 'gestion-penal.html' },
+    { key: 'alta-expediente',    icon: 'create_new_folder', label: 'Nuevo Expediente', href: 'alta-expediente.html' },
+    { key: 'detalle-expediente', icon: 'folder_open',       label: 'Expedientes',      href: 'bandeja-abogado.html' },
+    { key: 'reports',            icon: 'analytics',         label: 'Previsión',        href: '#' },
   ];
+
+  const u = window.SACO_SYNC ? window.SACO_SYNC.getCurrentUser() : null;
+  const accesos = (u && window.SACO) ? window.SACO.getAccesos(u) : null;
+  const allowedKeys = accesos ? accesos.nav : null;
+
+  // detalle-expediente is always accessible (it's opened from within the app)
+  const nav = allowedKeys
+    ? allNav.filter(n => allowedKeys.includes(n.key) || n.key === 'detalle-expediente')
+    : allNav;
 
   const items = nav.map(n => {
     const active = activePage === n.key;
@@ -60,6 +76,11 @@ function renderSidebar(activePage) {
       <span>${n.label}</span>
     </a>`;
   }).join('');
+
+  const iniciales  = u ? u.iniciales : '?';
+  const nombre     = u ? u.nombre.replace(/^Dr\. |^Dra\. /, '') : 'Sin sesión';
+  const cargo      = u ? u.cargo : 'Seleccionar usuario';
+  const avatarCls  = u ? _avatarCls(u.rol) : 'bg-surface-container text-on-surface-variant';
 
   return `
   <aside id="sidebar" class="h-screen w-64 fixed left-0 top-0 bg-surface-container-high flex flex-col py-6 z-50">
@@ -79,10 +100,10 @@ function renderSidebar(activePage) {
         Nuevo Expediente
       </a>
       <div class="px-2 py-4 border-t border-outline-variant/20 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">AR</div>
-        <div>
-          <p class="text-xs font-bold text-on-surface">Dr. A. Rossi</p>
-          <p class="text-[10px] text-on-surface-variant">Abogado Civil</p>
+        <div id="sidebar-user-avatar" class="w-8 h-8 rounded-full ${avatarCls} flex items-center justify-center font-bold text-xs flex-shrink-0">${iniciales}</div>
+        <div class="min-w-0">
+          <p id="sidebar-user-name" class="text-xs font-bold text-on-surface truncate">${nombre}</p>
+          <p id="sidebar-user-cargo" class="text-[10px] text-on-surface-variant truncate">${cargo}</p>
         </div>
       </div>
     </div>
@@ -98,6 +119,12 @@ function renderTopbar(title, breadcrumb) {
         <span class="text-primary font-semibold">${breadcrumb}</span>
        </nav>`
     : '';
+
+  const u           = window.SACO_SYNC ? window.SACO_SYNC.getCurrentUser() : null;
+  const iniciales   = u ? u.iniciales : '?';
+  const nombreCorto = u ? u.nombre.replace(/^Dr\. |^Dra\. /, '') : 'Seleccionar';
+  const avatarCls   = u ? _avatarCls(u.rol) : 'bg-surface-container text-on-surface-variant';
+
   return `
   <header class="fixed top-0 left-64 right-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center px-8 py-3 shadow-sm">
     <div class="flex items-center gap-6">
@@ -116,8 +143,103 @@ function renderTopbar(title, breadcrumb) {
       <button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
         <span class="material-symbols-outlined">settings</span>
       </button>
+      <button id="user-pill" onclick="SACO_UI.toggleUserDropdown()" class="flex items-center gap-2 pl-2 pr-3 py-1.5 bg-surface-container-low hover:bg-surface-container rounded-full transition-colors border border-outline-variant/20">
+        <div id="user-avatar" class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${avatarCls}">${iniciales}</div>
+        <span id="user-name" class="text-xs font-semibold text-on-surface hidden md:block">${nombreCorto}</span>
+        <span class="material-symbols-outlined text-[14px] text-on-surface-variant">expand_more</span>
+      </button>
     </div>
   </header>`;
+}
+
+// ── Selector de usuario (demo) ──────────────────────────────────────────────
+function toggleUserDropdown() {
+  const existing = document.getElementById('user-dropdown');
+  if (existing) { existing.remove(); return; }
+
+  const pill = document.getElementById('user-pill');
+  if (!pill) return;
+  const rect = pill.getBoundingClientRect();
+
+  const dropdown = document.createElement('div');
+  dropdown.id = 'user-dropdown';
+  dropdown.className = 'fixed z-[200] bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/15 py-2 w-64 overflow-hidden';
+  dropdown.style.top   = (rect.bottom + 8) + 'px';
+  dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+
+  const currentUser = window.SACO_SYNC ? window.SACO_SYNC.getCurrentUser() : null;
+
+  dropdown.innerHTML = `
+    <div class="px-4 py-2.5 border-b border-outline-variant/10 mb-1">
+      <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Demo — Cambiar usuario</p>
+    </div>
+    ${(window.SACO ? window.SACO.USUARIOS : []).map(u => `
+      <button onclick="SACO_UI.selectUser('${u.id}')" class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-low transition-colors text-left ${currentUser && currentUser.id === u.id ? 'bg-primary-container/20' : ''}">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${_avatarCls(u.rol)}">${u.iniciales}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold text-on-surface truncate">${u.nombre}</p>
+          <p class="text-[10px] text-on-surface-variant">${u.cargo}</p>
+        </div>
+        ${currentUser && currentUser.id === u.id ? '<span class="material-symbols-outlined text-primary text-[16px] ml-auto flex-shrink-0">check</span>' : ''}
+      </button>`).join('')}`;
+
+  document.body.appendChild(dropdown);
+  setTimeout(() => document.addEventListener('click', function h(e) {
+    if (!dropdown.contains(e.target) && !pill.contains(e.target)) {
+      dropdown.remove();
+      document.removeEventListener('click', h);
+    }
+  }), 100);
+}
+
+function selectUser(userId) {
+  const u = window.SACO ? window.SACO.USUARIOS.find(x => x.id === userId) : null;
+  if (!u) return;
+  window.SACO.CURRENT_USER = u;
+  if (window.SACO_SYNC) window.SACO_SYNC.setCurrentUser(u);
+
+  // Re-render sidebar on this tab
+  const pageKey = window._sacoPageKey || 'dashboard-mesa';
+  document.getElementById('sidebar-mount').innerHTML = renderSidebar(pageKey);
+  _updateUserPill(u);
+
+  // Redirect if current page is not in this user's nav
+  const accesos = window.SACO.getAccesos(u);
+  const mainNavKeys = ['dashboard-mesa','bandeja-abogado','area-civil','area-laboral','gestion-penal','alta-expediente','reports'];
+  if (mainNavKeys.includes(pageKey) && !accesos.nav.includes(pageKey)) {
+    window.location.href = accesos.inicio + '.html';
+    return;
+  }
+
+  document.getElementById('user-dropdown')?.remove();
+  showToast(`Sesión: ${u.nombre} — ${u.cargo}`, 'success');
+}
+
+function _updateUserPill(u) {
+  const avatarEl      = document.getElementById('user-avatar');
+  const nameEl        = document.getElementById('user-name');
+  const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+  const sidebarName   = document.getElementById('sidebar-user-name');
+  const sidebarCargo  = document.getElementById('sidebar-user-cargo');
+  const cls = _avatarCls(u.rol);
+  const nombre = u.nombre.replace(/^Dr\. |^Dra\. /, '');
+  if (avatarEl) {
+    avatarEl.className   = `w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${cls}`;
+    avatarEl.textContent = u.iniciales;
+  }
+  if (nameEl)        nameEl.textContent        = nombre;
+  if (sidebarAvatar) {
+    sidebarAvatar.className   = `w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0 ${cls}`;
+    sidebarAvatar.textContent = u.iniciales;
+  }
+  if (sidebarName)  sidebarName.textContent  = nombre;
+  if (sidebarCargo) sidebarCargo.textContent = u.cargo;
+}
+
+function puedeReasignar() {
+  const u = window.SACO_SYNC ? window.SACO_SYNC.getCurrentUser() : null;
+  if (!u || !window.SACO) return true; // sin usuario seleccionado: visible en demo
+  return window.SACO.getAccesos(u).puedeReasignar;
 }
 
 // ── Toast ──────────────────────────────────────────────────────────────────
@@ -209,4 +331,5 @@ function closeModal() {
 window.SACO_UI = {
   renderSidebar, renderTopbar, estadoBadge, areaBadge,
   showToast, showModal, closeModal, toggleNotifPanel,
+  toggleUserDropdown, selectUser, puedeReasignar, updateUserPill: _updateUserPill,
 };

@@ -116,6 +116,11 @@ tailwind.config = {
 <script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
+(function initUser() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+})();
+
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('area-laboral');
 document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Área Laboral', 'Coordinación Laboral');
 
@@ -165,10 +170,15 @@ function renderLetradosLaboral() {
 renderExpedientesLaboral();
 renderLetradosLaboral();
 
-SACO_SYNC.syncListen(({ type }) => {
+SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'ESTADO_CAMBIADO' || type === 'EXPEDIENTE_ASIGNADO') {
     renderExpedientesLaboral();
     SACO_UI.showToast('Expedientes actualizados desde otra pestaña.', 'info');
+  }
+  if (type === 'USUARIO_CAMBIADO') {
+    if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+    document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('area-laboral');
+    if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
   }
 });
 </script>

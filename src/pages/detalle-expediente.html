@@ -73,7 +73,7 @@ tailwind.config = {
       <button onclick="modalCambiarEstado()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
         <span class="material-symbols-outlined text-[16px]">swap_horiz</span> Cambiar Estado
       </button>
-      <button class="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-xl shadow-md hover:brightness-105 transition-all">
+      <button id="btn-reasignar" class="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-xl shadow-md hover:brightness-105 transition-all">
         <span class="material-symbols-outlined text-[16px]">forward</span> Reasignar
       </button>
     </div>
@@ -220,6 +220,11 @@ tailwind.config = {
 <script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
+(function initUser() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+})();
+
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('detalle-expediente');
 
 const exp = window.SACO.EXPEDIENTE_DETALLE;
@@ -573,6 +578,21 @@ function subirDoc(input) {
   if (!document.getElementById('panel-docs').classList.contains('hidden')) renderDocs();
   SACO_UI.showToast(`${f.name} subido correctamente.`, 'success');
 }
+
+function updateReasignarBtn() {
+  const btn = document.getElementById('btn-reasignar');
+  if (btn) btn.classList.toggle('hidden', !SACO_UI.puedeReasignar());
+}
+updateReasignarBtn();
+
+SACO_SYNC.syncListen(({ type, payload }) => {
+  if (type === 'USUARIO_CAMBIADO') {
+    if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+    document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('detalle-expediente');
+    if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
+    updateReasignarBtn();
+  }
+});
 </script>
 </body>
 </html>
