@@ -124,30 +124,13 @@ tailwind.config = {
         </button>
       </div>
 
-      <!-- Panel evaluación de admisibilidad -->
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-5">
-        <div class="flex items-center gap-2 mb-4">
-          <span class="material-symbols-outlined text-primary">verified_user</span>
-          <h3 class="font-headline font-bold text-on-surface text-sm">Evaluación — GAJ</h3>
-        </div>
-        <p class="text-xs text-on-surface-variant mb-4 leading-relaxed">
-          Las solicitudes de asistencia técnica y defensas penales requieren evaluación de admisibilidad por el equipo GAJ antes de asignar letrado.
-        </p>
-        <div id="gaj-list" class="space-y-2"></div>
-      </div>
-
-      <!-- Quick links -->
-      <div class="bg-surface-container-high rounded-xl p-5">
-        <h4 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Accesos Rápidos</h4>
-        <div id="quick-links-grid" class="grid grid-cols-2 gap-2"></div>
-      </div>
-
     </div>
   </div>
 </div>
 </main>
 
 <script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('gestion-penal');
@@ -286,38 +269,16 @@ function renderLetraados() {
   }).join('');
 }
 
-function renderGAJ() {
-  document.getElementById('gaj-list').innerHTML = [
-    ['ADMITIDA','Defensa Penal — Fernández, L.','bg-secondary-container text-on-secondary-fixed'],
-    ['EN_EVALUACION','Asistencia Técnica — Ruiz, M.','bg-tertiary-container text-on-tertiary-fixed'],
-    ['RECHAZADA','Defensa Penal — López, C.','bg-error-container/30 text-on-error-container'],
-  ].map(([estado, caso, cls]) => `
-  <div class="p-3 bg-surface-container-low rounded-lg">
-    <div class="flex justify-between items-start">
-      <p class="text-xs font-semibold text-on-surface leading-snug">${caso}</p>
-      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${cls} flex-shrink-0 ml-2">${estado.replace('_',' ')}</span>
-    </div>
-  </div>`).join('');
-}
-
-function renderQuickLinks() {
-  document.getElementById('quick-links-grid').innerHTML = [
-    ['history_edu','Plantillas GDE'],
-    ['folder_zip','Archivo Penal'],
-    ['analytics','Estadísticas'],
-    ['gavel','SIGEJ PTN'],
-  ].map(([icon, label]) => `
-  <button onclick="SACO_UI.showToast('${label} — próximamente.','info')" class="flex flex-col items-center justify-center gap-2 bg-surface-container-lowest p-3 rounded-xl hover:shadow-md transition-all border border-outline-variant/10">
-    <span class="material-symbols-outlined text-primary">${icon}</span>
-    <span class="text-[10px] font-bold text-center leading-tight">${label}</span>
-  </button>`).join('');
-}
-
 renderCartas();
 renderCausas();
 renderLetraados();
-renderGAJ();
-renderQuickLinks();
+
+SACO_SYNC.syncListen(({ type, payload }) => {
+  if (type === 'EXPEDIENTE_ASIGNADO' && payload?.area === 'PENAL') {
+    renderCausas();
+    SACO_UI.showToast('Causas penales actualizadas desde otra pestaña.', 'info');
+  }
+});
 </script>
 </body>
 </html>

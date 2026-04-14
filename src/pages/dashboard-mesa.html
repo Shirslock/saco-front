@@ -62,7 +62,7 @@ tailwind.config = {
         <span class="text-[10px] font-bold text-on-secondary-fixed bg-secondary-container px-2 py-1 rounded-full uppercase tracking-tight">Civil</span>
       </div>
       <div class="mt-4">
-        <p class="text-4xl font-black text-on-surface">24</p>
+        <p class="text-4xl font-black text-on-surface" id="metric-civil">—</p>
         <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Expedientes Activos Civil</p>
       </div>
     </div>
@@ -73,7 +73,7 @@ tailwind.config = {
         <span class="text-[10px] font-bold text-on-tertiary-fixed bg-tertiary-container px-2 py-1 rounded-full uppercase tracking-tight">Penal</span>
       </div>
       <div class="mt-4">
-        <p class="text-4xl font-black text-on-surface">47</p>
+        <p class="text-4xl font-black text-on-surface" id="metric-penal">—</p>
         <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Causas Penales Activas</p>
       </div>
     </div>
@@ -97,10 +97,10 @@ tailwind.config = {
   </section>
 
   <!-- ── Workspace grid ───────────────────────────────────────────────── -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <section class="grid grid-cols-1 gap-8">
 
     <!-- Cola de ingreso -->
-    <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl overflow-hidden shadow-card">
+    <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-card">
       <div class="px-6 py-5 flex justify-between items-center border-b border-outline-variant/10">
         <div>
           <h3 class="font-headline font-bold text-on-surface">Cola de Ingreso — Mesa SACO</h3>
@@ -126,74 +126,6 @@ tailwind.config = {
           <tbody id="queue-tbody" class="divide-y divide-outline-variant/5"></tbody>
         </table>
       </div>
-    </div>
-
-    <!-- Panel de asignación por área -->
-    <div class="lg:col-span-4 space-y-5">
-
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-6">
-        <div class="flex items-center justify-between mb-5">
-          <h3 class="text-sm font-headline font-black uppercase tracking-widest text-on-surface">Distribución por Área</h3>
-        </div>
-        <div class="space-y-4">
-          <!-- Civil -->
-          <div class="p-4 bg-surface-container-low rounded-xl hover:bg-primary-container/20 transition-all cursor-pointer" onclick="filterByArea('CIVIL')">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-on-surface">Civil — FIFO</span>
-              <span class="text-[10px] font-bold text-on-primary-container bg-primary-container px-2 py-0.5 rounded-full">12 pendientes</span>
-            </div>
-            <div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-primary h-full rounded-full transition-all" style="width:40%"></div>
-            </div>
-            <p class="text-[10px] mt-2 text-on-surface-variant">Demandas, Oficios, Mediaciones, Recuperos</p>
-          </div>
-          <!-- Laboral -->
-          <div class="p-4 bg-surface-container-low rounded-xl hover:bg-secondary-container/30 transition-all cursor-pointer" onclick="filterByArea('LABORAL')">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-on-surface">Laboral — FIFO</span>
-              <span class="text-[10px] font-bold text-on-secondary-fixed bg-secondary-container px-2 py-0.5 rounded-full">8 pendientes</span>
-            </div>
-            <div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-secondary h-full rounded-full" style="width:25%"></div>
-            </div>
-            <p class="text-[10px] mt-2 text-on-surface-variant">Demandas, Mediaciones, Desafueros</p>
-          </div>
-          <!-- Penal -->
-          <div class="p-4 bg-surface-container-low rounded-xl hover:bg-tertiary-container/30 transition-all cursor-pointer" onclick="filterByArea('PENAL')">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-on-surface">Penal — Por Línea Ferroviaria</span>
-              <span class="text-[10px] font-bold text-on-tertiary-fixed bg-tertiary-container px-2 py-0.5 rounded-full">22 pendientes</span>
-            </div>
-            <div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-tertiary h-full rounded-full" style="width:70%"></div>
-            </div>
-            <p class="text-[10px] mt-2 text-on-surface-variant">Carta Suceso, Oficios, Defensas</p>
-          </div>
-        </div>
-
-        <!-- Carga de trabajo -->
-        <div class="mt-6 pt-5 border-t border-outline-variant/10">
-          <h4 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-4">Carga de Letrados</h4>
-          <div class="space-y-3" id="workload-list"></div>
-        </div>
-      </div>
-
-      <!-- Panel GDE -->
-      <div class="bg-on-surface rounded-xl p-5 text-on-primary relative overflow-hidden">
-        <div class="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
-          <span class="material-symbols-outlined text-[140px]">cloud_sync</span>
-        </div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-inverse-on-surface mb-2">GDE — Gestión Documental</p>
-        <p class="font-headline font-bold text-white mb-4">Sincronización activa</p>
-        <div class="flex items-center gap-2 mb-4">
-          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-          <span class="text-[10px] text-white/70">Todos los módulos operacionales</span>
-        </div>
-        <button class="w-full bg-white text-on-surface py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-surface-container-low transition-colors">
-          Forzar Sincronización
-        </button>
-      </div>
-
     </div>
   </section>
 
@@ -238,6 +170,7 @@ tailwind.config = {
 </div>
 
 <script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
 // ── Mount shared components ────────────────────────────────────────────────
@@ -402,6 +335,9 @@ function confirmarAsignacion() {
   window.SACO.QUEUE_MESA = window.SACO.QUEUE_MESA.filter(q => q.id !== currentQueueItem?.id);
   currentQueue = [...window.SACO.QUEUE_MESA];
   renderQueue(currentQueue);
+  renderMetricas();
+  SACO_SYNC.syncEmit('EXPEDIENTE_ASIGNADO', { id: currentQueueItem?.id, area, abogado: abog });
+  SACO_SYNC.syncEmit('QUEUE_ACTUALIZADA', { queueLength: window.SACO.QUEUE_MESA.length });
   SACO_UI.showToast(`Expediente asignado a ${abog} — ${area}`, 'success');
 }
 
@@ -426,9 +362,27 @@ function vincularGDE() {
   SACO_UI.showToast(`GDE ${val} vinculado y agregado a la cola.`, 'success');
 }
 
+// ── Métricas dinámicas ─────────────────────────────────────────────────────
+function renderMetricas() {
+  document.getElementById('metric-pendientes').textContent =
+    window.SACO.QUEUE_MESA.filter(q => q.estado !== 'GDE_VINCULADO').length;
+  document.getElementById('metric-civil').textContent =
+    window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'CIVIL').length;
+  document.getElementById('metric-penal').textContent =
+    window.SACO.CAUSAS_PENALES.length;
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────
+renderMetricas();
 renderQueue(currentQueue);
-renderWorkload();
+
+SACO_SYNC.syncListen(({ type }) => {
+  if (type === 'QUEUE_ACTUALIZADA' || type === 'EXPEDIENTE_ASIGNADO') {
+    currentQueue = [...window.SACO.QUEUE_MESA];
+    renderQueue(currentQueue);
+    renderMetricas();
+  }
+});
 </script>
 </body>
 </html>

@@ -50,13 +50,16 @@ saco-frontend/
     ├── data/
     │   └── mock.js                    ← datos mock + window.SACO (fuente de estado)
     ├── components/
-    │   └── shared.js                  ← sidebar, topbar, toast, modal, badges
+    │   ├── shared.js                  ← sidebar, topbar, toast, modal, badges
+    │   └── sync.js                    ← BroadcastChannel entre pestañas (window.SACO_SYNC)
     └── pages/
         ├── dashboard-mesa.html        ← Vista: Administrativo Mesa SACO
         ├── alta-expediente.html       ← Vista: Formulario nuevo expediente
         ├── bandeja-abogado.html       ← Vista: Bandeja del letrado
         ├── detalle-expediente.html    ← Vista: Detalle + timeline + docs
-        └── gestion-penal.html         ← Vista: Coordinación penal
+        ├── gestion-penal.html         ← Vista: Coordinación penal
+        ├── area-civil.html            ← Vista: Coordinación Civil
+        └── area-laboral.html          ← Vista: Coordinación Laboral
 ```
 
 ### Regla de organización
@@ -181,7 +184,7 @@ tailwind.config = {
 
 ---
 
-## 5. Arquitectura de componentes compartidos (`shared.js`)
+## 5. Arquitectura de componentes compartidos (`shared.js` y `sync.js`)
 
 El archivo `src/components/shared.js` expone el objeto global `window.SACO_UI` con:
 
@@ -196,11 +199,35 @@ SACO_UI.closeModal()
 SACO_UI.toggleNotifPanel()          // Panel de alertas
 ```
 
+El archivo `src/components/sync.js` expone el objeto global `window.SACO_SYNC` con:
+
+```javascript
+SACO_SYNC.syncEmit(type, payload)  // Emite evento a otras pestañas via BroadcastChannel
+SACO_SYNC.syncListen(callback)     // Escucha eventos de otras pestañas
+```
+
+Tipos de eventos definidos:
+```
+'EXPEDIENTE_ASIGNADO'  → payload: { id, area, abogado }
+'ESTADO_CAMBIADO'      → payload: { id, estadoAnterior, estadoNuevo }
+'MOVIMIENTO_AGREGADO'  → payload: { expedienteId, movimiento }
+'QUEUE_ACTUALIZADA'    → payload: { queueLength }
+```
+
+**Orden de imports obligatorio en toda página:**
+```html
+<script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>   <!-- ANTES de shared.js -->
+<script src="../components/shared.js"></script>
+```
+
 ### Keys del sidebar (parámetro `activePage`)
 ```
 'dashboard-mesa'     → Mesa SACO Dashboard
 'alta-expediente'    → Nuevo Expediente
 'bandeja-abogado'    → Mi Bandeja
+'area-civil'         → Área Civil
+'area-laboral'       → Área Laboral
 'gestion-penal'      → Área Penal
 'detalle-expediente' → (sin active, viene de bandeja)
 'reports'            → Previsión Económica (futuro)

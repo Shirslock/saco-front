@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Área Laboral | SOFSE SACO</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "primary":"#3a5f94","primary-dim":"#2d5387","primary-container":"#d5e3ff","on-primary":"#f6f7ff","on-primary-container":"#2c5287","on-primary-fixed":"#153f73",
+      "secondary":"#49636f","secondary-container":"#cbe7f5","on-secondary-fixed":"#29434e","secondary-dim":"#3d5762",
+      "tertiary":"#5d5d78","tertiary-container":"#dbdafb","on-tertiary-fixed":"#393953","tertiary-dim":"#51516c",
+      "surface":"#f8f9fb","surface-container-lowest":"#ffffff","surface-container-low":"#f0f4f7","surface-container":"#e8eff3","surface-container-high":"#e1e9ee","surface-container-highest":"#d9e4ea",
+      "background":"#f8f9fb","on-background":"#2a3439","on-surface":"#2a3439","on-surface-variant":"#566166",
+      "outline":"#717c82","outline-variant":"#a9b4b9",
+      "error":"#9f403d","error-container":"#fe8983","on-error-container":"#752121",
+      "inverse-surface":"#0b0f10",
+    },
+    fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
+    borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
+  body { font-family:'Inter',sans-serif; }
+  h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
+  .shadow-card { box-shadow:0 4px 20px rgba(42,52,57,0.06); }
+  .shadow-card-lg { box-shadow:0 12px 40px rgba(42,52,57,0.08); }
+</style>
+</head>
+<body class="bg-background text-on-background">
+
+<div id="sidebar-mount"></div>
+<div id="topbar-mount"></div>
+
+<main class="ml-64 pt-16 min-h-screen">
+<div class="p-8 space-y-7">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-2 uppercase tracking-wide font-medium">
+        <span>SACO</span>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="text-primary">Área Laboral</span>
+      </nav>
+      <h1 class="text-2xl font-headline font-bold text-on-surface">Coordinación Laboral</h1>
+      <p class="text-on-surface-variant text-sm mt-0.5">Demandas laborales, mediaciones y desafueros activos.</p>
+    </div>
+    <a href="alta-expediente.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-br from-primary to-primary-dim text-white font-bold text-sm rounded-xl shadow-md hover:brightness-105 active:scale-[0.98] transition-all">
+      <span class="material-symbols-outlined">add_circle</span>
+      Nuevo Expediente Laboral
+    </a>
+  </div>
+
+  <div class="grid grid-cols-12 gap-7">
+
+    <!-- ── Tabla de expedientes laborales ───────────────────────────────── -->
+    <div class="col-span-12 lg:col-span-8 space-y-5">
+
+      <div class="bg-surface-container-lowest rounded-xl shadow-card overflow-hidden">
+        <div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">work</span>
+            <h2 class="font-headline font-bold text-on-surface">Expedientes Laborales Activos</h2>
+          </div>
+          <span class="text-[10px] font-bold bg-surface-container text-on-surface-variant px-3 py-1 rounded-full border border-outline-variant/20" id="laboral-count">0 expedientes</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-container-low/60">
+              <tr>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">N° Interno</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Carátula</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Letrado</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Tipo</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Estado</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Recepción</th>
+                <th class="px-6 py-3.5"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/5" id="laboral-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Sidebar derecho ───────────────────────────────────────────────── -->
+    <div class="col-span-12 lg:col-span-4 space-y-5">
+
+      <!-- Letrados Laboral -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-card p-5">
+        <div class="flex items-center gap-2 mb-5">
+          <span class="material-symbols-outlined text-primary">groups</span>
+          <h3 class="font-headline font-bold text-on-surface text-sm">Letrados — Área Laboral</h3>
+        </div>
+        <div class="space-y-3" id="letrados-laboral"></div>
+        <button onclick="SACO_UI.showToast('Rotación de letrados actualizada.','success')" class="w-full mt-5 py-2 border-2 border-dashed border-outline-variant/30 rounded-xl text-xs font-bold text-on-surface-variant hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[16px]">person_add</span>
+          Gestionar Rotación
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+</main>
+
+<script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
+<script src="../components/shared.js"></script>
+<script>
+document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('area-laboral');
+document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Área Laboral', 'Coordinación Laboral');
+
+// ── Expedientes laborales ──────────────────────────────────────────────────
+function renderExpedientesLaboral() {
+  const data = window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'LABORAL');
+  document.getElementById('laboral-count').textContent = `${data.length} expediente${data.length !== 1 ? 's' : ''}`;
+  const tbody = document.getElementById('laboral-tbody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-on-surface-variant text-sm">No hay expedientes laborales activos.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(e => `
+    <tr class="hover:bg-surface-container-highest transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
+      <td class="px-6 py-4 font-mono text-xs font-bold text-on-surface">${e.id}</td>
+      <td class="px-6 py-4 max-w-[200px]">
+        <p class="text-sm font-semibold text-on-surface line-clamp-1">${e.caratula}</p>
+        <p class="font-mono text-[10px] text-on-surface-variant mt-0.5">${e.numero_causa||''}</p>
+        ${e.tiene_alerta ? `<p class="text-[10px] text-error font-semibold mt-0.5">${e.alerta_msg}</p>` : ''}
+      </td>
+      <td class="px-6 py-4 text-xs text-on-surface">${e.abogado}</td>
+      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.tipo.replace(/_/g,' ')}</td>
+      <td class="px-6 py-4">${SACO_UI.estadoBadge(e.estado, e.estado.replace(/_/g,' '))}</td>
+      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.fecha_recepcion}</td>
+      <td class="px-6 py-4 text-right">
+        <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+      </td>
+    </tr>`).join('');
+}
+
+// ── Letrados laboral ───────────────────────────────────────────────────────
+function renderLetradosLaboral() {
+  const letrados = window.SACO.ABOGADOS.LABORAL;
+  document.getElementById('letrados-laboral').innerHTML = letrados.map(l => {
+    const causas = window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'LABORAL' && e.abogado === l).length;
+    return `
+    <div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl hover:bg-surface-container transition-colors cursor-pointer">
+      <div>
+        <p class="text-xs font-bold text-on-surface">${l}</p>
+        <p class="text-[11px] text-on-surface-variant">Área Laboral — FIFO</p>
+      </div>
+      <span class="text-[10px] font-bold px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-full">${causas} causas</span>
+    </div>`;
+  }).join('');
+}
+
+renderExpedientesLaboral();
+renderLetradosLaboral();
+
+SACO_SYNC.syncListen(({ type }) => {
+  if (type === 'ESTADO_CAMBIADO' || type === 'EXPEDIENTE_ASIGNADO') {
+    renderExpedientesLaboral();
+    SACO_UI.showToast('Expedientes actualizados desde otra pestaña.', 'info');
+  }
+});
+</script>
+</body>
+</html>

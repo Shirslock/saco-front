@@ -33,6 +33,7 @@ tailwind.config = {
   .tab-active { border-bottom:2px solid #3a5f94; color:#3a5f94; font-weight:700; }
   .tab-inactive { color:#566166; border-bottom:2px solid transparent; }
   .obs-area:focus { outline:none; box-shadow:0 0 0 2px rgba(58,95,148,0.2); border-radius:0.5rem; }
+  .rotate-90 { transform: rotate(90deg); }
 </style>
 </head>
 <body class="bg-background text-on-background">
@@ -68,6 +69,9 @@ tailwind.config = {
       <button onclick="document.getElementById('file-input-det').click()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
         <span class="material-symbols-outlined text-[16px]">upload_file</span> Subir Documento
         <input type="file" id="file-input-det" class="hidden" accept=".pdf,.docx" onchange="subirDoc(this)"/>
+      </button>
+      <button onclick="modalCambiarEstado()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[16px]">swap_horiz</span> Cambiar Estado
       </button>
       <button class="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-xl shadow-md hover:brightness-105 transition-all">
         <span class="material-symbols-outlined text-[16px]">forward</span> Reasignar
@@ -213,6 +217,7 @@ tailwind.config = {
 </main>
 
 <script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('detalle-expediente');
@@ -250,25 +255,79 @@ document.getElementById('metadata-list').innerHTML = metaFields.map(([k,v]) => `
   </div>`).join('');
 
 // ── Timeline ───────────────────────────────────────────────────────────────
+const tiposMov = ['DERIVACION','MEMO_ENVIADO','NOTA_RESPUESTA','PRORROGA','RECEPCION','CIERRE','OTRO'];
 const tipoIcons = { RECEPCION:'inbox', NOTA_RESPUESTA:'mail', MOVIMIENTO:'edit_note', DERIVACION:'forward', CIERRE:'task_alt' };
-document.getElementById('timeline-list').innerHTML = exp.timeline.map(t => `
-  <div class="relative">
-    <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${t.activo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
-    <div class="flex flex-col md:flex-row md:items-start gap-3">
-      <span class="text-xs font-label font-bold ${t.activo?'text-primary':'text-on-surface-variant'} whitespace-nowrap pt-0.5">${t.fecha}</span>
-      <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex-1 ${t.activo?'border-l-4 border-primary':''} ">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="material-symbols-outlined text-[16px] ${t.activo?'text-primary':'text-on-surface-variant'}">${tipoIcons[t.tipo]||'circle'}</span>
-          <h4 class="text-sm font-bold text-on-surface">${t.titulo}</h4>
+
+function renderTimeline() {
+  document.getElementById('timeline-list').innerHTML = exp.timeline.map((t, idx) => {
+    const expandido = t.activo; // solo el primero (activo) arranca expandido
+    const tieneContenido = t.desc || t.doc || (t.subMovimientos && t.subMovimientos.length > 0);
+    const subMov = (t.subMovimientos || []).map(s => `
+      <div class="mt-3 pl-4 border-l-2 border-outline-variant/20 space-y-2">
+        <div class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-[13px] text-on-surface-variant mt-0.5">subdirectory_arrow_right</span>
+          <div>
+            <p class="text-[11px] font-bold text-on-surface">${s.titulo}</p>
+            <p class="text-[10px] text-on-surface-variant">${s.fecha}</p>
+            <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">${s.desc}</p>
+            ${s.doc ? `<div class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-surface-container rounded-lg w-fit">
+              <span class="material-symbols-outlined text-[12px] text-on-surface-variant">attachment</span>
+              <span class="text-[10px] font-medium text-on-surface-variant font-mono">${s.doc}</span>
+            </div>` : ''}
+          </div>
         </div>
-        <p class="text-xs text-on-surface-variant leading-relaxed">${t.desc}</p>
-        ${t.doc ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-container rounded-lg w-fit">
-          <span class="material-symbols-outlined text-[14px] text-on-surface-variant">attachment</span>
-          <span class="text-[11px] font-medium text-on-surface-variant font-mono">${t.doc}</span>
-        </div>` : ''}
+      </div>`).join('');
+
+    return `
+    <div class="relative">
+      <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${t.activo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
+      <div class="flex flex-col md:flex-row md:items-start gap-3">
+        <span class="text-xs font-bold ${t.activo?'text-primary':'text-on-surface-variant'} whitespace-nowrap pt-0.5">${t.fecha}</span>
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm flex-1 ${t.activo?'border-l-4 border-primary':''}">
+          <button onclick="toggleMovimiento(${idx})" class="w-full flex items-center gap-2 p-5 text-left">
+            <span class="material-symbols-outlined text-[16px] ${t.activo?'text-primary':'text-on-surface-variant'}">${tipoIcons[t.tipo]||'circle'}</span>
+            <h4 class="text-sm font-bold text-on-surface flex-1">${t.titulo}</h4>
+            ${tieneContenido ? `<span id="chevron-${idx}" class="material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${expandido ? 'rotate-90' : ''}">chevron_right</span>` : ''}
+          </button>
+          ${tieneContenido ? `<div id="mov-body-${idx}" class="${expandido ? '' : 'hidden'} px-5 pb-5">
+            <p class="text-xs text-on-surface-variant leading-relaxed">${t.desc}</p>
+            ${t.doc ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-container rounded-lg w-fit">
+              <span class="material-symbols-outlined text-[14px] text-on-surface-variant">attachment</span>
+              <span class="text-[11px] font-medium text-on-surface-variant font-mono">${t.doc}</span>
+            </div>` : ''}
+            <div id="submov-list-${idx}">${subMov}</div>
+            <div class="mt-3 pt-3 border-t border-outline-variant/10">
+              <button id="reply-btn-${idx}" onclick="mostrarReply(${idx})" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+                <span class="material-symbols-outlined text-[15px]">reply</span> Responder
+              </button>
+              <div id="reply-form-${idx}" class="hidden mt-3 space-y-2">
+                <select id="sub-tipo-${idx}" class="w-full bg-surface-container-low border-none rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-primary/20">
+                  ${tiposMov.map(tp=>`<option value="${tp}">${tp.replace(/_/g,' ')}</option>`).join('')}
+                </select>
+                <textarea id="sub-desc-${idx}" rows="2" class="w-full bg-surface-container-low border-none rounded-lg py-2 px-3 text-xs resize-none focus:ring-2 focus:ring-primary/20" placeholder="Descripción..."></textarea>
+                <input id="sub-gde-${idx}" class="w-full bg-surface-container-low border-none rounded-lg py-2 px-3 text-xs font-mono focus:ring-2 focus:ring-primary/20" placeholder="N° GDE (opcional)"/>
+                <div class="flex gap-2">
+                  <button onclick="guardarSubMovimiento(${idx})" class="px-3 py-1.5 bg-gradient-to-br from-primary to-primary-dim text-white text-xs font-bold rounded-lg hover:brightness-105 transition-all">Guardar</button>
+                  <button onclick="cancelarReply(${idx})" class="px-3 py-1.5 text-xs font-semibold text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>` : ''}
+        </div>
       </div>
-    </div>
-  </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+function toggleMovimiento(idx) {
+  const body = document.getElementById(`mov-body-${idx}`);
+  const chevron = document.getElementById(`chevron-${idx}`);
+  if (!body) return;
+  const oculto = body.classList.toggle('hidden');
+  if (chevron) chevron.classList.toggle('rotate-90', !oculto);
+}
+
+renderTimeline();
 
 // ── Previsión Económica ────────────────────────────────────────────────────
 function renderPrevision() {
@@ -325,7 +384,6 @@ function guardarObs() {
 }
 
 // ── Modal nuevo movimiento ─────────────────────────────────────────────────
-const tiposMov = ['DERIVACION','MEMO_ENVIADO','NOTA_RESPUESTA','PRORROGA','RECEPCION','CIERRE','OTRO'];
 function modalMovimiento() {
   SACO_UI.showModal('Registrar Movimiento', `
     <div class="space-y-4">
@@ -360,21 +418,152 @@ function guardarMovimiento() {
   const gde   = document.getElementById('mov-gde').value.trim();
   if (!desc) { SACO_UI.showToast('Ingresá una descripción para el movimiento.','warn'); return; }
 
-  exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: gde||null, activo: true });
+  exp.timeline.forEach(m => { m.activo = false; });
+  exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: gde||null, activo: true, subMovimientos: [] });
   SACO_UI.closeModal();
-  document.getElementById('timeline-list').innerHTML = exp.timeline.map(t => `
-    <div class="relative">
-      <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${t.activo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
-      <div class="flex flex-col md:flex-row md:items-start gap-3">
-        <span class="text-xs font-bold ${t.activo?'text-primary':'text-on-surface-variant'} whitespace-nowrap pt-0.5">${t.fecha}</span>
-        <div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex-1 ${t.activo?'border-l-4 border-primary':''}">
-          <h4 class="text-sm font-bold text-on-surface mb-1">${t.titulo}</h4>
-          <p class="text-xs text-on-surface-variant leading-relaxed">${t.desc}</p>
-          ${t.doc ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-container rounded-lg w-fit"><span class="material-symbols-outlined text-[14px] text-on-surface-variant">attachment</span><span class="text-[11px] font-mono text-on-surface-variant">${t.doc}</span></div>` : ''}
+  renderTimeline();
+  SACO_UI.showToast('Movimiento registrado correctamente.', 'success');
+}
+
+// ── Sub-movimientos (reply) ────────────────────────────────────────────────
+function renderSubMovimientos(idx) {
+  const lista = (exp.timeline[idx].subMovimientos || []).map(s => `
+    <div class="mt-3 pl-4 border-l-2 border-outline-variant/20 space-y-2">
+      <div class="flex items-start gap-2">
+        <span class="material-symbols-outlined text-[13px] text-on-surface-variant mt-0.5">subdirectory_arrow_right</span>
+        <div>
+          <p class="text-[11px] font-bold text-on-surface">${s.titulo}</p>
+          <p class="text-[10px] text-on-surface-variant">${s.fecha}</p>
+          <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">${s.desc}</p>
+          ${s.doc ? `<div class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-surface-container rounded-lg w-fit">
+            <span class="material-symbols-outlined text-[12px] text-on-surface-variant">attachment</span>
+            <span class="text-[10px] font-medium text-on-surface-variant font-mono">${s.doc}</span>
+          </div>` : ''}
         </div>
       </div>
     </div>`).join('');
-  SACO_UI.showToast('Movimiento registrado correctamente.', 'success');
+  const container = document.getElementById(`submov-list-${idx}`);
+  if (container) container.innerHTML = lista;
+}
+
+function mostrarReply(idx) {
+  document.getElementById(`reply-btn-${idx}`).classList.add('hidden');
+  document.getElementById(`reply-form-${idx}`).classList.remove('hidden');
+}
+
+function cancelarReply(idx) {
+  document.getElementById(`reply-form-${idx}`).classList.add('hidden');
+  document.getElementById(`reply-btn-${idx}`).classList.remove('hidden');
+}
+
+function guardarSubMovimiento(idx) {
+  const tipo  = document.getElementById(`sub-tipo-${idx}`).value;
+  const desc  = document.getElementById(`sub-desc-${idx}`).value.trim();
+  const gde   = document.getElementById(`sub-gde-${idx}`).value.trim();
+  if (!desc) { SACO_UI.showToast('Ingresá una descripción.', 'warn'); return; }
+
+  const subMov = {
+    fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`,
+    tipo,
+    titulo: tipo.replace(/_/g,' '),
+    desc,
+    doc: gde || null,
+  };
+
+  if (!exp.timeline[idx].subMovimientos) exp.timeline[idx].subMovimientos = [];
+  exp.timeline[idx].subMovimientos.push(subMov);
+
+  renderSubMovimientos(idx);
+  cancelarReply(idx);
+  document.getElementById(`sub-desc-${idx}`).value = '';
+  document.getElementById(`sub-gde-${idx}`).value = '';
+
+  SACO_SYNC.syncEmit('MOVIMIENTO_AGREGADO', { expedienteId: exp.id, movimiento: subMov });
+  SACO_UI.showToast('Sub-movimiento registrado.', 'success');
+}
+
+// ── Cambio de estado ───────────────────────────────────────────────────────
+const estadosValidos = [
+  { code: 'EN_TRAMITE',          label: 'En Trámite' },
+  { code: 'EN_PLAZO_CONTESTAR',  label: 'En Plazo Contestar' },
+  { code: 'SUSPENSION_TERMINOS', label: 'Suspensión Términos' },
+  { code: 'EN_PRUEBA',           label: 'En Prueba' },
+  { code: 'PENDIENTE_GDE',       label: 'Pendiente GDE' },
+  { code: 'GDE_VINCULADO',       label: 'GDE Vinculado' },
+  { code: 'CUMPLIDO',            label: 'Cumplido' },
+  { code: 'ARCHIVADO',           label: 'Archivado' },
+];
+
+function modalCambiarEstado() {
+  SACO_UI.showModal('Cambiar Estado del Expediente', `
+    <div class="space-y-4">
+      <div class="p-3 bg-surface-container-low rounded-lg flex items-center gap-3">
+        <span class="text-xs text-on-surface-variant">Estado actual:</span>
+        ${SACO_UI.estadoBadge(exp.estado, exp.estado.replace(/_/g,' '))}
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Nuevo Estado</label>
+        <select id="new-estado" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20">
+          ${estadosValidos.map(e => `<option value="${e.code}" ${e.code === exp.estado ? 'selected' : ''}>${e.label}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Motivo del cambio <span class="text-error">*</span></label>
+        <textarea id="motivo-estado" rows="3" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-primary/20" placeholder="Describí el motivo del cambio de estado..."></textarea>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="confirmarCambioEstado()" class="px-6 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-lg">Confirmar</button>`
+  );
+}
+
+function confirmarCambioEstado() {
+  const nuevoEstado = document.getElementById('new-estado').value;
+  const motivo = document.getElementById('motivo-estado').value.trim();
+  if (!motivo) { SACO_UI.showToast('Ingresá un motivo para el cambio de estado.', 'warn'); return; }
+  if (nuevoEstado === exp.estado) { SACO_UI.showToast('El estado seleccionado es el mismo que el actual.', 'warn'); return; }
+
+  const estadoPrevio = exp.estado;
+  const estadoLabel = estadosValidos.find(e => e.code === nuevoEstado)?.label || nuevoEstado;
+  const ahora = new Date().toLocaleDateString('es-AR');
+
+  // 1. Actualizar estado en runtime
+  exp.estado = nuevoEstado;
+
+  // 2. Actualizar badge en el header
+  document.getElementById('h-estado-badge').innerHTML = SACO_UI.estadoBadge(nuevoEstado, estadoLabel);
+
+  // 3. Agregar al historial de estados
+  const logEntry = document.createElement('div');
+  logEntry.className = 'flex gap-3 items-start';
+  logEntry.innerHTML = `
+    <div class="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+    <div>
+      <p class="text-xs font-bold text-on-surface">${estadoLabel}</p>
+      <p class="text-[10px] text-on-surface-variant">${ahora} · Dr. A. Rossi</p>
+    </div>`;
+  document.getElementById('estado-log').prepend(logEntry);
+
+  // 4. Agregar movimiento automático al timeline
+  exp.timeline.forEach(m => { m.activo = false; });
+  exp.timeline.unshift({
+    fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`,
+    tipo: 'MOVIMIENTO',
+    titulo: 'Cambio de Estado',
+    desc: motivo,
+    doc: null,
+    activo: true,
+    subMovimientos: [],
+  });
+
+  // 5. Re-renderizar timeline
+  renderTimeline();
+
+  // 6. Emitir evento de sincronización
+  SACO_SYNC.syncEmit('ESTADO_CAMBIADO', { id: exp.id, estadoAnterior: estadoPrevio, estadoNuevo: nuevoEstado });
+
+  SACO_UI.closeModal();
+  SACO_UI.showToast('Estado actualizado correctamente.', 'success');
 }
 
 function subirDoc(input) {

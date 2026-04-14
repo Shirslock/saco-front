@@ -99,72 +99,58 @@ const QUEUE_MESA = [
 ];
 
 // Expedientes del abogado (bandeja)
+// Narrativa: accidente en paso a nivel Km 4.5 Línea Mitre (14/09/2023)
+// Siniestro SS-2023-0441 — generó 3 procesos derivados
 const EXPEDIENTES_ABOGADO = [
   {
     id: 'C-0023/2026', area: 'CIVIL', tipo: 'DEMANDA',
     caratula: 'Martínez, Juan Carlos c/ Trenes Argentinos SOFSE s/ daños y perjuicios',
     juzgado: 'Juzgado Federal Civil y Comercial N°8 — Sec. 15',
-    numero_causa: 'FSM-11802/2023', estado: 'EN_PRUEBA',
+    numero_causa: 'FSM-11802/2023', numero_siniestro: 'SS-2023-0441',
+    estado: 'EN_PRUEBA',
     fecha_hecho: '2023-09-14', fecha_recepcion: '2023-10-20',
-    abogado: 'Dr. Alejandro Rossi', linea: 'LSM', prioridad: 'ALTA',
+    abogado: 'Dr. Alejandro Rossi', linea: 'LM', prioridad: 'ALTA',
     tiene_alerta: true, alerta_msg: 'Vence período probatorio en 12 días',
     gde: 'EX-2023-08842-APN-SACO#SOFSE',
   },
   {
-    id: 'C-0031/2026', area: 'CIVIL', tipo: 'MEDIACION',
-    caratula: 'López, María Estela c/ SOFSE s/ daños paso a nivel Km 4.5',
-    juzgado: 'Centro de Mediación — Retiro',
-    numero_causa: 'MED-992-2026', estado: 'EN_TRAMITE',
-    fecha_hecho: '2025-11-02', fecha_recepcion: '2026-01-15',
-    abogado: 'Dr. Alejandro Rossi', linea: 'LM', prioridad: 'NORMAL',
+    id: 'P-0089/2026', area: 'PENAL', tipo: 'CARTA_SUCESO',
+    caratula: 'Descarrilamiento Est. Palermo — Formación 3408 Línea Mitre Km 4.5',
+    juzgado: 'Juzgado Federal en lo Criminal y Correccional N°2',
+    numero_causa: 'CFP-14233/2023', numero_siniestro: 'SS-2023-0441',
+    estado: 'GDE_VINCULADO',
+    fecha_hecho: '2023-09-14', fecha_recepcion: '2023-09-16',
+    abogado: 'Dr. Marcos Gallo', linea: 'LM', prioridad: 'NORMAL',
     tiene_alerta: false, alerta_msg: null,
-    gde: 'EX-2026-00992-APN-SACO#SOFSE',
-  },
-  {
-    id: 'C-0041/2026', area: 'CIVIL', tipo: 'RECUPERO',
-    caratula: 'Recupero daños — Vehículo particular paso a nivel Quilmes',
-    juzgado: 'Mediación extrajudicial',
-    numero_causa: 'SS SOFSE', estado: 'EN_TRAMITE',
-    fecha_hecho: '2026-02-28', fecha_recepcion: '2026-03-10',
-    abogado: 'Dr. Alejandro Rossi', linea: 'LGR', prioridad: 'NORMAL',
-    tiene_alerta: false, alerta_msg: null,
-    gde: 'ME-2026-00441-APN-SGSSL#SOFSE',
+    gde: 'EX-2023-08910-APN-SACO#SOFSE',
   },
   {
     id: 'L-0012/2026', area: 'LABORAL', tipo: 'DEMANDA',
-    caratula: 'García, Roberto c/ SOFSE s/ despido injustificado y diferencias salariales',
+    caratula: 'Fernández, Diego Ariel c/ SOFSE s/ accidente de trabajo — Km 4.5 Línea Mitre',
     juzgado: 'Juzgado Nacional del Trabajo N°42',
-    numero_causa: 'FLP-8834/2025', estado: 'EN_PLAZO_CONTESTAR',
-    fecha_hecho: null, fecha_recepcion: '2026-04-01',
-    abogado: 'Dr. Alejandro Rossi', linea: null, prioridad: 'ALTA',
+    numero_causa: 'FLP-8834/2023', numero_siniestro: 'SS-2023-0441',
+    estado: 'EN_PLAZO_CONTESTAR',
+    fecha_hecho: '2023-09-14', fecha_recepcion: '2026-04-01',
+    abogado: 'Dr. Hernán Blanco', linea: 'LM', prioridad: 'ALTA',
     tiene_alerta: true, alerta_msg: 'Plazo contestación vence 25/04/2026',
     gde: 'EX-2026-00449-APN-SACO#SOFSE',
   },
-  {
-    id: 'L-0018/2026', area: 'LABORAL', tipo: 'MEDIACION',
-    caratula: 'Sánchez, Pedro Hugo c/ SOFSE s/ horas extras y ART',
-    juzgado: 'Centro de Mediación Laboral — San Nicolás',
-    numero_causa: 'MED-LAB-344-2026', estado: 'EN_TRAMITE',
-    fecha_hecho: null, fecha_recepcion: '2026-03-20',
-    abogado: 'Dr. Alejandro Rossi', linea: null, prioridad: 'NORMAL',
-    tiene_alerta: false, alerta_msg: null,
-    gde: 'EX-2026-00888-APN-SACO#SOFSE',
-  },
 ];
 
-// Detalle de expediente (C-0023/2026)
+// Detalle de expediente (C-0023/2026) — demanda civil siniestro Km 4.5 Línea Mitre
 const EXPEDIENTE_DETALLE = {
   id: 'C-0023/2026',
   area: 'CIVIL',
   tipo: 'DEMANDA',
   caratula: 'Martínez, Juan Carlos c/ Trenes Argentinos SOFSE s/ daños y perjuicios',
   numero_causa: 'FSM-11802/2023',
+  numero_siniestro: 'SS-2023-0441',
   juzgado: 'Juzgado Federal Civil y Comercial N°8 — Secretaría 15',
   dependencia: 'Fuero Federal Civil y Comercial — CABA',
   estado: 'EN_PRUEBA',
-  linea: 'LSM — Línea San Martín',
+  linea: 'LM — Línea Mitre',
   lugar_hecho: 'Paso a nivel Km 4.5 — Estación Palermo',
-  fecha_hecho: '23/09/2023',
+  fecha_hecho: '14/09/2023',
   fecha_recepcion: '20/10/2023',
   abogado: 'Dr. Alejandro Rossi',
   demandado: 'SOFSE',
@@ -174,7 +160,7 @@ const EXPEDIENTE_DETALLE = {
   numero_sigej: 'SIGEJ-2023-18842',
   monto_demanda: '$4.200.000',
   gde: 'EX-2023-08842-APN-SACO#SOFSE',
-  observaciones: 'Peritaje técnico-accidentológico pendiente de homologación. La contraparte objetó el dictamen del Ing. Santoro. Audiencia fijada para el 30/04/2026.',
+  observaciones: 'Peritaje técnico-accidentológico pendiente de homologación. La contraparte objetó el dictamen del Ing. Santoro. Audiencia fijada para el 30/04/2026. Expediente penal relacionado: P-0089/2026 (Dr. Marcos Gallo). Demanda laboral relacionada: L-0012/2026 (Dr. Hernán Blanco).',
   timeline: [
     {
       fecha: 'Hoy · 10:45',
@@ -183,6 +169,20 @@ const EXPEDIENTE_DETALLE = {
       desc: 'Se adjunta peritaje accidentológico realizado por el Ing. Santoro. El informe concluye responsabilidad compartida en el siniestro.',
       doc: 'PER-2026-001.pdf',
       activo: true,
+      subMovimientos: [
+        {
+          fecha: 'Hoy · 11:10',
+          titulo: 'Objeción de la contraparte al dictamen',
+          desc: 'El Dr. Pérez (patrocinante actor) presentó escrito de impugnación al dictamen del Ing. Santoro, solicitando nueva pericia.',
+          doc: 'IF-2026-00512-APN-SACO#SOFSE',
+        },
+        {
+          fecha: 'Hoy · 14:30',
+          titulo: 'Traslado al juzgado de la objeción',
+          desc: 'Se remitió NOTA GDE al Juzgado informando la impugnación y solicitando fecha de audiencia para resolver.',
+          doc: 'NO-2026-0401-APN-SACO#SOFSE',
+        },
+      ],
     },
     {
       fecha: '21/03/2026 · 16:30',
@@ -191,6 +191,14 @@ const EXPEDIENTE_DETALLE = {
       desc: 'Se remitió NOTA GDE al Juzgado con respuesta al oficio de designación del perito de la contraparte.',
       doc: 'NO-2026-0334-APN-SACO#SOFSE',
       activo: false,
+      subMovimientos: [
+        {
+          fecha: '22/03/2026 · 09:00',
+          titulo: 'Acuse de recibo del Juzgado',
+          desc: 'El Juzgado acusó recibo de la nota y designó audiencia para el 30/04/2026 a las 10:00 hs.',
+          doc: null,
+        },
+      ],
     },
     {
       fecha: '10/02/2026 · 09:00',
@@ -199,6 +207,7 @@ const EXPEDIENTE_DETALLE = {
       desc: 'Se celebró la audiencia de prueba documental. El juez admitió la totalidad de la prueba ofrecida por SOFSE.',
       doc: null,
       activo: false,
+      subMovimientos: [],
     },
     {
       fecha: '20/10/2023 · 09:00',
@@ -207,6 +216,7 @@ const EXPEDIENTE_DETALLE = {
       desc: 'Ingreso por variante A — cédula en papel recibida en Mesa de Entradas SOFSE (Ramos Mejía 1302). EE creado en GDE y derivado a Mesa SACO.',
       doc: 'EX-2023-08842-APN-SACO#SOFSE',
       activo: false,
+      subMovimientos: [],
     },
   ],
   documentos: [
@@ -252,22 +262,10 @@ const CARTA_SUCESO_QUEUE = [
 // Causas penales activas
 const CAUSAS_PENALES = [
   {
-    id: 'P-0089/2026', caratula: 'Descarrilamiento Est. Palermo — Formación 3408',
+    id: 'P-0089/2026', caratula: 'Descarrilamiento Est. Palermo — Formación 3408 Km 4.5',
     origen: 'Carta Suceso SAE-0088', abogado: 'Dr. Marcos Gallo',
     estado: 'GDE_VINCULADO', linea: 'LM', progreso: 65,
-    asignacion: 'Manual',
-  },
-  {
-    id: 'P-0094/2026', caratula: 'Robo Material Rodante — Talleres Junín',
-    origen: 'Carta Suceso SAE-0071', abogado: 'Dra. Carla Ibáñez',
-    estado: 'PENDIENTE_GDE', linea: 'LSM', progreso: 25,
-    asignacion: 'Smart',
-  },
-  {
-    id: 'P-0078/2026', caratula: 'Vandalismo formación 301 — Línea Belgrano Sur',
-    origen: 'Denuncia Policial #12-C', abogado: 'Dra. Sofía Mena',
-    estado: 'EN_TRAMITE', linea: 'LBS', progreso: 40,
-    asignacion: 'Smart',
+    asignacion: 'Manual', numero_siniestro: 'SS-2023-0441',
   },
 ];
 
