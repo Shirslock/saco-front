@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nuevo Expediente | SOFSE SACO</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "primary":"#3a5f94","primary-dim":"#2d5387","primary-container":"#d5e3ff","on-primary":"#f6f7ff","on-primary-container":"#2c5287","on-primary-fixed":"#153f73",
+      "secondary":"#49636f","secondary-container":"#cbe7f5","on-secondary-fixed":"#29434e",
+      "tertiary":"#5d5d78","tertiary-container":"#dbdafb","on-tertiary-fixed":"#393953",
+      "surface":"#f8f9fb","surface-container-lowest":"#ffffff","surface-container-low":"#f0f4f7","surface-container":"#e8eff3","surface-container-high":"#e1e9ee","surface-container-highest":"#d9e4ea",
+      "background":"#f8f9fb","on-background":"#2a3439","on-surface":"#2a3439","on-surface-variant":"#566166",
+      "outline":"#717c82","outline-variant":"#a9b4b9",
+      "error":"#9f403d","error-container":"#fe8983","on-error-container":"#752121",
+      "inverse-surface":"#0b0f10",
+    },
+    fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
+    borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
+  body { font-family:'Inter',sans-serif; }
+  h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
+  .shadow-card { box-shadow:0 4px 20px rgba(42,52,57,0.06); }
+  .step-badge { width:2rem;height:2rem;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.875rem; }
+  input,select,textarea { font-family:'Inter',sans-serif; }
+  .field-label { display:block;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#566166;margin-bottom:0.375rem; }
+  .field-input { width:100%;background:#f0f4f7;border:none;border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.875rem;transition:box-shadow .15s; }
+  .field-input:focus { outline:none;box-shadow:0 0 0 2px rgba(58,95,148,0.2); }
+  .field-input.error { box-shadow:0 0 0 2px rgba(159,64,61,0.4); }
+  .section-card { background:#fff;border-radius:0.75rem;padding:2rem;box-shadow:0 4px 20px rgba(42,52,57,0.06); }
+  .canal-tag { display:inline-flex;align-items:center;gap:0.25rem;font-size:0.65rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:9999px; }
+</style>
+</head>
+<body class="bg-background text-on-background">
+
+<div id="sidebar-mount"></div>
+<div id="topbar-mount"></div>
+
+<main class="ml-64 pt-16 min-h-screen">
+<div class="px-10 py-8 max-w-[1400px] mx-auto">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-2 font-medium uppercase tracking-wide">
+        <a href="dashboard-mesa.html" class="hover:text-primary transition-colors">Mesa SACO</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="text-primary">Nuevo Expediente</span>
+      </nav>
+      <h1 class="text-3xl font-headline font-extrabold text-on-surface tracking-tight">Nuevo Ingreso de Expediente</h1>
+      <p class="text-on-surface-variant text-sm mt-1">Completá los datos según el canal y tipo de gestión.</p>
+    </div>
+    <a href="dashboard-mesa.html" class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface-variant font-semibold hover:bg-surface-container-high transition-colors text-sm">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+      Cancelar
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+
+    <!-- ── Columna formulario ──────────────────────────────────────────── -->
+    <div class="xl:col-span-8 flex flex-col gap-6">
+
+      <!-- Sección 1: Origen y Tipo -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-primary-container text-primary">1</div>
+          <h3 class="text-base font-headline font-bold text-on-surface">Origen y Tipo de Gestión</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <!-- Canal -->
+          <div>
+            <label class="field-label">Canal de Ingreso</label>
+            <div class="flex p-1 bg-surface-container rounded-xl gap-1" id="canal-selector">
+              <button onclick="setCanal('EE_GDE')"   class="canal-btn flex-1 py-2.5 text-sm font-bold rounded-lg bg-surface-container-lowest shadow-sm text-primary transition-all" data-val="EE_GDE">EE GDE</button>
+              <button onclick="setCanal('MEMO_GDE')" class="canal-btn flex-1 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all" data-val="MEMO_GDE">Memo GDE</button>
+              <button onclick="setCanal('MAIL')"     class="canal-btn flex-1 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all" data-val="MAIL">Mail</button>
+            </div>
+          </div>
+
+          <!-- Nro EE/Memo/Mail -->
+          <div>
+            <label class="field-label" id="ref-label">N° Expediente Electrónico (GDE)</label>
+            <input id="ref-input" class="field-input font-mono" placeholder="EX-2026-XXXXXXX-APN-SACO#SOFSE" oninput="updateResumen()"/>
+          </div>
+
+          <!-- Área -->
+          <div>
+            <label class="field-label">Área Jurídica</label>
+            <div class="flex p-1 bg-surface-container rounded-xl gap-1" id="area-selector">
+              <button onclick="setArea('CIVIL')"   class="area-btn flex-1 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all rounded-lg" data-val="CIVIL">Civil</button>
+              <button onclick="setArea('LABORAL')" class="area-btn flex-1 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all rounded-lg" data-val="LABORAL">Laboral</button>
+              <button onclick="setArea('PENAL')"   class="area-btn flex-1 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all rounded-lg" data-val="PENAL">Penal</button>
+            </div>
+          </div>
+
+          <!-- Tipo de gestión -->
+          <div>
+            <label class="field-label">Tipo de Gestión</label>
+            <select id="tipo-select" onchange="onTipoChange()" class="field-input">
+              <option value="">— Seleccioná área primero —</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Aviso canal/tipo -->
+        <div id="canal-info" class="hidden mt-4 p-3 bg-primary-container/30 rounded-lg flex items-start gap-2">
+          <span class="material-symbols-outlined text-primary text-[18px] mt-0.5" style="font-variation-settings:'FILL' 1;">info</span>
+          <p class="text-xs text-on-primary-container" id="canal-info-text"></p>
+        </div>
+      </div>
+
+      <!-- Sección 2: Detalles del Caso -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-primary-container text-primary">2</div>
+          <h3 class="text-base font-headline font-bold text-on-surface">Detalles del Caso</h3>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label class="field-label">Carátula / Título del Caso</label>
+            <input id="caratula" class="field-input" placeholder="Ej: García, Roberto c/ SOFSE s/ diferencias salariales" oninput="updateResumen()"/>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="field-label">N° de Causa Judicial</label>
+              <input id="num-causa" class="field-input font-mono" placeholder="FSM-XXXXX/2026 / IPP-XXXX / SS SOFSE"/>
+              <p class="text-[10px] text-on-surface-variant mt-1">SS = Sin Siniestro cuando no hay N° de causa</p>
+            </div>
+            <div>
+              <label class="field-label">Dependencia Judicial / Juzgado</label>
+              <input id="dependencia" class="field-input" placeholder="Juzgado Federal N°8 — Secretaría 15"/>
+            </div>
+            <div>
+              <label class="field-label">Fecha del Hecho</label>
+              <input id="fecha-hecho" class="field-input" type="date"/>
+            </div>
+            <div>
+              <label class="field-label">Fecha de Recepción en SACO</label>
+              <input id="fecha-recep" class="field-input" type="date" value="" />
+            </div>
+          </div>
+
+          <!-- Línea ferroviaria (siempre visible, obligatoria en Penal) -->
+          <div>
+            <label class="field-label">Línea Ferroviaria <span id="linea-req" class="text-error hidden">*</span></label>
+            <select id="linea-select" onchange="onLineaChange()" class="field-input">
+              <option value="">— Sin línea asociada —</option>
+            </select>
+          </div>
+
+          <!-- Demanda: variante A/B -->
+          <div id="demanda-extra" class="hidden space-y-4 p-4 bg-surface-container-low rounded-xl border-l-4 border-primary/30">
+            <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Datos específicos — Demanda</p>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="field-label">Variante de Ingreso</label>
+                <select id="variante" class="field-input">
+                  <option value="A">Variante A — Cédula en papel (SOFSE demandada)</option>
+                  <option value="B">Variante B — GDE directo (Estado Nacional demandado)</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Monto de la Demanda</label>
+                <input id="monto" class="field-input" placeholder="$0.000.000"/>
+              </div>
+            </div>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input id="req-25344" type="checkbox" class="rounded text-primary focus:ring-primary"/>
+              <span class="text-sm font-medium text-on-surface">Requisitos Ley 25.344 cumplidos</span>
+            </label>
+          </div>
+
+          <!-- Observaciones -->
+          <div>
+            <label class="field-label">Observaciones <span class="text-on-surface-variant font-normal normal-case">(accesible en cualquier estado)</span></label>
+            <textarea id="observaciones" class="field-input resize-none" rows="3" placeholder="Notas relevantes sobre el expediente..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 3: Asignación -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-primary-container text-primary">3</div>
+          <h3 class="text-base font-headline font-bold text-on-surface">Asignación de Letrado</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="field-label">Letrado Asignado</label>
+            <select id="abogado-select" class="field-input">
+              <option value="">— Seleccioná área primero —</option>
+            </select>
+            <p class="text-[10px] text-on-surface-variant mt-1" id="asignacion-regla"></p>
+          </div>
+          <div class="p-4 bg-surface-container-low rounded-xl flex items-start gap-3">
+            <span class="material-symbols-outlined text-primary text-2xl mt-0.5" style="font-variation-settings:'FILL' 1;">info</span>
+            <div id="asignacion-info">
+              <p class="text-xs font-bold text-on-surface-variant uppercase tracking-tight">Regla de asignación</p>
+              <p class="text-[11px] text-on-surface-variant mt-1">Seleccioná el área para ver la regla aplicable.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerta reincidencia -->
+        <div id="reincidencia-alert" class="hidden mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 flex items-start gap-3">
+          <span class="material-symbols-outlined text-amber-600 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
+          <div>
+            <p class="text-sm font-bold text-amber-800">Reincidencia detectada</p>
+            <p class="text-xs text-amber-700 mt-0.5">El N° de Causa ingresado tiene expedientes previos en el sistema. Se sugiere asignar al mismo letrado para mantener la continuidad (reincidencia).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 4: Documentación -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-primary-container text-primary">4</div>
+          <h3 class="text-base font-headline font-bold text-on-surface">Documentación Adjunta</h3>
+        </div>
+
+        <div id="drop-zone" class="border-2 border-dashed border-outline-variant/40 rounded-xl p-12 text-center bg-surface-container-low/50 hover:bg-surface-container transition-all cursor-pointer group"
+          ondragover="event.preventDefault();this.classList.add('border-primary/50','bg-primary-container/10')"
+          ondragleave="this.classList.remove('border-primary/50','bg-primary-container/10')"
+          ondrop="handleDrop(event)"
+          onclick="document.getElementById('file-input').click()">
+          <span class="material-symbols-outlined text-5xl text-outline-variant group-hover:text-primary transition-colors mb-3 block">cloud_upload</span>
+          <h4 class="text-sm font-bold text-on-surface mb-1">Arrastrá y soltá los archivos aquí</h4>
+          <p class="text-xs text-on-surface-variant">PDF, DOCX hasta 25 MB — el PDF principal quedará como Documento GDE vinculado</p>
+          <input type="file" id="file-input" class="hidden" multiple accept=".pdf,.docx" onchange="handleFiles(this.files)"/>
+        </div>
+
+        <ul id="file-list" class="mt-4 space-y-2"></ul>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex justify-end gap-3 pt-2">
+        <a href="dashboard-mesa.html" class="px-5 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container rounded-xl transition-colors">Cancelar</a>
+        <button onclick="crearExpediente()" class="bg-gradient-to-br from-primary to-primary-dim text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined">task_alt</span>
+          Crear Expediente
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ── Sidebar resumen ─────────────────────────────────────────────── -->
+    <aside class="xl:col-span-4 flex flex-col gap-5 sticky top-20">
+
+      <!-- Flujo de proceso -->
+      <div class="bg-surface-container-low rounded-xl p-5 border border-outline-variant/10">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-primary">auto_stories</span>
+          <h4 class="font-headline font-bold text-on-surface text-sm">Flujo de Proceso</h4>
+        </div>
+        <div class="space-y-4" id="flujo-proceso">
+          <div class="relative pl-6 pb-4 border-l-2 border-primary/20">
+            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-surface-container-low"></div>
+            <p class="text-xs font-bold text-primary">1. Ingreso GDE / Mail</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">EE, Memo o Mail de Carta Suceso llega a Mesa SACO.</p>
+          </div>
+          <div class="relative pl-6 pb-4 border-l-2 border-primary/20">
+            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-container border-4 border-surface-container-low"></div>
+            <p class="text-xs font-bold text-on-surface-variant">2. Clasificación y Apertura</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Mesa SACO clasifica por área y tipo de gestión. Se genera el N° interno.</p>
+          </div>
+          <div class="relative pl-6">
+            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-container border-4 border-surface-container-low"></div>
+            <p class="text-xs font-bold text-on-surface-variant">3. Asignación al Letrado</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Civil/Laboral: FIFO secuencial. Penal: por línea ferroviaria.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen en tiempo real -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-card">
+        <h4 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4">Resumen del Nuevo Registro</h4>
+        <dl class="space-y-3">
+          <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <dt class="text-[11px] text-on-surface-variant">N° Interno</dt>
+            <dd class="text-[11px] font-bold text-primary font-mono" id="res-numero">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <dt class="text-[11px] text-on-surface-variant">Área</dt>
+            <dd class="text-[11px] font-bold" id="res-area">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <dt class="text-[11px] text-on-surface-variant">Tipo de gestión</dt>
+            <dd class="text-[11px] font-bold" id="res-tipo">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <dt class="text-[11px] text-on-surface-variant">Canal</dt>
+            <dd class="text-[11px] font-bold" id="res-canal">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+            <dt class="text-[11px] text-on-surface-variant">Letrado</dt>
+            <dd class="text-[11px] font-bold" id="res-abogado">—</dd>
+          </div>
+          <div class="flex justify-between items-start py-2">
+            <dt class="text-[11px] text-on-surface-variant">Carátula</dt>
+            <dd class="text-[11px] font-semibold text-right max-w-[180px] leading-snug" id="res-caratula">—</dd>
+          </div>
+        </dl>
+        <div class="mt-4 p-3 bg-tertiary-container/30 rounded-lg">
+          <div class="flex items-center gap-2 text-on-tertiary-fixed text-[10px] font-bold">
+            <span class="material-symbols-outlined text-[14px]">lock</span>
+            DATOS PROTEGIDOS
+          </div>
+          <p class="text-[9px] text-on-tertiary-fixed-variant mt-1">Expediente visible solo por el área asignada y auditoría.</p>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</div>
+</main>
+
+<script src="../data/mock.js"></script>
+<script src="../components/shared.js"></script>
+<script>
+document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('alta-expediente');
+document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Nuevo Expediente', 'Nuevo Expediente');
+
+// Hoy como default
+document.getElementById('fecha-recep').value = new Date().toISOString().split('T')[0];
+
+// ── Estado del form ────────────────────────────────────────────────────────
+let state = { canal:'EE_GDE', area:'', tipo:'', abogado:'', numerosActivos:{CIVIL:88, LABORAL:31, PENAL:102} };
+
+// ── Canal ──────────────────────────────────────────────────────────────────
+function setCanal(c) {
+  state.canal = c;
+  document.querySelectorAll('.canal-btn').forEach(b => {
+    const active = b.dataset.val === c;
+    b.className = `canal-btn flex-1 py-2.5 text-sm rounded-lg transition-all font-${active?'bold':'medium'} ${active ? 'bg-surface-container-lowest shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'}`;
+  });
+  const labels = { EE_GDE:'N° Expediente Electrónico (GDE)', MEMO_GDE:'N° de Memo GDE', MAIL:'Referencia de Mail / SAE' };
+  const placeholders = { EE_GDE:'EX-2026-XXXXXXX-APN-SACO#SOFSE', MEMO_GDE:'ME-2026-XXXXXXX-APN-SACO#SOFSE', MAIL:'MAIL-SAE-2026-XXXX' };
+  document.getElementById('ref-label').textContent = labels[c];
+  document.getElementById('ref-input').placeholder = placeholders[c];
+
+  // Info contextual
+  const infos = {
+    EE_GDE:   'Canal Externo: el EE fue creado por Mesa de Entradas General o por el organismo notificante. Adjuntá el documento tipo OJ o EE.',
+    MEMO_GDE: 'Canal Interno: el Memo GDE fue generado por otra área de SOFSE (SGSySL, GCO, GAJ). Vinculá el número completo.',
+    MAIL:     'Canal Mail: Carta Suceso del sistema SAE de Seguridad. Adjuntá el PDF de la Carta Suceso y las fotos del suceso.',
+  };
+  const info = document.getElementById('canal-info');
+  document.getElementById('canal-info-text').textContent = infos[c];
+  info.classList.remove('hidden');
+  updateResumen();
+}
+
+// ── Área ───────────────────────────────────────────────────────────────────
+function setArea(a) {
+  state.area = a;
+  state.tipo = '';
+  document.querySelectorAll('.area-btn').forEach(b => {
+    const active = b.dataset.val === a;
+    b.className = `area-btn flex-1 py-2.5 text-sm rounded-lg transition-all font-${active?'bold':'medium'} ${active ? 'bg-surface-container-lowest shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'}`;
+  });
+
+  // Poblar tipos
+  const tipos = window.SACO.TIPOS_GESTION[a] || [];
+  const sel = document.getElementById('tipo-select');
+  sel.innerHTML = `<option value="">— Seleccioná tipo de gestión —</option>` +
+    tipos.map(t => `<option value="${t.code}" data-canal="${t.canal}">${t.label}</option>`).join('');
+
+  // Poblar líneas
+  const lineaSel = document.getElementById('linea-select');
+  lineaSel.innerHTML = `<option value="">— Sin línea asociada —</option>` +
+    window.SACO.LINEAS_FERROVIARIAS.map(l => `<option value="${l.code}">${l.label}</option>`).join('');
+
+  // Línea obligatoria en Penal
+  document.getElementById('linea-req').classList.toggle('hidden', a !== 'PENAL');
+
+  // Letrados
+  const abogs = window.SACO.ABOGADOS[a] || [];
+  const abogSel = document.getElementById('abogado-select');
+  abogSel.innerHTML = abogs.map((ab, i) =>
+    `<option value="${ab}">${ab}${i===0 ? ' — siguiente en rotación' : ''}</option>`
+  ).join('');
+  state.abogado = abogs[0] || '';
+
+  // Regla asignación
+  const regla = a === 'PENAL'
+    ? 'Asignación por línea ferroviaria — el letrado se determina al seleccionar la línea.'
+    : 'Asignación secuencial FIFO — se sugiere el siguiente letrado disponible en el área.';
+  document.getElementById('asignacion-regla').textContent = regla;
+  document.getElementById('asignacion-info').innerHTML = `
+    <p class="text-xs font-bold text-on-surface-variant uppercase tracking-tight">Regla de asignación</p>
+    <p class="text-[11px] text-on-surface-variant mt-1">${regla}</p>`;
+
+  // Número interno preview
+  const n = state.numerosActivos[a] + 1;
+  const prefix = {CIVIL:'C', LABORAL:'L', PENAL:'P'}[a];
+  document.getElementById('res-numero').textContent = `${prefix}-${String(n).padStart(4,'0')}/${new Date().getFullYear()}`;
+  document.getElementById('res-area').textContent = a;
+
+  updateResumen();
+}
+
+// ── Tipo de gestión ────────────────────────────────────────────────────────
+function onTipoChange() {
+  const sel = document.getElementById('tipo-select');
+  const opt = sel.options[sel.selectedIndex];
+  state.tipo = sel.value;
+  const canalSugerido = opt.dataset.canal;
+
+  // Mostrar extra para DEMANDA
+  document.getElementById('demanda-extra').classList.toggle('hidden', state.tipo !== 'DEMANDA');
+
+  // Sugerir canal
+  if (canalSugerido && canalSugerido !== state.canal) {
+    const labels = { EE_GDE:'EE GDE', MEMO_GDE:'Memo GDE', MAIL:'Mail' };
+    SACO_UI.showToast(`Este tipo de gestión típicamente ingresa por ${labels[canalSugerido]}.`, 'info');
+  }
+
+  // Reincidencia simulada para FSM
+  const causa = document.getElementById('num-causa').value;
+  document.getElementById('reincidencia-alert').classList.toggle('hidden', !causa.startsWith('FSM'));
+
+  document.getElementById('res-tipo').textContent = opt.text || '—';
+  updateResumen();
+}
+
+function onLineaChange() {
+  if (state.area !== 'PENAL') return;
+  const linea = window.SACO.LINEAS_FERROVIARIAS.find(l => l.code === document.getElementById('linea-select').value);
+  if (!linea) return;
+  const abogSel = document.getElementById('abogado-select');
+  abogSel.innerHTML = `<option value="${linea.abogado}">${linea.abogado} — Letrado línea ${linea.label}</option>`;
+  state.abogado = linea.abogado;
+  updateResumen();
+}
+
+// ── Resumen live ───────────────────────────────────────────────────────────
+function updateResumen() {
+  document.getElementById('res-canal').textContent   = state.canal || '—';
+  document.getElementById('res-abogado').textContent = document.getElementById('abogado-select').value || state.abogado || '—';
+  document.getElementById('res-caratula').textContent = document.getElementById('caratula').value || '—';
+}
+
+// ── Archivos ───────────────────────────────────────────────────────────────
+let files = [];
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('border-primary/50','bg-primary-container/10');
+  handleFiles(e.dataTransfer.files);
+}
+function handleFiles(fl) {
+  Array.from(fl).forEach(f => {
+    if (f.size > 25*1024*1024) { SACO_UI.showToast(`${f.name} excede 25 MB.`, 'warn'); return; }
+    files.push(f);
+  });
+  renderFiles();
+}
+function renderFiles() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = files.map((f,i) => `
+    <li class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg">
+      <span class="material-symbols-outlined text-error text-[20px]" style="font-variation-settings:'FILL' 1;">picture_as_pdf</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-semibold text-on-surface truncate">${f.name}</p>
+        <p class="text-[10px] text-on-surface-variant">${(f.size/1024).toFixed(0)} KB</p>
+      </div>
+      <button onclick="files.splice(${i},1);renderFiles()" class="p-1 hover:bg-surface-container rounded transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant text-[16px]">close</span>
+      </button>
+    </li>`).join('');
+}
+
+// ── Crear expediente ───────────────────────────────────────────────────────
+function crearExpediente() {
+  const errores = [];
+  if (!state.area)  errores.push('Seleccioná el área jurídica');
+  if (!state.tipo)  errores.push('Seleccioná el tipo de gestión');
+  if (!document.getElementById('caratula').value.trim()) errores.push('Ingresá la carátula');
+  if (state.area === 'PENAL' && !document.getElementById('linea-select').value) errores.push('Seleccioná la línea ferroviaria');
+
+  if (errores.length) {
+    SACO_UI.showToast(errores[0], 'warn');
+    return;
+  }
+
+  const prefix = {CIVIL:'C', LABORAL:'L', PENAL:'P'}[state.area];
+  const n = ++state.numerosActivos[state.area];
+  const numInterno = `${prefix}-${String(n).padStart(4,'0')}/${new Date().getFullYear()}`;
+
+  SACO_UI.showToast(`Expediente ${numInterno} creado exitosamente.`, 'success');
+  setTimeout(() => { window.location.href = 'bandeja-abogado.html'; }, 1500);
+}
+
+// Init
+setCanal('EE_GDE');
+</script>
+</body>
+</html>
