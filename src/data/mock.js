@@ -24,6 +24,7 @@ const TIPOS_GESTION = {
     { code: 'CONSIGNACION',    label: 'Consignación',              canal: 'MEMO_GDE' },
     { code: 'DEMANDA',         label: 'Demanda',                   canal: 'EE_GDE' },
     { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',        canal: 'MEMO_GDE' },
+    
   ],
   PENAL: [
     { code: 'OFICIO',          label: 'Oficio',                    canal: 'EE_GDE' },

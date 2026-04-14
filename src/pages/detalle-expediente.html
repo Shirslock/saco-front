@@ -202,15 +202,7 @@ tailwind.config = {
                 <th class="px-4 py-3 font-bold text-on-surface-variant uppercase tracking-wider rounded-r-lg">Monto dic.</th>
               </tr>
             </thead>
-            <tbody>
-              ${[['2023','En Plazo Contestar','Favorable','$4.200.000'],['2024','En Prueba','Desfavorable','$5.100.000'],['2025','En Prueba','Desfavorable','$5.800.000']].map(r=>`
-              <tr class="hover:bg-surface-container-highest transition-colors">
-                <td class="px-4 py-3 font-bold text-on-surface">${r[0]}</td>
-                <td class="px-4 py-3 text-on-surface-variant">${r[1]}</td>
-                <td class="px-4 py-3"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${r[2]==='Favorable'?'bg-secondary-container text-on-secondary-fixed':'bg-tertiary-container text-on-tertiary-fixed'}">${r[2]}</span></td>
-                <td class="px-4 py-3 font-mono font-semibold text-on-surface">${r[3]}</td>
-              </tr>`).join('')}
-            </tbody>
+            <tbody id="prevision-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -277,6 +269,22 @@ document.getElementById('timeline-list').innerHTML = exp.timeline.map(t => `
       </div>
     </div>
   </div>`).join('');
+
+// ── Previsión Económica ────────────────────────────────────────────────────
+function renderPrevision() {
+  document.getElementById('prevision-tbody').innerHTML = [
+    ['2023','En Plazo Contestar','Favorable','$4.200.000'],
+    ['2024','En Prueba','Desfavorable','$5.100.000'],
+    ['2025','En Prueba','Desfavorable','$5.800.000'],
+  ].map(r => `
+  <tr class="hover:bg-surface-container-highest transition-colors">
+    <td class="px-4 py-3 font-bold text-on-surface">${r[0]}</td>
+    <td class="px-4 py-3 text-on-surface-variant">${r[1]}</td>
+    <td class="px-4 py-3"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${r[2]==='Favorable'?'bg-secondary-container text-on-secondary-fixed':'bg-tertiary-container text-on-tertiary-fixed'}">${r[2]}</span></td>
+    <td class="px-4 py-3 font-mono font-semibold text-on-surface">${r[3]}</td>
+  </tr>`).join('');
+}
+renderPrevision();
 
 // ── Documentos ─────────────────────────────────────────────────────────────
 function renderDocs() {
