@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard | SOFSE SACO</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "primary":"#3a5f94","primary-dim":"#2d5387","primary-container":"#d5e3ff","on-primary":"#f6f7ff","on-primary-container":"#2c5287","on-primary-fixed":"#153f73",
+      "secondary":"#49636f","secondary-container":"#cbe7f5","on-secondary-fixed":"#29434e","secondary-dim":"#3d5762",
+      "tertiary":"#5d5d78","tertiary-container":"#dbdafb","on-tertiary-fixed":"#393953","tertiary-dim":"#51516c",
+      "surface":"#f8f9fb","surface-container-lowest":"#ffffff","surface-container-low":"#f0f4f7","surface-container":"#e8eff3","surface-container-high":"#e1e9ee","surface-container-highest":"#d9e4ea",
+      "background":"#f8f9fb","on-background":"#2a3439","on-surface":"#2a3439","on-surface-variant":"#566166",
+      "outline":"#717c82","outline-variant":"#a9b4b9",
+      "error":"#9f403d","error-container":"#fe8983","on-error-container":"#752121",
+      "inverse-surface":"#0b0f10",
+    },
+    fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
+    borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
+  body { font-family:'Inter',sans-serif; }
+  h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
+  .shadow-card    { box-shadow:0 4px 20px rgba(42,52,57,0.06); }
+  .shadow-card-lg { box-shadow:0 12px 40px rgba(42,52,57,0.08); }
+
+  /* ── Barras animadas ── */
+  .bar-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .bar-fill.animate { transform: scaleX(1); }
+
+  /* ── Número animado ── */
+  @keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .kpi-num { animation: countUp 0.5s ease both; }
+
+  /* ── Mini spark line SVG ── */
+  .spark-line { stroke-dasharray: 300; stroke-dashoffset: 300; transition: stroke-dashoffset 1.2s ease; }
+  .spark-line.animate { stroke-dashoffset: 0; }
+
+  /* ── Anillo de donut ── */
+  .donut-ring { stroke-dasharray: 0 283; transition: stroke-dasharray 1s ease 0.2s; }
+  .donut-ring.animate { }
+
+  /* ── Alert pulse ── */
+  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .pulse-dot { animation: pulse-dot 2s ease infinite; }
+</style>
+</head>
+<body class="bg-background text-on-background">
+
+<div id="sidebar-mount"></div>
+<div id="topbar-mount"></div>
+
+<main class="ml-64 pt-16 min-h-screen">
+<div class="p-8 max-w-[1600px] mx-auto space-y-7">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Panel de Gestión</p>
+      <h1 class="text-3xl font-headline font-extrabold text-on-surface tracking-tight">Dashboard Ejecutivo</h1>
+      <p class="text-on-surface-variant text-sm mt-1">Vista consolidada de causas activas — <span class="font-semibold text-on-surface" id="fecha-hoy"></span></p>
+    </div>
+  </div>
+
+  <!-- ── KPI Cards ────────────────────────────────────────────────────────── -->
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+
+    <!-- Total activos -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+      <div class="flex justify-between items-start">
+        <div class="p-2.5 bg-primary-container rounded-xl">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">folder_open</span>
+        </div>
+        <div class="flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+          <span class="material-symbols-outlined text-[12px]">trending_up</span>+8%
+        </div>
+      </div>
+      <div>
+        <p class="text-4xl font-black text-on-surface kpi-num" id="kpi-total">0</p>
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Causas Activas</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5">Civil · Laboral · Penal</p>
+      </div>
+    </div>
+
+    <!-- Urgentes -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+      <div class="flex justify-between items-start">
+        <div class="p-2.5 bg-error-container/30 rounded-xl">
+          <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">warning</span>
+        </div>
+        <span class="pulse-dot w-2.5 h-2.5 bg-error rounded-full mt-1"></span>
+      </div>
+      <div>
+        <p class="text-4xl font-black text-error kpi-num" id="kpi-urgentes">0</p>
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Con Alerta Activa</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5">Requieren atención inmediata</p>
+      </div>
+    </div>
+
+    <!-- En prueba / tramitación avanzada -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+      <div class="flex justify-between items-start">
+        <div class="p-2.5 bg-tertiary-container rounded-xl">
+          <span class="material-symbols-outlined text-tertiary" style="font-variation-settings:'FILL' 1;">hourglass_top</span>
+        </div>
+        <span class="text-[10px] font-bold text-on-tertiary-fixed bg-tertiary-container px-2 py-0.5 rounded-full">Etapa avanzada</span>
+      </div>
+      <div>
+        <p class="text-4xl font-black text-on-surface kpi-num" id="kpi-en-prueba">0</p>
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">En Prueba / Suspensión</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5">Instancia procesal avanzada</p>
+      </div>
+    </div>
+
+    <!-- Cumplidos este año -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+      <div class="flex justify-between items-start">
+        <div class="p-2.5 bg-green-100 rounded-xl">
+          <span class="material-symbols-outlined text-green-700" style="font-variation-settings:'FILL' 1;">task_alt</span>
+        </div>
+        <span class="text-[10px] font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded-full">2026</span>
+      </div>
+      <div>
+        <p class="text-4xl font-black text-green-700 kpi-num" id="kpi-cumplidos">0</p>
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Causas Cumplidas</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5">Cerradas en el año en curso</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Fila 2: Distribución + Carga letrados + Alertas ─────────────────── -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Distribución por área -->
+    <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-card p-6">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">donut_large</span>
+          <h3 class="font-headline font-bold text-on-surface">Distribución por Área</h3>
+        </div>
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Total</span>
+      </div>
+
+      <!-- Donut SVG -->
+      <div class="flex justify-center mb-6">
+        <svg viewBox="0 0 100 100" class="w-44 h-44" id="donut-svg">
+          <!-- Pista de fondo -->
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#e1e9ee" stroke-width="14"/>
+          <!-- Segmento PENAL (tertiary) -->
+          <circle id="arc-penal" cx="50" cy="50" r="40" fill="none" stroke="#5d5d78" stroke-width="14"
+            stroke-dasharray="0 251" stroke-dashoffset="0"
+            style="transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dasharray 0.8s ease 0.5s"/>
+          <!-- Segmento LABORAL (secondary) -->
+          <circle id="arc-laboral" cx="50" cy="50" r="40" fill="none" stroke="#49636f" stroke-width="14"
+            stroke-dasharray="0 251" stroke-dashoffset="0"
+            style="transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dasharray 0.8s ease 0.3s"/>
+          <!-- Segmento CIVIL (primary) -->
+          <circle id="arc-civil" cx="50" cy="50" r="40" fill="none" stroke="#3a5f94" stroke-width="14"
+            stroke-dasharray="0 251" stroke-dashoffset="0"
+            style="transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dasharray 0.8s ease 0.1s"/>
+          <!-- Centro -->
+          <text x="50" y="46" text-anchor="middle" class="font-headline" style="font-family:'Public Sans';font-weight:800;font-size:14px;fill:#2a3439;" id="donut-center-num">—</text>
+          <text x="50" y="57" text-anchor="middle" style="font-family:'Inter';font-size:5px;fill:#566166;font-weight:600;letter-spacing:0.05em;text-transform:uppercase">causas</text>
+        </svg>
+      </div>
+
+      <!-- Leyenda -->
+      <div class="space-y-3" id="area-legend"></div>
+    </div>
+
+    <!-- Carga por letrado -->
+    <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-card p-6">
+      <div class="flex items-center gap-2 mb-5">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">groups</span>
+        <h3 class="font-headline font-bold text-on-surface">Carga por Letrado</h3>
+      </div>
+      <div class="space-y-4" id="letrados-bars"></div>
+    </div>
+
+    <!-- Alertas y vencimientos -->
+    <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-card p-6">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">notifications_active</span>
+          <h3 class="font-headline font-bold text-on-surface">Alertas y Vencimientos</h3>
+        </div>
+        <span class="w-5 h-5 bg-error text-white text-[10px] font-black rounded-full flex items-center justify-center" id="alert-count-badge">0</span>
+      </div>
+      <div class="space-y-3" id="alertas-list"></div>
+      <a href="bandeja-abogado.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+        Ver todas en la bandeja
+        <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ── Fila 3: Estado por área + Expedientes recientes ──────────────────── -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Distribución por estado -->
+    <div class="col-span-12 lg:col-span-5 bg-surface-container-lowest rounded-xl shadow-card p-6">
+      <div class="flex items-center gap-2 mb-5">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">stacked_bar_chart</span>
+        <h3 class="font-headline font-bold text-on-surface">Distribución por Estado</h3>
+      </div>
+      <div class="space-y-3" id="estados-dist"></div>
+    </div>
+
+    <!-- Expedientes recientes -->
+    <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-card overflow-hidden">
+      <div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">history</span>
+          <h3 class="font-headline font-bold text-on-surface">Expedientes Recientes</h3>
+        </div>
+        <a href="bandeja-abogado.html" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+          Ver todos
+          <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+        </a>
+      </div>
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-surface-container-low/60">
+          <tr>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">N° Interno</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Carátula</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Área</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Estado</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Letrado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant/5" id="recientes-tbody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── Fila 4: Accesos rápidos por área ─────────────────────────────────── -->
+  <section>
+    <h2 class="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4">Accesos Rápidos por Área</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+      <a href="area-civil.html" class="group bg-surface-container-lowest rounded-xl shadow-card p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="p-3 bg-primary-container rounded-xl group-hover:bg-primary group-hover:text-white transition-all">
+            <span class="material-symbols-outlined text-primary group-hover:text-white" style="font-variation-settings:'FILL' 1;">gavel</span>
+          </div>
+          <div>
+            <h4 class="font-headline font-bold text-on-surface">Área Civil</h4>
+            <p class="text-[11px] text-on-surface-variant">Coordinación de causas civiles</p>
+          </div>
+          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary ml-auto transition-colors">arrow_right_alt</span>
+        </div>
+        <div class="flex gap-3">
+          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
+            <p class="text-lg font-black text-on-surface" id="civil-quick-total">—</p>
+            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Activas</p>
+          </div>
+          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
+            <p class="text-lg font-black text-on-surface" id="civil-quick-letrados">4</p>
+            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Letrados</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="area-laboral.html" class="group bg-surface-container-lowest rounded-xl shadow-card p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="p-3 bg-secondary-container rounded-xl group-hover:bg-secondary group-hover:text-white transition-all">
+            <span class="material-symbols-outlined text-secondary group-hover:text-white" style="font-variation-settings:'FILL' 1;">work</span>
+          </div>
+          <div>
+            <h4 class="font-headline font-bold text-on-surface">Área Laboral</h4>
+            <p class="text-[11px] text-on-surface-variant">Coordinación de causas laborales</p>
+          </div>
+          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary ml-auto transition-colors">arrow_right_alt</span>
+        </div>
+        <div class="flex gap-3">
+          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
+            <p class="text-lg font-black text-on-surface" id="laboral-quick-total">—</p>
+            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Activas</p>
+          </div>
+          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
+            <p class="text-lg font-black text-on-surface" id="laboral-quick-letrados">3</p>
+            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Letrados</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="gestion-penal.html" class="group bg-surface-container-lowest rounded-xl shadow-card p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="p-3 bg-tertiary-container rounded-xl group-hover:bg-tertiary group-hover:text-white transition-all">
+            <span class="material-symbols-outlined text-tertiary group-hover:text-white" style="font-variation-settings:'FILL' 1;">policy</span>
+          </div>
+          <div>
+            <h4 class="font-headline font-bold text-on-surface">Área Penal</h4>
+            <p class="text-[11px] text-on-surface-variant">Coordinación de causas penales</p>
+          </div>
+          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary ml-auto transition-colors">arrow_right_alt</span>
+        </div>
+        <div class="flex gap-3">
+          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
+            <p class="text-lg font-black text-on-surface" id="penal-quick-total">—</p>
+            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Activas</p>
+          </div>
+          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
+            <p class="text-lg font-black text-on-surface" id="penal-quick-cartas">—</p>
+            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Cartas SAE</p>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+</div>
+</main>
+
+<script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
+<script src="../components/shared.js"></script>
+<script>
+(function initUser() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+})();
+
+document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('dashboard');
+document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Dashboard', 'Dashboard Ejecutivo');
+
+// Fecha de hoy
+document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', {
+  weekday:'long', year:'numeric', month:'long', day:'numeric'
+});
+
+// ── Datos ──────────────────────────────────────────────────────────────────
+const todos     = window.SACO.EXPEDIENTES_ABOGADO;
+const civil     = todos.filter(e => e.area === 'CIVIL');
+const laboral   = todos.filter(e => e.area === 'LABORAL');
+const penal     = todos.filter(e => e.area === 'PENAL');
+const urgentes  = todos.filter(e => e.tiene_alerta);
+const enPrueba  = todos.filter(e => ['EN_PRUEBA','SUSPENSION_TERMINOS'].includes(e.estado));
+const cumplidos = todos.filter(e => e.estado === 'CUMPLIDO');
+const total     = todos.length;
+
+// ── KPIs ───────────────────────────────────────────────────────────────────
+function animateCount(el, target) {
+  let current = 0;
+  const step = Math.max(1, Math.floor(target / 20));
+  const interval = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current;
+    if (current >= target) clearInterval(interval);
+  }, 30);
+}
+
+setTimeout(() => {
+  animateCount(document.getElementById('kpi-total'),     total);
+  animateCount(document.getElementById('kpi-urgentes'),  urgentes.length);
+  animateCount(document.getElementById('kpi-en-prueba'), enPrueba.length);
+  animateCount(document.getElementById('kpi-cumplidos'), cumplidos.length);
+}, 200);
+
+// ── Donut ─────────────────────────────────────────────────────────────────
+function renderDonut() {
+  const circunferencia = 2 * Math.PI * 40; // ~251.3
+  const C = circunferencia;
+
+  const pCivil   = total ? civil.length   / total : 0;
+  const pLaboral = total ? laboral.length / total : 0;
+  const pPenal   = total ? penal.length   / total : 0;
+
+  const arcCivil   = pCivil   * C;
+  const arcLaboral = pLaboral * C;
+  const arcPenal   = pPenal   * C;
+
+  document.getElementById('donut-center-num').textContent = total;
+
+  // Segmento civil: empieza en 0
+  const elCivil = document.getElementById('arc-civil');
+  elCivil.setAttribute('stroke-dashoffset', '0');
+
+  // Segmento laboral: empieza donde termina civil
+  const elLaboral = document.getElementById('arc-laboral');
+  elLaboral.setAttribute('stroke-dashoffset', -arcCivil);
+
+  // Segmento penal: empieza donde termina laboral
+  const elPenal = document.getElementById('arc-penal');
+  elPenal.setAttribute('stroke-dashoffset', -(arcCivil + arcLaboral));
+
+  setTimeout(() => {
+    elCivil.setAttribute('stroke-dasharray',   `${arcCivil} ${C - arcCivil}`);
+    elLaboral.setAttribute('stroke-dasharray', `${arcLaboral} ${C - arcLaboral}`);
+    elPenal.setAttribute('stroke-dasharray',   `${arcPenal} ${C - arcPenal}`);
+  }, 100);
+
+  // Leyenda
+  const areaData = [
+    { label:'Civil',   count:civil.length,   color:'bg-primary',   pct: Math.round(pCivil*100)   },
+    { label:'Laboral', count:laboral.length, color:'bg-secondary', pct: Math.round(pLaboral*100) },
+    { label:'Penal',   count:penal.length,   color:'bg-tertiary',  pct: Math.round(pPenal*100)   },
+  ];
+  document.getElementById('area-legend').innerHTML = areaData.map(a => `
+    <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+      <div class="w-3 h-3 rounded-full ${a.color} flex-shrink-0"></div>
+      <span class="text-sm font-semibold text-on-surface flex-1">${a.label}</span>
+      <span class="text-sm font-black text-on-surface">${a.count}</span>
+      <span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded-full">${a.pct}%</span>
+    </div>`).join('');
+}
+
+// ── Carga por letrado ──────────────────────────────────────────────────────
+function renderLetradosBars() {
+  // Consolidar todos los letrados y sus causas
+  const letradoMap = {};
+  todos.forEach(e => {
+    if (!letradoMap[e.abogado]) letradoMap[e.abogado] = { nombre: e.abogado, count: 0, area: e.area };
+    letradoMap[e.abogado].count++;
+  });
+  const letrados = Object.values(letradoMap).sort((a,b) => b.count - a.count);
+  const maxCount = Math.max(...letrados.map(l => l.count), 1);
+
+  const areaBarColor = { CIVIL:'bg-primary', LABORAL:'bg-secondary', PENAL:'bg-tertiary' };
+
+  document.getElementById('letrados-bars').innerHTML = letrados.map(l => {
+    const pct = (l.count / maxCount * 100).toFixed(0);
+    const barColor = areaBarColor[l.area] || 'bg-primary';
+    const nombreCorto = l.nombre.replace(/^Dr\. |^Dra\. /, '');
+    return `
+    <div class="space-y-1.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-6 h-6 rounded-full ${barColor} flex items-center justify-center text-white text-[9px] font-black flex-shrink-0">
+            ${nombreCorto.split(' ').map(w=>w[0]).join('').slice(0,2)}
+          </div>
+          <span class="text-xs font-semibold text-on-surface truncate">${nombreCorto}</span>
+        </div>
+        <span class="text-xs font-black text-on-surface ml-2 flex-shrink-0">${l.count}</span>
+      </div>
+      <div class="h-2 bg-surface-container rounded-full overflow-hidden">
+        <div class="bar-fill h-full rounded-full ${barColor}" style="--bar-width:${pct}%;width:${pct}%" data-width="${pct}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Animar barras
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(b => b.classList.add('animate'));
+  }, 300);
+}
+
+// ── Alertas ────────────────────────────────────────────────────────────────
+function renderAlertas() {
+  const alertas = todos.filter(e => e.tiene_alerta);
+  document.getElementById('alert-count-badge').textContent = alertas.length;
+
+  if (!alertas.length) {
+    document.getElementById('alertas-list').innerHTML = `
+      <div class="text-center py-6">
+        <span class="material-symbols-outlined text-4xl text-green-500 mb-2 block" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        <p class="text-sm font-semibold text-on-surface">Sin alertas activas</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">Todos los vencimientos están al día.</p>
+      </div>`;
+    return;
+  }
+
+  const alertaIcons = { CIVIL:'gavel', LABORAL:'work', PENAL:'policy' };
+  document.getElementById('alertas-list').innerHTML = alertas.map(e => `
+    <div class="flex items-start gap-3 p-3 bg-error-container/10 rounded-xl border border-error-container/20">
+      <span class="material-symbols-outlined text-error text-[18px] mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1;">${alertaIcons[e.area] || 'warning'}</span>
+      <div class="min-w-0">
+        <p class="text-xs font-bold text-on-surface truncate">${e.id} — ${e.area}</p>
+        <p class="text-[11px] text-error font-semibold mt-0.5 leading-snug">${e.alerta_msg}</p>
+        <p class="text-[10px] text-on-surface-variant mt-1 truncate">${e.abogado}</p>
+      </div>
+    </div>`).join('');
+}
+
+// ── Distribución por estado ────────────────────────────────────────────────
+function renderEstadosDist() {
+  const estadoCount = {};
+  todos.forEach(e => {
+    estadoCount[e.estado] = (estadoCount[e.estado] || 0) + 1;
+  });
+
+  const estadoConfig = [
+    { code:'EN_TRAMITE',          label:'En Trámite',           color:'bg-secondary' },
+    { code:'EN_PLAZO_CONTESTAR',  label:'En Plazo Contestar',   color:'bg-primary' },
+    { code:'EN_PRUEBA',           label:'En Prueba',            color:'bg-tertiary' },
+    { code:'SUSPENSION_TERMINOS', label:'Suspensión Términos',  color:'bg-tertiary' },
+    { code:'GDE_VINCULADO',       label:'GDE Vinculado',        color:'bg-secondary' },
+    { code:'PENDIENTE_GDE',       label:'Pendiente GDE',        color:'bg-tertiary' },
+    { code:'CUMPLIDO',            label:'Cumplido',             color:'bg-green-500' },
+    { code:'ARCHIVADO',           label:'Archivado',            color:'bg-outline-variant' },
+  ].filter(e => estadoCount[e.code] > 0);
+
+  const maxVal = Math.max(...estadoConfig.map(e => estadoCount[e.code] || 0), 1);
+
+  document.getElementById('estados-dist').innerHTML = estadoConfig.map(e => {
+    const count = estadoCount[e.code] || 0;
+    const pct = (count / maxVal * 100).toFixed(0);
+    return `
+    <div class="flex items-center gap-3">
+      <span class="text-[11px] text-on-surface-variant w-36 flex-shrink-0 truncate">${e.label}</span>
+      <div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+        <div class="bar-fill h-full rounded-full ${e.color}" style="width:${pct}%" data-width="${pct}"></div>
+      </div>
+      <span class="text-xs font-bold text-on-surface w-4 text-right flex-shrink-0">${count}</span>
+    </div>`;
+  }).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(b => b.classList.add('animate'));
+  }, 400);
+}
+
+// ── Expedientes recientes ──────────────────────────────────────────────────
+function renderRecientes() {
+  const areaColors = {
+    CIVIL:   'bg-primary-container/60 text-on-primary-container',
+    LABORAL: 'bg-secondary-container text-on-secondary-fixed',
+    PENAL:   'bg-tertiary-container text-on-tertiary-fixed',
+  };
+
+  // Ordenar por fecha de recepción (más recientes primero)
+  const recientes = [...todos].sort((a,b) => b.fecha_recepcion.localeCompare(a.fecha_recepcion));
+
+  document.getElementById('recientes-tbody').innerHTML = recientes.map(e => `
+    <tr class="hover:bg-surface-container-highest transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
+      <td class="px-6 py-3.5">
+        <div class="flex items-center gap-1.5">
+          ${e.tiene_alerta ? `<span class="material-symbols-outlined text-error text-[12px]" style="font-variation-settings:'FILL' 1;">warning</span>` : ''}
+          <span class="font-mono text-xs font-bold text-on-surface">${e.id}</span>
+        </div>
+      </td>
+      <td class="px-6 py-3.5 max-w-[200px]">
+        <p class="text-xs font-semibold text-on-surface line-clamp-1">${e.caratula}</p>
+      </td>
+      <td class="px-6 py-3.5">
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${areaColors[e.area]||''}">${e.area}</span>
+      </td>
+      <td class="px-6 py-3.5">
+        ${SACO_UI.estadoBadge(e.estado, e.estado.replace(/_/g,' '))}
+      </td>
+      <td class="px-6 py-3.5 text-xs text-on-surface-variant">${e.abogado.replace(/^Dr\. |^Dra\. /, '')}</td>
+    </tr>`).join('');
+}
+
+// ── Cards acceso rápido ────────────────────────────────────────────────────
+document.getElementById('civil-quick-total').textContent   = civil.length;
+document.getElementById('laboral-quick-total').textContent = laboral.length;
+document.getElementById('penal-quick-total').textContent   = penal.length;
+document.getElementById('penal-quick-cartas').textContent  = window.SACO.CARTA_SUCESO_QUEUE.length;
+
+// ── Init ───────────────────────────────────────────────────────────────────
+renderDonut();
+renderLetradosBars();
+renderAlertas();
+renderEstadosDist();
+renderRecientes();
+
+// ── Sync ───────────────────────────────────────────────────────────────────
+SACO_SYNC.syncListen(({ type, payload }) => {
+  if (type === 'ESTADO_CAMBIADO' || type === 'EXPEDIENTE_ASIGNADO') {
+    renderDonut();
+    renderLetradosBars();
+    renderAlertas();
+    renderEstadosDist();
+    renderRecientes();
+    SACO_UI.showToast('Dashboard actualizado desde otra pestaña.', 'info');
+  }
+  if (type === 'USUARIO_CAMBIADO') {
+    if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+    document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('dashboard');
+    if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
+  }
+});
+</script>
+</body>
+</html>

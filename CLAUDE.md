@@ -44,7 +44,7 @@ El prototipo debe poder abrirse directamente en el browser desde VSCode con Live
 ```
 saco-frontend/
 ├── CLAUDE.md                          ← este archivo
-├── index.html                         ← redirect a dashboard-mesa.html
+├── index.html                         ← redirect a dashboard.html
 ├── README.md
 └── src/
     ├── data/
@@ -53,7 +53,8 @@ saco-frontend/
     │   ├── shared.js                  ← sidebar, topbar, toast, modal, badges
     │   └── sync.js                    ← BroadcastChannel entre pestañas (window.SACO_SYNC)
     └── pages/
-        ├── dashboard-mesa.html        ← Vista: Administrativo Mesa SACO
+        ├── dashboard.html             ← Vista: Dashboard para Gerentes / Subgerentes / Coordinadores
+        ├── mesa-saco.html             ← Vista: Bandeja para la Mesa SACO
         ├── alta-expediente.html       ← Vista: Formulario nuevo expediente
         ├── bandeja-abogado.html       ← Vista: Bandeja del letrado
         ├── detalle-expediente.html    ← Vista: Detalle + timeline + docs
@@ -223,7 +224,8 @@ Tipos de eventos definidos:
 
 ### Keys del sidebar (parámetro `activePage`)
 ```
-'dashboard-mesa'     → Mesa SACO Dashboard
+'dashboard'          → Dashboard Gerencial (Gerentes / Subgerentes / Coordinadores)
+'mesa-saco'          → Bandeja para la Mesa SACO
 'alta-expediente'    → Nuevo Expediente
 'bandeja-abogado'    → Mi Bandeja
 'area-civil'         → Área Civil
@@ -320,6 +322,7 @@ window.SACO = {
   EXPEDIENTE_DETALLE,     // objeto único del expediente abierto
   CARTA_SUCESO_QUEUE,     // cartas SAE pendientes (penal)
   CAUSAS_PENALES,         // causas activas del área penal
+  JUZGADOS,               // [{ code, label }]
 }
 ```
 
@@ -338,6 +341,8 @@ Estas reglas vienen del análisis funcional y **no son negociables**. Claude Cod
 - Dos niveles: **Área** (CIVIL / LABORAL / PENAL) → **Tipo de gestión** (15 subtipos)
 - El selector de tipo de gestión **filtra según el área seleccionada** — nunca mostrar todos los tipos sin filtrar
 - Los tipos disponibles por área están en `SACO.TIPOS_GESTION[area]`
+- Se agrega el tipo de gestión: `OTROS` para las 3 áreas
+- Permite registrar documentación no clasificada en los tipos existentes
 
 ### 8.2 Numeración automática
 ```
@@ -403,29 +408,89 @@ EN_TRAMITE → EN_PLAZO_CONTESTAR → SUSPENSION_TERMINOS → EN_PRUEBA → CUMP
 - Al agregar un movimiento, siempre va al inicio del array (`unshift`)
 - El movimiento más reciente se muestra con `border-l-4 border-primary` y punto azul sólido
 
+### 8.11 Juzgado (desplegable)
+
+- El campo `juzgado` no es de texto libre
+- Debe ser un **select (desplegable)** basado en catálogo
+- El catálogo se carga desde `SACO.JUZGADOS`
+
+### 8.12 Área Penal — Campos adicionales
+
+Para expedientes del área PENAL:
+
+- Se deben habilitar los campos:
+  - `numero_sumario` (texto libre)
+  - `comisaria` (texto libre)
+- Estos campos son opcionales pero visibles solo si `area = PENAL`
+
 ---
 
 ## 9. Páginas existentes — qué hace cada una
 
-### `dashboard-mesa.html` — Mesa SACO Dashboard
-**Rol:** Administrativo de Mesa SACO
-**Funcionalidades:**
-- Métricas de volumen (cards): pendientes de asignación, activos Civil, activos Penal
-- Quick actions: "Nuevo Expediente" (→ alta-expediente.html) + "Vincular GDE" (modal)
-- Cola de ingreso: tabla de `SACO.QUEUE_MESA` con estado, canal, origen, acción
-- Botón "Asignar" abre modal con: selección de área → tipo → letrado (FIFO o por línea)
-- Panel lateral: distribución por área (barras de carga) + carga de letrados
-- Panel GDE: estado de sincronización (decorativo en prototipo)
-- Filtro de cola: por área y canal
+### `dashboard.html` — Dashboard Gerencial
 
-**Estado que modifica:** `SACO.QUEUE_MESA` (elimina items al asignar)
+**Rol:** Gerente / Subgerente / Coordinador
+
+**Funcionalidades:**
+- Vista agregada de expedientes por área (Civil / Laboral / Penal)
+- Indicadores clave:
+  - Cantidad de expedientes activos
+  - Distribución por estado
+  - Carga por letrado
+- Acceso a vistas consolidadas (no operativas)
+- No permite acciones operativas (solo lectura / análisis)
+
+### `mesa-saco.html` — Mesa SACO Bandeja
+
+**Rol:** Administrativo de Mesa SACO
+
+**Funcionalidades:**
+
+- Botón principal: **"Nuevo Expediente"** (redirige a `alta-expediente.html`)
+  
+- Bandeja principal:
+  - Lista de expedientes **ya asignados**
+  - Fuente de datos: `SACO.EXPEDIENTES_ABOGADO` (vista global)
+
+- Grilla de expedientes:
+  - Tipo de Gestión
+  - Referencia GDE (N° de MEMO / EE)
+  - Origen (canal de ingreso)
+  - Estado → siempre `ASIGNADO`
+  - Abogado (letrado asignado)
+  - Fecha (fecha de recepción o asignación)
+
+- Acciones:
+  - Botón **visualizar expediente** (ícono de ojo)
+  - Navega a `detalle-expediente.html`
+  - No hay edición ni asignación desde esta vista
+
+- Filtros:
+  - Tipo de Gestión
+  - Referencia GDE
+  - Origen
+  - Abogado
+  - Fecha
+  - ❌ No incluye filtro por estado (ya que todos están en `ASIGNADO`)
+
+- Comportamiento:
+  - Vista **solo lectura**
+  - No modifica estado ni asignaciones
+  - Permite trazabilidad y consulta de expedientes cargados
+
+**Estado que modifica:** ninguno (solo lectura)
+> ⚠️ Nota:
+> La Mesa SACO deja de ser una cola de asignación y pasa a ser una bandeja de consulta de expedientes ya asignados.
+> La asignación se realiza únicamente en el flujo de alta de expediente.
 
 ### `alta-expediente.html` — Nuevo Expediente
 **Rol:** Administrativo de Mesa SACO
 **Funcionalidades:**
 - Sección 1: Canal (EE_GDE / MEMO_GDE / MAIL) + N° de referencia + Área + Tipo de gestión
-- Sección 2: Carátula, N° Causa, Juzgado, Fecha hecho, Fecha recepción, Línea ferroviaria
-- Campos condicionales: extensión DEMANDA (variante A/B, monto, Ley 25.344) visible solo si tipo = DEMANDA
+- Sección 2: Carátula, N° Causa, Juzgado (desplegable), Fecha hecho, Fecha recepción, Línea ferroviaria
+- Campos condicionales:
+  - DEMANDA: variante A/B, monto, Ley 25.344
+  - PENAL: N° de Sumario y Comisaría
 - Sección 3: Asignación de letrado (regla según área)
 - Sección 4: Upload de documentos (drag & drop decorativo)
 - Sidebar derecho: flujo de proceso + resumen en tiempo real (se actualiza con cada cambio)
@@ -514,10 +579,10 @@ Las siguientes páginas están diseñadas funcionalmente pero no codificadas aú
 - Formulario email + contraseña
 - Selector de rol simulado (Administrativo / Abogado / Coordinador / Referente)
 - Al hacer login: guarda `currentUser` en `window.SACO` y redirige según rol:
-  - Administrativo → `dashboard-mesa.html`
+  - Administrativo → `mesa-saco.html`
   - Abogado → `bandeja-abogado.html`
   - Coordinador Penal → `gestion-penal.html`
-  - Referente → `dashboard-mesa.html`
+  - Referente → `dashboard.html`
 - No hay validación real de credenciales — cualquier input funciona
 
 ### P5 — `recupero-dano.html` (Baja prioridad)

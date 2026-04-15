@@ -46,13 +46,13 @@ function renderSidebar(activePage) {
   window._sacoPageKey = activePage;
 
   const allNav = [
-    { key: 'dashboard-mesa',     icon: 'assignment',        label: 'Mesa SACO',        href: 'dashboard-mesa.html' },
+    { key: 'dashboard',          icon: 'dashboard',         label: 'Dashboard',        href: 'dashboard.html' },
+    { key: 'mesa-saco',          icon: 'view_list',         label: 'Mesa SACO',        href: 'mesa-saco.html' },
     { key: 'bandeja-abogado',    icon: 'inbox',             label: 'Mi Bandeja',       href: 'bandeja-abogado.html' },
     { key: 'area-civil',         icon: 'gavel',             label: 'Área Civil',       href: 'area-civil.html' },
     { key: 'area-laboral',       icon: 'work',              label: 'Área Laboral',     href: 'area-laboral.html' },
     { key: 'gestion-penal',      icon: 'policy',            label: 'Área Penal',       href: 'gestion-penal.html' },
     { key: 'alta-expediente',    icon: 'create_new_folder', label: 'Nuevo Expediente', href: 'alta-expediente.html' },
-    { key: 'detalle-expediente', icon: 'folder_open',       label: 'Expedientes',      href: 'bandeja-abogado.html' },
     { key: 'reports',            icon: 'analytics',         label: 'Previsión',        href: '#' },
   ];
 
@@ -199,13 +199,13 @@ function selectUser(userId) {
   if (window.SACO_SYNC) window.SACO_SYNC.setCurrentUser(u);
 
   // Re-render sidebar on this tab
-  const pageKey = window._sacoPageKey || 'dashboard-mesa';
+  const pageKey = window._sacoPageKey || 'dashboard';
   document.getElementById('sidebar-mount').innerHTML = renderSidebar(pageKey);
   _updateUserPill(u);
 
   // Redirect if current page is not in this user's nav
   const accesos = window.SACO.getAccesos(u);
-  const mainNavKeys = ['dashboard-mesa','bandeja-abogado','area-civil','area-laboral','gestion-penal','alta-expediente','reports'];
+  const mainNavKeys = ['dashboard', 'mesa-saco','bandeja-abogado','area-civil','area-laboral','gestion-penal','alta-expediente','reports'];
   if (mainNavKeys.includes(pageKey) && !accesos.nav.includes(pageKey)) {
     window.location.href = accesos.inicio + '.html';
     return;

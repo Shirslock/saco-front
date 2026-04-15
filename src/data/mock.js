@@ -1,50 +1,119 @@
 // ── SACO Mock Data ─────────────────────────────────────────────────────────
-// Terminología y datos alineados al CLAUDE.md
 
+// ── Matriz canal × área (fuente de verdad del filtro de tipos) ─────────────
+// canales: array → el tipo aparece cuando el canal activo está en ese array
 const TIPOS_GESTION = {
   CIVIL: [
-    { code: 'OFICIO',          label: 'Oficio',                    canal: 'EE_GDE' },
-    { code: 'CARTA_DOC',       label: 'Carta Documento',           canal: 'EE_GDE' },
-    { code: 'MEDIACION',       label: 'Mediación',                 canal: 'EE_GDE' },
-    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',        canal: 'MEMO_GDE' },
-    { code: 'DEFENSA_CIVIL',   label: 'Defensa Civil',             canal: 'MEMO_GDE' },
-    { code: 'RECUPERO',        label: 'Recupero de Daños',         canal: 'MEMO_GDE' },
-    { code: 'COBRO_CANON',     label: 'Cobro de Cánones',          canal: 'EE_GDE' },
-    { code: 'RECLAMO_CONTRAT', label: 'Reclamo a Contratistas',    canal: 'MEMO_GDE' },
-    { code: 'DEMANDA',         label: 'Demanda',                   canal: 'EE_GDE' },
-    { code: 'EJECUCION_GAR',   label: 'Ejecución de Garantía',     canal: 'MEMO_GDE' },
-    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',        canal: 'MEMO_GDE' },
+    { code: 'OFICIO',          label: 'Oficio',                 canales: ['EE_GDE'] },
+    { code: 'CARTA_DOC',       label: 'Carta Documento',        canales: ['EE_GDE'] },
+    { code: 'MEDIACION',       label: 'Mediación',              canales: ['EE_GDE', 'MEMO_GDE'] },
+    { code: 'COBRO_CANON',     label: 'Cobro de Cánones',       canales: ['EE_GDE'] },
+    { code: 'DEMANDA',         label: 'Demanda',                canales: ['EE_GDE'] },
+    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',     canales: ['MEMO_GDE'] },
+    { code: 'DEFENSA_CIVIL',   label: 'Defensa Civil',          canales: ['MEMO_GDE'] },
+    { code: 'RECUPERO',        label: 'Recupero de Daños',      canales: ['MEMO_GDE'] },
+    { code: 'RECLAMO_CONTRAT', label: 'Reclamo a Contratistas', canales: ['MEMO_GDE'] },
+    { code: 'EJECUCION_GAR',   label: 'Ejecución de Garantía',  canales: ['MEMO_GDE'] },
+    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',     canales: ['MEMO_GDE'] },
+    { code: 'OTROS',           label: 'Otros',                  canales: ['EE_GDE', 'MEMO_GDE'] },
   ],
   LABORAL: [
-    { code: 'OFICIO',          label: 'Oficio',                    canal: 'EE_GDE' },
-    { code: 'CARTA_DOC',       label: 'Carta Documento',           canal: 'EE_GDE' },
-    { code: 'MEDIACION',       label: 'Mediación',                 canal: 'EE_GDE' },
-    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',        canal: 'MEMO_GDE' },
-    { code: 'DESAFUERO',       label: 'Desafuero',                 canal: 'MEMO_GDE' },
-    { code: 'CONSIGNACION',    label: 'Consignación',              canal: 'MEMO_GDE' },
-    { code: 'DEMANDA',         label: 'Demanda',                   canal: 'EE_GDE' },
-    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',        canal: 'MEMO_GDE' },
-    
+    { code: 'OFICIO',          label: 'Oficio',                 canales: ['EE_GDE'] },
+    { code: 'CARTA_DOC',       label: 'Carta Documento',        canales: ['EE_GDE'] },
+    { code: 'MEDIACION',       label: 'Mediación',              canales: ['EE_GDE', 'MEMO_GDE'] },
+    { code: 'DEMANDA',         label: 'Demanda',                canales: ['EE_GDE'] },
+    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',     canales: ['MEMO_GDE'] },
+    { code: 'DESAFUERO',       label: 'Desafuero',              canales: ['MEMO_GDE'] },
+    { code: 'CONSIGNACION',    label: 'Consignación',           canales: ['MEMO_GDE'] },
+    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',     canales: ['MEMO_GDE'] },
+    { code: 'OTROS',           label: 'Otros',                  canales: ['EE_GDE', 'MEMO_GDE'] },
   ],
   PENAL: [
-    { code: 'OFICIO',          label: 'Oficio',                    canal: 'EE_GDE' },
-    { code: 'MEDIACION',       label: 'Mediación',                 canal: 'EE_GDE' },
-    { code: 'DEFENSA_PENAL',   label: 'Defensa Penal',             canal: 'MEMO_GDE' },
-    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',        canal: 'MEMO_GDE' },
-    { code: 'CARTA_SUCESO',    label: 'Carta Suceso (SAE)',        canal: 'MAIL' },
-    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',        canal: 'MEMO_GDE' },
-    { code: 'OTROS',           label: 'Otros',                     canal: 'MEMO_GDE' },
+    // EE GDE
+    { code: 'OFICIO',          label: 'Oficio',                 canales: ['EE_GDE'] },
+    { code: 'MEDIACION',       label: 'Mediación',              canales: ['EE_GDE', 'MEMO_GDE'] },
+    // MEMO GDE
+    { code: 'DEFENSA_PENAL',   label: 'Defensa Penal',          canales: ['MEMO_GDE'] },
+    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',     canales: ['MEMO_GDE'] },
+    { code: 'QUERELLA',        label: 'Querella',               canales: ['MEMO_GDE'] },
+    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',     canales: ['MEMO_GDE'] },
+    { code: 'OTROS',           label: 'Otros',                  canales: ['EE_GDE', 'MEMO_GDE'] },
+    // MAIL
+    { code: 'CARTA_SUCESO',    label: 'Carta Suceso (SAE)',     canales: ['MAIL'] },
   ],
 };
 
+// ── Juzgados (catálogo — completar con los datos del Excel del negocio) ────
+const JUZGADOS = [
+  // ── Fuero Federal Civil y Comercial — CABA ──────────────────────────────
+  { code: 'FFCC_01', label: 'Juzgado Federal Civil y Comercial N°1 — CABA' },
+  { code: 'FFCC_02', label: 'Juzgado Federal Civil y Comercial N°2 — CABA' },
+  { code: 'FFCC_03', label: 'Juzgado Federal Civil y Comercial N°3 — CABA' },
+  { code: 'FFCC_04', label: 'Juzgado Federal Civil y Comercial N°4 — CABA' },
+  { code: 'FFCC_05', label: 'Juzgado Federal Civil y Comercial N°5 — CABA' },
+  { code: 'FFCC_06', label: 'Juzgado Federal Civil y Comercial N°6 — CABA' },
+  { code: 'FFCC_07', label: 'Juzgado Federal Civil y Comercial N°7 — CABA' },
+  { code: 'FFCC_08', label: 'Juzgado Federal Civil y Comercial N°8 — CABA' },
+  { code: 'FFCC_09', label: 'Juzgado Federal Civil y Comercial N°9 — CABA' },
+  { code: 'FFCC_10', label: 'Juzgado Federal Civil y Comercial N°10 — CABA' },
+  { code: 'FFCC_11', label: 'Juzgado Federal Civil y Comercial N°11 — CABA' },
+  { code: 'FFCC_12', label: 'Juzgado Federal Civil y Comercial N°12 — CABA' },
+  // ── Fuero Nacional del Trabajo — CABA ───────────────────────────────────
+  { code: 'JNT_30',  label: 'Juzgado Nacional del Trabajo N°30 — CABA' },
+  { code: 'JNT_38',  label: 'Juzgado Nacional del Trabajo N°38 — CABA' },
+  { code: 'JNT_40',  label: 'Juzgado Nacional del Trabajo N°40 — CABA' },
+  { code: 'JNT_42',  label: 'Juzgado Nacional del Trabajo N°42 — CABA' },
+  { code: 'JNT_45',  label: 'Juzgado Nacional del Trabajo N°45 — CABA' },
+  { code: 'JNT_55',  label: 'Juzgado Nacional del Trabajo N°55 — CABA' },
+  { code: 'JNT_60',  label: 'Juzgado Nacional del Trabajo N°60 — CABA' },
+  { code: 'JNT_74',  label: 'Juzgado Nacional del Trabajo N°74 — CABA' },
+  { code: 'JNT_80',  label: 'Juzgado Nacional del Trabajo N°80 — CABA' },
+  // ── Fuero Federal en lo Criminal y Correccional — CABA ──────────────────
+  { code: 'JFCC_01', label: 'Juzgado Federal en lo Criminal y Correccional N°1 — CABA' },
+  { code: 'JFCC_02', label: 'Juzgado Federal en lo Criminal y Correccional N°2 — CABA' },
+  { code: 'JFCC_03', label: 'Juzgado Federal en lo Criminal y Correccional N°3 — CABA' },
+  { code: 'JFCC_04', label: 'Juzgado Federal en lo Criminal y Correccional N°4 — CABA' },
+  { code: 'JFCC_05', label: 'Juzgado Federal en lo Criminal y Correccional N°5 — CABA' },
+  { code: 'JFCC_06', label: 'Juzgado Federal en lo Criminal y Correccional N°6 — CABA' },
+  { code: 'JFCC_07', label: 'Juzgado Federal en lo Criminal y Correccional N°7 — CABA' },
+  { code: 'JFCC_08', label: 'Juzgado Federal en lo Criminal y Correccional N°8 — CABA' },
+  { code: 'JFCC_09', label: 'Juzgado Federal en lo Criminal y Correccional N°9 — CABA' },
+  { code: 'JFCC_10', label: 'Juzgado Federal en lo Criminal y Correccional N°10 — CABA' },
+  { code: 'JFCC_11', label: 'Juzgado Federal en lo Criminal y Correccional N°11 — CABA' },
+  { code: 'JFCC_12', label: 'Juzgado Federal en lo Criminal y Correccional N°12 — CABA' },
+  // ── Fuero Federal — Interior ─────────────────────────────────────────────
+  { code: 'JFR_MZA', label: 'Juzgado Federal de Mendoza' },
+  { code: 'JFR_TUC', label: 'Juzgado Federal de Tucumán' },
+  { code: 'JFR_CBA', label: 'Juzgado Federal de Córdoba' },
+  { code: 'JFR_ROS', label: 'Juzgado Federal de Rosario' },
+  // ── Fuero Contencioso Administrativo Federal ─────────────────────────────
+  { code: 'JCAF_01', label: 'Juzgado Contencioso Administrativo Federal N°1' },
+  { code: 'JCAF_02', label: 'Juzgado Contencioso Administrativo Federal N°2' },
+  { code: 'JCAF_03', label: 'Juzgado Contencioso Administrativo Federal N°3' },
+  { code: 'JCAF_04', label: 'Juzgado Contencioso Administrativo Federal N°4' },
+  { code: 'JCAF_05', label: 'Juzgado Contencioso Administrativo Federal N°5' },
+  { code: 'JCAF_06', label: 'Juzgado Contencioso Administrativo Federal N°6' },
+  // ── Cámara ───────────────────────────────────────────────────────────────
+  { code: 'CAM_CCIV', label: 'Cámara Federal Civil y Comercial — CABA' },
+  { code: 'CAM_TRAB', label: 'Cámara Nacional del Trabajo — CABA' },
+  { code: 'CAM_CRIM', label: 'Cámara Federal Criminal y Correccional — CABA' },
+  { code: 'CAM_CAF',  label: 'Cámara Contencioso Administrativo Federal' },
+  // ── Mediación ────────────────────────────────────────────────────────────
+  { code: 'MED_CABA', label: 'Centro de Mediación Prejudicial — CABA' },
+  // ── Sin juzgado / pendiente ──────────────────────────────────────────────
+  { code: 'SIN_JDO',  label: 'Sin juzgado asignado aún' },
+];
+
 const LINEAS_FERROVIARIAS = [
-  { code: 'LM',  label: 'Línea Mitre',         abogado: 'Dr. Marcos Gallo' },
-  { code: 'LSM', label: 'Línea San Martín',    abogado: 'Dra. Carla Ibáñez' },
-  { code: 'LGR', label: 'Línea General Roca',  abogado: 'Dr. Ramón Pereyra' },
-  { code: 'LBS', label: 'Línea Belgrano Sur',  abogado: 'Dra. Sofía Mena' },
-  { code: 'LS',  label: 'Línea Sarmiento',     abogado: 'Dr. Pablo Torres' },
-  { code: 'TDC', label: 'Tren de la Costa',    abogado: 'Dra. Carla Ibáñez' },
-  { code: 'AMBA',label: 'AMBA / General',      abogado: 'Dr. Marcos Gallo' },
+  { code: 'LM',          label: 'Línea Mitre',         abogado: 'Dr. Marcos Gallo' },
+  { code: 'LSM',         label: 'Línea San Martín',    abogado: 'Dra. Carla Ibáñez' },
+  { code: 'LGR',         label: 'Línea General Roca',  abogado: 'Dr. Ramón Pereyra' },
+  { code: 'LBS',         label: 'Línea Belgrano Sur',  abogado: 'Dra. Sofía Mena' },
+  { code: 'LS',          label: 'Línea Sarmiento',     abogado: 'Dr. Pablo Torres' },
+  { code: 'TDC',         label: 'Tren de la Costa',    abogado: 'Dra. Carla Ibáñez' },
+  { code: 'CENTRAL',     label: 'Central',             abogado: 'Dra. Carla Ibáñez' },
+  { code: 'REGIONALES',  label: 'Regionales',          abogado: 'Dra. Carla Ibáñez' },
+  { code: 'GENERAL',     label: 'General',             abogado: 'Dr. Marcos Gallo' },
 ];
 
 const ABOGADOS = {
@@ -64,37 +133,37 @@ const ESTADOS = [
   { code: 'URGENTE',              label: 'Urgente',              color: 'error' },
 ];
 
-// Queue de Mesa SACO — expedientes pendientes de asignación
+// Bandeja Mesa SACO
 const QUEUE_MESA = [
   {
     id: 'Q-001', tipo: 'Oficio Judicial', ref: 'EX-2026-00441-APN-SACO#SOFSE',
-    origen: 'Externo', canal: 'EE_GDE', area: null, estado: 'PENDIENTE',
+    origen: 'Externo', canal: 'EE_GDE', area: 'CIVIL', estado: 'ASIGNADO',
     caratula: 'Juzgado Federal N°3 s/ información vía férrea Km 4.5',
-    linea: 'LM', fecha: '2026-04-12', prioridad: 'NORMAL',
+    linea: 'LM', fecha: '2026-04-12', prioridad: 'NORMAL', abogado: 'Dr. Alejandro Rossi'
   },
   {
     id: 'Q-002', tipo: 'Carta Documento', ref: 'EX-2026-00449-APN-SACO#SOFSE',
-    origen: 'Externo', canal: 'EE_GDE', area: 'LABORAL', estado: 'GDE_VINCULADO',
+    origen: 'Externo', canal: 'EE_GDE', area: 'LABORAL', estado: 'ASIGNADO',
     caratula: 'García, Roberto c/ SOFSE s/ diferencias salariales',
-    linea: null, fecha: '2026-04-12', prioridad: 'NORMAL',
+    linea: null, fecha: '2026-04-12', prioridad: 'NORMAL', abogado: 'Dr. Hernán Blanco'
   },
   {
     id: 'Q-003', tipo: 'Mediación Prejudicial', ref: 'EX-2026-00452-APN-SACO#SOFSE',
-    origen: 'Externo', canal: 'EE_GDE', area: 'CIVIL', estado: 'PENDIENTE',
+    origen: 'Externo', canal: 'EE_GDE', area: 'CIVIL', estado: 'ASIGNADO',
     caratula: 'Martínez, Ana c/ SOFSE s/ daños y perjuicios paso a nivel',
-    linea: null, fecha: '2026-04-11', prioridad: 'NORMAL',
+    linea: null, fecha: '2026-04-11', prioridad: 'NORMAL', abogado: 'Dra. Elena Ruiz'
   },
   {
     id: 'Q-004', tipo: 'Carta Suceso SAE', ref: 'MAIL-SAE-2026-0088',
-    origen: 'Interno', canal: 'MAIL', area: 'PENAL', estado: 'URGENTE',
+    origen: 'Interno', canal: 'MAIL', area: 'PENAL', estado: 'ASIGNADO',
     caratula: 'Descarrilamiento Línea Mitre — Estación Palermo',
-    linea: 'LM', fecha: '2026-04-13', prioridad: 'URGENTE',
+    linea: 'LM', fecha: '2026-04-13', prioridad: 'URGENTE', abogado: 'Dr. Marcos Gallo'
   },
   {
     id: 'Q-005', tipo: 'Memo GDE — Recupero', ref: 'ME-2026-00118-APN-SGSSL#SOFSE',
-    origen: 'Interno', canal: 'MEMO_GDE', area: 'CIVIL', estado: 'PENDIENTE',
+    origen: 'Interno', canal: 'MEMO_GDE', area: 'CIVIL', estado: 'ASIGNADO',
     caratula: 'Recupero daños vehículo — Paso a nivel Manuel Acosta',
-    linea: 'LSM', fecha: '2026-04-10', prioridad: 'NORMAL',
+    linea: 'LSM', fecha: '2026-04-10', prioridad: 'NORMAL', abogado: 'Dr. Sergio Fontana'
   },
 ];
 
@@ -284,22 +353,22 @@ const USUARIOS = [
 // Accesos por rol — nav visible, permisos y página de inicio
 const ROL_ACCESOS = {
   REFERENTE: {
-    nav: ['dashboard-mesa','bandeja-abogado','area-civil','area-laboral','gestion-penal','alta-expediente','reports'],
-    puedeReasignar: true, verTodaBandeja: true, inicio: 'dashboard-mesa',
+    nav: ['dashboard','bandeja-abogado','area-civil','area-laboral','gestion-penal','reports'],
+    puedeReasignar: true, verTodaBandeja: true, inicio: 'dashboard',
   },
   ADMINISTRATIVO: {
-    nav: ['dashboard-mesa','alta-expediente','bandeja-abogado'],
-    puedeReasignar: false, verTodaBandeja: false, inicio: 'dashboard-mesa',
+    nav: ['mesa-saco','alta-expediente'],
+    puedeReasignar: false, verTodaBandeja: false, inicio: 'mesa-saco',
   },
   COORDINADOR: {
-    CIVIL:   { nav: ['dashboard-mesa','bandeja-abogado','area-civil','alta-expediente','reports'],    puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-civil'    },
-    LABORAL: { nav: ['dashboard-mesa','bandeja-abogado','area-laboral','alta-expediente','reports'],  puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-laboral'  },
-    PENAL:   { nav: ['dashboard-mesa','bandeja-abogado','gestion-penal','alta-expediente','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'gestion-penal' },
+    CIVIL:   { nav: ['dashboard','bandeja-abogado','area-civil','reports'],    puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-civil'    },
+    LABORAL: { nav: ['dashboard','bandeja-abogado','area-laboral','reports'],  puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-laboral'  },
+    PENAL:   { nav: ['dashboard','bandeja-abogado','gestion-penal','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'gestion-penal' },
   },
   ABOGADO: {
-    CIVIL:   { nav: ['bandeja-abogado','area-civil','alta-expediente'],    puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
-    LABORAL: { nav: ['bandeja-abogado','area-laboral','alta-expediente'],  puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
-    PENAL:   { nav: ['bandeja-abogado','gestion-penal','alta-expediente'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    CIVIL:   { nav: ['bandeja-abogado','area-civil'],    puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    LABORAL: { nav: ['bandeja-abogado','area-laboral'],  puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    PENAL:   { nav: ['bandeja-abogado','gestion-penal'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
   },
 };
 
@@ -311,9 +380,404 @@ function getAccesos(usuario) {
   return r;
 }
 
+// ── SACO Form Config ────────────────────────
+//
+// ── Definiciones atómicas de cada campo ───────────────────────────────────
+// El render usa estas definiciones para generar el HTML correcto.
+// type: 'text' | 'date' | 'select' | 'textarea' | 'select-dynamic' | 'toggle-input'
+//
+// select-dynamic: las options se resuelven en tiempo de render via optionsFn
+// toggle-input:   switch + input condicional (caso N° de Siniestro)
+
+const FIELD_DEFINITIONS = {
+
+  // ── Campos universales ─────────────────────────────────────────────────
+  num_causa: {
+    label: 'N° de Causa Judicial',
+    type: 'text',
+    mono: true,
+    placeholder: 'FSM-XXXXX/2026 / IPP-XXXX / SS SOFSE',
+    hint: 'SS = Sin Siniestro cuando no hay N° de causa',
+  },
+  caratula: {
+    label: 'Carátula / Título del Caso',
+    type: 'text',
+    placeholder: 'Ej: García, Roberto c/ SOFSE s/ diferencias salariales',
+    onInput: 'updateResumen()',
+  },
+  fecha_hecho: {
+    label: 'Fecha del Hecho',
+    type: 'date',
+  },
+  fecha_recepcion: {
+    label: 'Fecha de Recepción en SACO',
+    type: 'date',
+    defaultToday: true,
+  },
+  dependencia: {
+    label: 'Dependencia Judicial / Juzgado',
+    type: 'select-dynamic',
+    optionsFn: () => (window.SACO.JUZGADOS || []).map(j => ({ value: j.code, label: j.label })),
+    placeholder: '— Seleccioná juzgado —',
+  },
+  linea_ferroviaria: {
+    label: 'Línea Ferroviaria',
+    type: 'select-dynamic',
+    optionsFn: () => window.SACO.LINEAS_FERROVIARIAS.map(l => ({ value: l.code, label: l.label })),
+    placeholder: '— Sin línea asociada —',
+    onChange: 'onLineaChange()',
+  },
+  num_siniestro: {
+    label: 'N° de Siniestro',
+    type: 'toggle-input',
+    mono: true,
+    placeholder: 'SS-XXXX-XXXX / SS SOFSE',
+    toggleLabel: 'Tiene N° de Siniestro',
+  },
+  observaciones: {
+    label: 'Observaciones',
+    labelSuffix: '(accesible en cualquier estado)',
+    type: 'textarea',
+    rows: 3,
+    placeholder: 'Notas relevantes sobre el expediente...',
+  },
+
+  // ── Civil / Laboral ────────────────────────────────────────────────────
+  parte_actora: {
+    label: 'Parte Actora',
+    type: 'text',
+    placeholder: 'Nombre y apellido / razón social',
+  },
+  parte_demandada: {
+    label: 'Parte Demandada',
+    type: 'text',
+    placeholder: 'Ej: SOFSE / Estado Nacional',
+  },
+  coactores: {
+    label: 'Coactores',
+    type: 'text',
+    placeholder: 'Otros actores (opcional)',
+  },
+  codemandados: {
+    label: 'Codemandados',
+    type: 'text',
+    placeholder: 'Otros demandados (opcional)',
+  },
+  tipo_hecho: {
+    label: 'Tipo de Hecho',
+    type: 'select',
+    options: [
+      { value: '', label: '— Seleccioná —' },
+      { value: 'ACCIDENTE_PASO_NIVEL', label: 'Accidente en paso a nivel' },
+      { value: 'CAIDA_ANDEN',          label: 'Caída en andén / plataforma' },
+      { value: 'CHOQUE_FORMACION',     label: 'Choque de formación' },
+      { value: 'ACCIDENTE_LABORAL',    label: 'Accidente laboral' },
+      { value: 'DAÑO_VEHICULO',        label: 'Daño a vehículo' },
+      { value: 'OTRO',                 label: 'Otro' },
+    ],
+  },
+  lugar_hecho: {
+    label: 'Lugar del Hecho',
+    type: 'text',
+    placeholder: 'Km / Estación / Sector',
+  },
+  juicio: {
+    label: 'Juicio',
+    type: 'select',
+    options: [
+      { value: '',  label: '— Seleccioná —' },
+    ],
+  },
+  importe: {
+    label: 'Importe / Monto de la Demanda',
+    type: 'text',
+    placeholder: '$ 0',
+    onInput: 'formatCurrency(this)'
+  },
+
+  // ── DEMANDA extra (Civil / Laboral) ────────────────────────────────────
+  variante_ingreso: {
+    label: 'Variante de Ingreso',
+    type: 'select',
+    options: [
+      { value: 'A', label: 'Variante A — Cédula en papel (SOFSE demandada)' },
+      { value: 'B', label: 'Variante B — GDE directo (Estado Nacional demandado)' },
+    ],
+  },
+  req_25344: {
+    label: 'Requisitos Ley 25.344 cumplidos',
+    type: 'checkbox',
+  },
+
+  // ── PENAL — compartidos ────────────────────────────────────────────────
+  penal_requirente: {
+    label: 'Datos del Requirente',
+    type: 'select',
+    options: [
+      { value: '',                    label: '— Seleccioná —' },
+      { value: 'JUZGADO',             label: 'Juzgado' },
+      { value: 'PEDIDO_FILMACIONES',  label: 'Pedido de Filmaciones' },
+      { value: 'COMISARIA',           label: 'Comisaría' },
+      { value: 'FISCALIA',            label: 'Fiscalía' },
+      { value: 'TRIBUNAL',            label: 'Tribunal' },
+      { value: 'ORGANISMO',           label: 'Organismo' },
+    ],
+  },
+  penal_mail: {
+    label: 'Mail del Requirente',
+    type: 'text',
+    placeholder: 'ejemplo@organismo.gob.ar',
+  },
+  penal_telefono: {
+    label: 'Teléfono del Requirente',
+    type: 'text',
+    placeholder: '011-1234-5678',
+  },
+  penal_direccion: {
+    label: 'Dirección del Requirente',
+    type: 'text',
+    placeholder: 'Av. Siempre Viva 123',
+  },
+  penal_tipo_hecho: {
+    label: 'Tipo de Hecho',
+    type: 'text',
+    placeholder: 'Describe el tipo de hecho penal',
+  },
+  penal_lugar_hecho: {
+    label: 'Lugar del Hecho',
+    type: 'text',
+    placeholder: 'Km / Estación / Sector',
+  },
+  penal_damnificada: {
+    label: 'Parte Damnificada',
+    type: 'text',
+    placeholder: 'Nombre y apellido',
+  },
+  penal_tipo_solicitud_ee: {
+    label: 'Tipo de Solicitud',
+    type: 'select',
+    options: [
+      { value: '',                    label: '— Seleccioná —' },
+      { value: 'PEDIDO_INFO',         label: 'Pedido de Información' },
+      { value: 'PEDIDO_FILMACIONES',  label: 'Pedido de Filmaciones' },
+      { value: 'CITACION',            label: 'Citación' },
+      { value: 'DESCRIPCION',         label: 'Descripción / Campo abierto' },
+    ],
+    onChange: 'onTipoSolicitudChange(this)',
+    conditionalField: {
+      triggerValue: 'DESCRIPCION',
+      field: 'penal_solicitud_desc',
+    },
+  },
+  penal_solicitud_desc: {
+    label: 'Descripción de la Solicitud',
+    type: 'textarea',
+    rows: 2,
+    placeholder: 'Detallá la solicitud...',
+    hiddenByDefault: true,  // visible solo cuando el select padre = DESCRIPCION
+  },
+
+  // ── PENAL EE específicos ───────────────────────────────────────────────
+  penal_imputada: {
+    label: 'Parte Imputada',
+    type: 'text',
+    placeholder: 'Nombre y apellido / N.N.',
+  },
+
+  // ── PENAL MEMO específicos ─────────────────────────────────────────────
+  penal_area_req: {
+    label: 'Área Requirente (interna)',
+    type: 'text',
+    placeholder: 'SGSySL / GCO / GAJ...',
+  },
+  penal_empleado: {
+    label: 'Datos del Empleado a Asistir',
+    type: 'text',
+    placeholder: 'Nombre, cargo, legajo',
+  },
+  penal_tipo_solicitud_memo: {
+    label: 'Tipo de Solicitud',
+    type: 'select',
+    options: [
+      { value: '',                       label: '— Seleccioná —' },
+      { value: 'PEDIDO_INFO',            label: 'Pedido de Información' },
+      { value: 'PEDIDO_FILMACIONES',     label: 'Pedido de Filmaciones' },
+      { value: 'CITACION',               label: 'Citación' },
+      { value: 'PEDIDO_ASISTENCIA',      label: 'Pedido de Asistencia' },
+      { value: 'PEDIDO_INTERVENCION',    label: 'Pedido de Intervención' },
+      { value: 'DESCRIPCION',            label: 'Descripción / Campo abierto' },
+    ],
+    onChange: 'onTipoSolicitudChange(this)',
+    conditionalField: {
+      triggerValue: 'DESCRIPCION',
+      field: 'penal_solicitud_desc',
+    },
+  },
+
+  // ── PENAL (todos los canales) ──────────────────────
+  penal_sumario: {
+    label: 'N° de Sumario',
+    type: 'text',
+    mono: true,
+    placeholder: 'IPP-XXXX-XXXX / Sin sumario',
+  },
+  penal_comisaria: {
+    label: 'Comisaría',
+    type: 'text',
+    placeholder: 'Comisaría N° / Nombre',
+  },
+};
+
+// ── Configuración de formulario por área × canal ───────────────────────────
+
+const FORM_CONFIG = {
+
+  // ── CIVIL ──────────────────────────────────────────────────────────────
+  CIVIL: {
+    // Campos comunes a todos los canales civil
+    common: [
+      'num_causa',
+      'caratula',
+      'parte_actora',
+      'parte_demandada',
+      'coactores',
+      'codemandados',
+      'fecha_hecho',
+      'fecha_recepcion',
+      'dependencia',
+      'tipo_hecho',
+      'lugar_hecho',
+      'linea_ferroviaria',
+      'juicio',
+      'importe',
+      {
+        group: 'Datos específicos — Demanda',
+        icon: 'description',
+        color: 'border-primary/30',
+        visibleWhenTipo: 'DEMANDA',
+        fields: ['variante_ingreso', 'req_25344'],
+      },
+      'num_siniestro',
+      'observaciones:full',
+    ],
+  },
+
+  // ── LABORAL ────────────────────────────────────────────────────────────
+  LABORAL: {
+    common: [
+      'num_causa',
+      'caratula',
+      'parte_actora',
+      'parte_demandada',
+      'coactores',
+      'codemandados',
+      'fecha_hecho',
+      'fecha_recepcion',
+      'dependencia',
+      'tipo_hecho',
+      'lugar_hecho',
+      'linea_ferroviaria',
+      'juicio',
+      'importe',
+      {
+        group: 'Datos específicos — Demanda',
+        icon: 'description',
+        color: 'border-primary/30',
+        visibleWhenTipo: 'DEMANDA',
+        fields: ['variante_ingreso', 'req_25344'],
+      },
+      'num_siniestro',
+      'observaciones:full',
+    ],
+  },
+
+  // ── PENAL × canal ──────────────────────────────────────────────────────
+  PENAL: {
+
+    EE_GDE: [
+      'num_causa',
+      'caratula',
+      'fecha_hecho',
+      'fecha_recepcion',
+      'dependencia',
+      'linea_ferroviaria',
+      'penal_requirente',
+      'penal_mail',
+      'penal_telefono',
+      'penal_direccion',
+      'penal_tipo_hecho',
+      'penal_lugar_hecho',
+      'penal_damnificada',
+      'penal_imputada',
+      'penal_tipo_solicitud_ee:full',
+      'penal_solicitud_desc:full',
+      'penal_sumario', 'penal_comisaria',
+      'num_siniestro',
+      'observaciones:full',
+    ],
+
+    MEMO_GDE: [
+      'num_causa',
+      'caratula',
+      'fecha_hecho',
+      'fecha_recepcion',
+      'dependencia',
+      'linea_ferroviaria',
+      'penal_mail',
+      'penal_telefono',
+      'penal_direccion',
+      'penal_tipo_hecho',
+      'penal_lugar_hecho',
+      'penal_damnificada',
+      'datos_empleado',
+      'penal_tipo_solicitud_memo:full',
+      'penal_solicitud_desc:full',
+      'penal_sumario',
+      'penal_comisaria',
+      'num_siniestro',
+      'observaciones:full',
+    ],
+
+    MAIL: [
+      'num_causa',
+      'caratula',
+      'fecha_hecho',
+      'fecha_recepcion',
+      'dependencia',
+      'linea_ferroviaria',
+      'penal_requirente',
+      'penal_mail',
+      'penal_telefono',
+      'penal_direccion',
+      'penal_tipo_hecho',
+      'penal_lugar_hecho',
+      'penal_damnificada',
+      'penal_imputada',
+      'penal_tipo_solicitud_ee:full',
+      'penal_solicitud_desc:full',
+      'penal_sumario', 'penal_comisaria',
+      'num_siniestro',
+      'observaciones:full',
+    ],
+  },
+};
+
 window.SACO = {
-  TIPOS_GESTION, LINEAS_FERROVIARIAS, ABOGADOS, ESTADOS,
-  QUEUE_MESA, EXPEDIENTES_ABOGADO, EXPEDIENTE_DETALLE,
-  CARTA_SUCESO_QUEUE, CAUSAS_PENALES,
-  USUARIOS, ROL_ACCESOS, CURRENT_USER: null, getAccesos,
+  TIPOS_GESTION,
+  LINEAS_FERROVIARIAS,
+  ABOGADOS,
+  ESTADOS,
+  QUEUE_MESA,
+  EXPEDIENTES_ABOGADO,
+  EXPEDIENTE_DETALLE,
+  CARTA_SUCESO_QUEUE,
+  CAUSAS_PENALES,
+  JUZGADOS,
+  USUARIOS,
+  ROL_ACCESOS,
+  CURRENT_USER: null,
+  getAccesos,
+
+  FIELD_DEFINITIONS,
+  FORM_CONFIG,
 };
