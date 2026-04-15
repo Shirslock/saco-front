@@ -70,6 +70,9 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[16px]">upload_file</span> Subir Documento
         <input type="file" id="file-input-det" class="hidden" accept=".pdf,.docx" onchange="subirDoc(this)"/>
       </button>
+      <button onclick="abrirModalVincular()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[16px]">link</span> Vincular
+      </button>
       <button onclick="modalCambiarEstado()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-colors">
         <span class="material-symbols-outlined text-[16px]">swap_horiz</span> Cambiar Estado
       </button>
@@ -82,53 +85,75 @@ tailwind.config = {
   <!-- ── Bento Grid ────────────────────────────────────────────────────── -->
   <div class="grid grid-cols-12 gap-6">
 
-    <!-- ── Columna izquierda: metadata ──────────────────────────────────── -->
+    <!-- ── Columna izquierda: tabs ──────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-5">
 
-      <!-- Metadata -->
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-6">
-        <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant mb-5">Datos del Expediente</h3>
-        <dl id="metadata-list" class="space-y-3"></dl>
-      </div>
+      <div class="bg-surface-container-lowest rounded-xl shadow-card">
 
-      <!-- Observaciones — siempre accesible -->
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant">Observaciones</h3>
-          <button onclick="guardarObs()" class="text-[10px] font-bold text-primary hover:underline">Guardar</button>
+        <!-- Tab headers -->
+        <div class="flex border-b border-outline-variant/15 px-6 pt-4 gap-6">
+          <button onclick="setTabIzq('datos')"   id="ti-datos"    class="tab-active pb-3 text-sm transition-colors">Datos</button>
+          <button onclick="setTabIzq('vinculos')" id="ti-vinculos" class="tab-inactive pb-3 text-sm transition-colors">Vínculos</button>
+          <button onclick="setTabIzq('estados')"  id="ti-estados"  class="tab-inactive pb-3 text-sm transition-colors">Estados</button>
         </div>
-        <textarea id="obs-field" class="obs-area w-full bg-surface-container-low border-none rounded-lg p-3 text-sm resize-none leading-relaxed" rows="5" placeholder="Notas relevantes sobre el expediente..."></textarea>
-        <p class="text-[10px] text-on-surface-variant mt-2">Campo accesible en cualquier estado del expediente.</p>
-      </div>
 
-      <!-- Log de estados -->
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-6">
-        <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant mb-4">Historial de Estados</h3>
-        <div class="space-y-3" id="estado-log">
-          <div class="flex gap-3 items-start">
-            <div class="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
-            <div>
-              <p class="text-xs font-bold text-on-surface">En Prueba</p>
-              <p class="text-[10px] text-on-surface-variant">10/02/2026 · Mesa SACO</p>
-            </div>
+        <!-- Tab Datos -->
+        <div id="panel-izq-datos" class="p-6">
+          <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant mb-5">Datos del Expediente</h3>
+          <dl id="metadata-list" class="space-y-3"></dl>
+        </div>
+
+        <!-- Tab Vínculos -->
+        <div id="panel-izq-vinculos" class="hidden p-6">
+          <button onclick="abrirModalVincular()"
+            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5
+            bg-surface-container-low text-on-surface text-sm font-semibold rounded-xl
+            border border-outline-variant/15 hover:bg-surface-container transition-colors mb-4">
+            <span class="material-symbols-outlined text-[16px]">link</span>
+            Vincular Expediente
+          </button>
+          <div id="vinculos-list"></div>
+        </div>
+
+        <!-- Tab Estados -->
+        <div id="panel-izq-estados" class="hidden p-6">
+          <!-- Filtro de timeline por estado -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Filtrar por estado procesal</label>
+            <select id="filtro-estado-timeline"
+              onchange="renderTimeline(this.value || null)"
+              class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary/20">
+              <option value="">Todos los estados</option>
+            </select>
           </div>
-          <div class="flex gap-3 items-start">
-            <div class="w-2 h-2 rounded-full bg-outline-variant mt-1.5 flex-shrink-0"></div>
-            <div>
-              <p class="text-xs font-bold text-on-surface">En Plazo Contestar Demanda</p>
-              <p class="text-[10px] text-on-surface-variant">20/10/2023 · Mesa SACO</p>
+          <!-- Historial de estados -->
+          <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant mb-4">Historial de Estados</h3>
+          <div class="space-y-3" id="estado-log">
+            <div class="flex gap-3 items-start">
+              <div class="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+              <div>
+                <p class="text-xs font-bold text-on-surface">En Prueba</p>
+                <p class="text-[10px] text-on-surface-variant">10/02/2026 · Mesa SACO</p>
+              </div>
             </div>
-          </div>
-          <div class="flex gap-3 items-start">
-            <div class="w-2 h-2 rounded-full bg-outline-variant mt-1.5 flex-shrink-0"></div>
-            <div>
-              <p class="text-xs font-bold text-on-surface">Apertura — EN_TRAMITE</p>
-              <p class="text-[10px] text-on-surface-variant">20/10/2023 · Sistema (auto)</p>
+            <div class="flex gap-3 items-start">
+              <div class="w-2 h-2 rounded-full bg-outline-variant mt-1.5 flex-shrink-0"></div>
+              <div>
+                <p class="text-xs font-bold text-on-surface">En Plazo Contestar Demanda</p>
+                <p class="text-[10px] text-on-surface-variant">20/10/2023 · Mesa SACO</p>
+              </div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <div class="w-2 h-2 rounded-full bg-outline-variant mt-1.5 flex-shrink-0"></div>
+              <div>
+                <p class="text-xs font-bold text-on-surface">Apertura — EN_TRAMITE</p>
+                <p class="text-[10px] text-on-surface-variant">20/10/2023 · Sistema (auto)</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
+      </div>
     </div>
 
     <!-- ── Columna derecha: timeline + docs ─────────────────────────────── -->
@@ -145,7 +170,7 @@ tailwind.config = {
       <div id="panel-timeline" class="bg-surface-container-low rounded-xl p-7 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-28 h-28 bg-primary/5 rounded-bl-full pointer-events-none"></div>
         <h3 class="font-headline font-bold text-on-surface mb-7">Ciclo de Vida — Actividades</h3>
-        <div class="relative pl-8 space-y-10 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[2px] before:bg-primary-container" id="timeline-list"></div>
+        <div id="timeline-list"></div>
         <div class="mt-8 pt-5 border-t border-outline-variant/10">
           <button onclick="modalMovimiento()" class="flex items-center gap-2 text-primary text-sm font-bold hover:underline">
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
@@ -234,7 +259,6 @@ document.getElementById('h-juzgado').textContent   = exp.juzgado;
 document.getElementById('h-num').textContent       = exp.id;
 document.getElementById('h-estado-badge').innerHTML = SACO_UI.estadoBadge(exp.estado, exp.estado.replace(/_/g,' '));
 document.getElementById('h-area-badge').innerHTML  = SACO_UI.areaBadge(exp.area);
-document.getElementById('obs-field').value         = exp.observaciones;
 
 // ── Metadata ───────────────────────────────────────────────────────────────
 const metaFields = [
@@ -264,35 +288,35 @@ const tiposMov = ['DERIVACION','MEMO_ENVIADO','NOTA_RESPUESTA','PRORROGA','RECEP
 const tipoIcons = { RECEPCION:'inbox', NOTA_RESPUESTA:'mail', MOVIMIENTO:'edit_note', DERIVACION:'forward', CIERRE:'task_alt' };
 let movFileSelected = null;
 let subFilesSelected = {};
+let estadoActual = exp.estado;
 
-function renderTimeline() {
-  document.getElementById('timeline-list').innerHTML = exp.timeline.map((t, idx) => {
-    const expandido = t.activo; // solo el primero (activo) arranca expandido
-    const tieneContenido = t.desc || t.doc || (t.subMovimientos && t.subMovimientos.length > 0);
-    const subMov = (t.subMovimientos || []).map(s => `
-      <div class="mt-3 pl-4 border-l-2 border-outline-variant/20 space-y-2">
-        <div class="flex items-start gap-2">
-          <span class="material-symbols-outlined text-[13px] text-on-surface-variant mt-0.5">subdirectory_arrow_right</span>
-          <div>
-            <p class="text-[11px] font-bold text-on-surface">${s.titulo}</p>
-            <p class="text-[10px] text-on-surface-variant">${s.fecha}</p>
-            <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">${s.desc}</p>
-            ${s.doc ? `<div class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-surface-container rounded-lg w-fit">
-              <span class="material-symbols-outlined text-[12px] text-on-surface-variant">attachment</span>
-              <span class="text-[10px] font-medium text-on-surface-variant font-mono">${s.doc}</span>
-            </div>` : ''}
-          </div>
+function renderMovimiento(t, idx, esActivo) {
+  const expandido = esActivo;
+  const tieneContenido = t.desc || t.doc || (t.subMovimientos && t.subMovimientos.length > 0);
+  const subMov = (t.subMovimientos || []).map(s => `
+    <div class="mt-3 pl-4 border-l-2 border-outline-variant/20 space-y-2">
+      <div class="flex items-start gap-2">
+        <span class="material-symbols-outlined text-[13px] text-on-surface-variant mt-0.5">subdirectory_arrow_right</span>
+        <div>
+          <p class="text-[11px] font-bold text-on-surface">${s.titulo}</p>
+          <p class="text-[10px] text-on-surface-variant">${s.fecha}</p>
+          <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">${s.desc}</p>
+          ${s.doc ? `<div class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-surface-container rounded-lg w-fit">
+            <span class="material-symbols-outlined text-[12px] text-on-surface-variant">attachment</span>
+            <span class="text-[10px] font-medium text-on-surface-variant font-mono">${s.doc}</span>
+          </div>` : ''}
         </div>
-      </div>`).join('');
+      </div>
+    </div>`).join('');
 
-    return `
+  return `
     <div class="relative">
-      <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${t.activo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
+      <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${esActivo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
       <div class="flex flex-col md:flex-row md:items-start gap-3">
-        <span class="text-xs font-bold ${t.activo?'text-primary':'text-on-surface-variant'} whitespace-nowrap pt-0.5">${t.fecha}</span>
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm flex-1 ${t.activo?'border-l-4 border-primary':''}">
+        <span class="text-xs font-bold ${esActivo?'text-primary':'text-on-surface-variant'} whitespace-nowrap pt-0.5">${t.fecha}</span>
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm flex-1 ${esActivo?'border-l-4 border-primary':''}">
           <button onclick="toggleMovimiento(${idx})" class="w-full flex items-center gap-2 p-5 text-left">
-            <span class="material-symbols-outlined text-[16px] ${t.activo?'text-primary':'text-on-surface-variant'}">${tipoIcons[t.tipo]||'circle'}</span>
+            <span class="material-symbols-outlined text-[16px] ${esActivo?'text-primary':'text-on-surface-variant'}">${tipoIcons[t.tipo]||'circle'}</span>
             <h4 class="text-sm font-bold text-on-surface flex-1">${t.titulo}</h4>
             ${tieneContenido ? `<span id="chevron-${idx}" class="material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${expandido ? 'rotate-90' : ''}">chevron_right</span>` : ''}
           </button>
@@ -331,7 +355,38 @@ function renderTimeline() {
         </div>
       </div>
     </div>`;
-  }).join('');
+}
+
+function renderTimeline(filtroEstado = null) {
+  // Agrupar movimientos por estadoExpediente
+  const grupos = {};
+  const ordenGrupos = [];
+  exp.timeline.forEach(t => {
+    const key = t.estadoExpediente || 'EN_TRAMITE';
+    if (!grupos[key]) { grupos[key] = []; ordenGrupos.push(key); }
+    grupos[key].push(t);
+  });
+
+  const container = document.getElementById('timeline-list');
+  container.innerHTML = ordenGrupos
+    .filter(estado => !filtroEstado || estado === filtroEstado)
+    .map((estado, gi) => {
+      const movs = grupos[estado];
+      const esActual = gi === 0;
+      return `
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full ${esActual ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant'}">
+              <span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">${esActual ? 'radio_button_checked' : 'radio_button_unchecked'}</span>
+              <span class="text-[10px] font-black uppercase tracking-widest">${estado.replace(/_/g,' ')}</span>
+            </div>
+            <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+          </div>
+          <div class="relative pl-8 space-y-8 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[2px] before:bg-primary-container">
+            ${movs.map((t, i) => renderMovimiento(t, exp.timeline.indexOf(t), esActual && i === 0)).join('')}
+          </div>
+        </div>`;
+    }).join('');
 }
 
 function toggleMovimiento(idx) {
@@ -342,7 +397,147 @@ function toggleMovimiento(idx) {
   if (chevron) chevron.classList.toggle('rotate-90', !oculto);
 }
 
+// ── Tabs panel izquierdo ───────────────────────────────────────────────────
+function setTabIzq(tab) {
+  ['datos','vinculos','estados'].forEach(t => {
+    document.getElementById(`panel-izq-${t}`).classList.toggle('hidden', t !== tab);
+    const btn = document.getElementById(`ti-${t}`);
+    btn.className = t === tab ? 'tab-active pb-3 text-sm transition-colors' : 'tab-inactive pb-3 text-sm transition-colors';
+  });
+}
+
+// ── Filtro de estado en timeline ───────────────────────────────────────────
+function poblarFiltroEstado() {
+  const estados = [...new Set(exp.timeline.map(t => t.estadoExpediente || 'EN_TRAMITE'))];
+  const sel = document.getElementById('filtro-estado-timeline');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Todos los estados</option>' +
+    estados.map(e => `<option value="${e}">${e.replace(/_/g,' ')}</option>`).join('');
+}
+
+// ── Vínculos ──────────────────────────────────────────────────────────────
+let vincSeleccionado = null;
+
+function renderVinculos() {
+  const container = document.getElementById('vinculos-list');
+  if (!exp.vinculos || exp.vinculos.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8">
+        <span class="material-symbols-outlined text-3xl text-outline-variant">link_off</span>
+        <p class="text-xs text-on-surface-variant mt-2">Sin expedientes vinculados</p>
+      </div>`;
+    return;
+  }
+  const tipoLabels = { MISMA_CAUSA:'Misma Causa', MISMO_SINIESTRO:'Mismo Siniestro', DERIVACION:'Derivación', CONEXO:'Conexo' };
+  container.innerHTML = exp.vinculos.map(v => `
+    <div onclick="window.location='detalle-expediente.html'"
+      class="p-4 bg-surface-container-low rounded-xl hover:bg-surface-container cursor-pointer transition-colors border-l-4 border-primary/30 hover:border-primary group mb-3">
+      <div class="flex items-start justify-between mb-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="font-mono text-xs font-bold text-on-surface">${v.id}</span>
+          ${SACO_UI.areaBadge(v.area)}
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-full">${tipoLabels[v.tipo_relacion]||v.tipo_relacion}</span>
+        </div>
+        <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-[16px]">open_in_new</span>
+      </div>
+      <p class="text-xs text-on-surface-variant line-clamp-2 leading-snug">${v.caratula}</p>
+      <div class="mt-2">${SACO_UI.estadoBadge(v.estado, v.estado.replace(/_/g,' '))}</div>
+    </div>`).join('');
+}
+
+function abrirModalVincular() {
+  vincSeleccionado = null;
+  SACO_UI.showModal('Vincular Expediente', `
+    <div class="space-y-4">
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+        <input id="vinc-search" oninput="buscarParaVincular(this.value)"
+          class="w-full bg-surface-container-low border-none rounded-lg pl-9 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary/20"
+          placeholder="Buscar por N° interno, carátula o N° causa..."/>
+      </div>
+      <div id="vinc-resultados" class="space-y-2 max-h-48 overflow-y-auto"></div>
+      <div id="vinc-seleccionado" class="hidden p-3 bg-primary-container/30 rounded-lg">
+        <p class="text-xs font-bold text-on-primary-container mb-1">Expediente seleccionado</p>
+        <p id="vinc-sel-texto" class="text-sm font-semibold text-on-surface"></p>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Tipo de relación</label>
+        <select id="vinc-tipo" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20">
+          <option value="MISMA_CAUSA">Misma Causa — mismo número de causa judicial</option>
+          <option value="MISMO_SINIESTRO">Mismo Siniestro — mismo hecho</option>
+          <option value="DERIVACION">Derivación — uno derivó en el otro</option>
+          <option value="CONEXO">Conexo — relación indirecta</option>
+        </select>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="confirmarVinculo()" class="px-6 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-lg">Vincular</button>`
+  );
+  setTimeout(() => buscarParaVincular(''), 50);
+}
+
+function buscarParaVincular(query) {
+  const q = query.toLowerCase();
+  const resultados = SACO.EXPEDIENTES_ABOGADO.filter(e => {
+    if (e.id === exp.id) return false;
+    if (!q) return true;
+    return e.id.toLowerCase().includes(q) ||
+           e.caratula.toLowerCase().includes(q) ||
+           (e.numero_causa && e.numero_causa.toLowerCase().includes(q));
+  });
+  const container = document.getElementById('vinc-resultados');
+  if (!container) return;
+  if (resultados.length === 0) {
+    container.innerHTML = `<p class="text-xs text-on-surface-variant text-center py-4">Sin resultados</p>`;
+    return;
+  }
+  container.innerHTML = resultados.map(e => `
+    <div onclick="seleccionarParaVincular('${e.id}')" id="vinc-item-${e.id}"
+      class="p-3 bg-surface-container-low rounded-lg hover:bg-surface-container cursor-pointer flex items-center justify-between group">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs font-bold text-on-surface">${e.id}</span>
+          ${SACO_UI.areaBadge(e.area)}
+        </div>
+        <p class="text-xs text-on-surface-variant mt-0.5 line-clamp-1">${e.caratula}</p>
+      </div>
+      <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-[18px]">arrow_forward_ios</span>
+    </div>`).join('');
+}
+
+function seleccionarParaVincular(id) {
+  const e = SACO.EXPEDIENTES_ABOGADO.find(x => x.id === id);
+  if (!e) return;
+  vincSeleccionado = e;
+  document.getElementById('vinc-sel-texto').textContent = `${e.id} — ${e.caratula}`;
+  document.getElementById('vinc-seleccionado').classList.remove('hidden');
+  document.querySelectorAll('[id^="vinc-item-"]').forEach(el => {
+    el.classList.remove('bg-primary-container/20','border','border-primary/30');
+  });
+  const item = document.getElementById(`vinc-item-${id}`);
+  if (item) item.classList.add('bg-primary-container/20','border','border-primary/30');
+}
+
+function confirmarVinculo() {
+  if (!vincSeleccionado) { SACO_UI.showToast('Seleccioná un expediente', 'warn'); return; }
+  if (!exp.vinculos) exp.vinculos = [];
+  exp.vinculos.push({
+    id: vincSeleccionado.id,
+    area: vincSeleccionado.area,
+    caratula: vincSeleccionado.caratula,
+    estado: vincSeleccionado.estado,
+    tipo_relacion: document.getElementById('vinc-tipo').value,
+  });
+  SACO_UI.closeModal();
+  renderVinculos();
+  setTabIzq('vinculos');
+  SACO_UI.showToast('Expediente vinculado correctamente', 'success');
+  vincSeleccionado = null;
+}
+
 renderTimeline();
+poblarFiltroEstado();
+renderVinculos();
 
 // ── Previsión Económica ────────────────────────────────────────────────────
 function renderPrevision() {
@@ -390,12 +585,6 @@ function setTabDet(tab) {
     btn.className = t === tab ? 'tab-active pb-3 text-sm transition-colors' : 'tab-inactive pb-3 text-sm transition-colors';
   });
   if (tab === 'docs') renderDocs();
-}
-
-// ── Observaciones ──────────────────────────────────────────────────────────
-function guardarObs() {
-  exp.observaciones = document.getElementById('obs-field').value;
-  SACO_UI.showToast('Observaciones guardadas correctamente.', 'success');
 }
 
 // ── Modal nuevo movimiento ─────────────────────────────────────────────────
@@ -462,9 +651,10 @@ function guardarMovimiento() {
   }
 
   exp.timeline.forEach(m => { m.activo = false; });
-  exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: docLabel, activo: true, subMovimientos: [] });
+  exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: docLabel, activo: true, subMovimientos: [], estadoExpediente: estadoActual });
   SACO_UI.closeModal();
   renderTimeline();
+  poblarFiltroEstado();
   SACO_UI.showToast('Movimiento registrado correctamente.', 'success');
 }
 
@@ -618,6 +808,7 @@ function confirmarCambioEstado() {
 
   // 1. Actualizar estado en runtime
   exp.estado = nuevoEstado;
+  estadoActual = nuevoEstado;
 
   // 2. Actualizar badge en el header
   document.getElementById('h-estado-badge').innerHTML = SACO_UI.estadoBadge(nuevoEstado, estadoLabel);
@@ -643,10 +834,12 @@ function confirmarCambioEstado() {
     doc: null,
     activo: true,
     subMovimientos: [],
+    estadoExpediente: estadoActual,
   });
 
-  // 5. Re-renderizar timeline
+  // 5. Re-renderizar timeline y filtro
   renderTimeline();
+  poblarFiltroEstado();
 
   // 6. Emitir evento de sincronización
   SACO_SYNC.syncEmit('ESTADO_CAMBIADO', { id: exp.id, estadoAnterior: estadoPrevio, estadoNuevo: nuevoEstado });

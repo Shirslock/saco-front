@@ -317,7 +317,7 @@ window.SACO = {
   ESTADOS,                // [{ code, label, color }]
   QUEUE_MESA,             // expedientes pendientes en Mesa SACO
   EXPEDIENTES_ABOGADO,    // expedientes asignados al letrado
-  EXPEDIENTE_DETALLE,     // objeto único del expediente abierto
+  EXPEDIENTE_DETALLE,     // objeto único del expediente abierto (incluye vinculos:[] y estadoExpediente en cada movimiento del timeline)
   CARTA_SUCESO_QUEUE,     // cartas SAE pendientes (penal)
   CAUSAS_PENALES,         // causas activas del área penal
 }
@@ -451,16 +451,26 @@ EN_TRAMITE → EN_PLAZO_CONTESTAR → SUSPENSION_TERMINOS → EN_PRUEBA → CUMP
 **Rol:** Abogado / Coordinador
 **Funcionalidades:**
 - Header: N° interno, badges de estado y área, carátula, juzgado
-- Botones header: "Nuevo Movimiento" (modal), "Subir Documento" (file input), "Reasignar" (decorativo)
-- Panel izquierdo (4 cols): metadata completa en `<dl>`, Observaciones (siempre editable, se guarda en runtime), historial de estados
-- Panel derecho (8 cols): tabs Timeline / Repositorio de Documentos / Previsión Económica
-- **Timeline:** lista de movimientos con línea vertical, punto azul activo en el más reciente, border-left azul
-- **Modal nuevo movimiento:** tipo (catálogo), fecha, descripción, N° GDE opcional → agrega a `timeline[]`
+- Botones header: "Nueva Actividad" (modal), "Subir Documento" (file input), "Vincular" (modal vincular), "Cambiar Estado" (modal), "Reasignar" (condicional por rol)
+- **Panel izquierdo (4 cols): sistema de 3 tabs** — función `setTabIzq(tab)`:
+  - **Tab "Datos"** (activa por default): metadata completa en `<dl id="metadata-list">`
+  - **Tab "Vínculos"**: botón "Vincular Expediente" + `<div id="vinculos-list">` — lista de vínculos en `exp.vinculos[]`; estado vacío si no hay vínculos
+  - **Tab "Estados"**: select `#filtro-estado-timeline` (filtra el timeline por estado procesal) + `<div id="estado-log">` (historial de estados)
+- Panel derecho (8 cols): tabs Timeline / Repositorio de Documentos / Previsión Económica — función `setTabDet(tab)`
+- **Timeline agrupado por estado procesal:** cada grupo muestra un header pill con el nombre del estado (activo = azul, históricos = gris); dentro de cada grupo, línea vertical + movimientos individuales. Función `renderMovimiento(t, idx, esActivo)` extrae el HTML de un movimiento individual.
+- Campo `estadoExpediente` en cada movimiento del timeline indica en qué estado procesal fue registrado
+- Variable `estadoActual` sincroniza el estado del expediente con los nuevos movimientos
+- `poblarFiltroEstado()` rellena el select de filtro con los estados únicos presentes en `exp.timeline`
+- **Sistema de vínculos:** `abrirModalVincular()` → buscar en `EXPEDIENTES_ABOGADO` → `seleccionarParaVincular(id)` → `confirmarVinculo()` → push a `exp.vinculos[]` → `renderVinculos()` → activa tab "Vínculos"
+- Tipos de relación: `MISMA_CAUSA`, `MISMO_SINIESTRO`, `DERIVACION`, `CONEXO`
+- **Modal nuevo movimiento:** tipo (catálogo), fecha, descripción, N° GDE opcional → agrega a `timeline[]` con `estadoExpediente: estadoActual`
 - **Repositorio:** tabla de `documentos[]` con nombre, tipo GDE, fecha, tamaño, botón descarga
 - **Previsión:** cards de monto original/actualizado/pronóstico + tabla histórica por año
 - Subir documento agrega al array `documentos[]` en runtime
 
-**Estado que modifica:** `SACO.EXPEDIENTE_DETALLE.timeline`, `.documentos`, `.observaciones`
+**Estado que modifica:** `SACO.EXPEDIENTE_DETALLE.timeline`, `.documentos`, `.vinculos`
+
+**Nota:** El campo `observaciones` (textarea) fue eliminado del panel izquierdo en el refactor de tabs.
 
 ### `gestion-penal.html` — Área Penal
 **Rol:** Coordinador Penal / Abogado Penal
@@ -687,6 +697,7 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 | v0.2 | Abr 2026 | Design System Sovereign Ledger definido y comparado con branding TA |
 | v1.0 | Abr 2026 | 5 páginas implementadas: dashboard-mesa, alta-expediente, bandeja-abogado, detalle-expediente, gestion-penal |
 | v1.0 | Abr 2026 | shared.js (sidebar, topbar, toast, modal, badges) + mock.js (datos de negocio reales) |
+| v1.1 | Abr 2026 | detalle-expediente: panel izquierdo convertido a 3 tabs (Datos/Vínculos/Estados), sistema de vínculos entre expedientes, timeline agrupado por estado procesal (estadoExpediente), eliminación del box de Observaciones |
 
 ---
 
