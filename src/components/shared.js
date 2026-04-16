@@ -328,8 +328,16 @@ function closeModal() {
   document.getElementById('modal-overlay')?.remove();
 }
 
+// ── Badge con texto libre (catálogo de estados por tipo de gestión) ─────────
+function estadoBadgeCustom(label, colorClass) {
+  const cls = colorClass || 'bg-secondary-container text-on-secondary-fixed';
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${cls}">
+    <span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>${label}
+  </span>`;
+}
+
 window.SACO_UI = {
-  renderSidebar, renderTopbar, estadoBadge, areaBadge,
+  renderSidebar, renderTopbar, estadoBadge, areaBadge, estadoBadgeCustom,
   showToast, showModal, closeModal, toggleNotifPanel,
   toggleUserDropdown, selectUser, puedeReasignar, updateUserPill: _updateUserPill,
 };

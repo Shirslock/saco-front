@@ -581,6 +581,16 @@ function onTipoChange() {
     el.classList.toggle('hidden', state.tipo !== trigger);
   });
 
+  // Poblar estados iniciales según tipo seleccionado
+  const estados = window.SACO.getEstadosPorTipo(state.tipo);
+  const estadoSel = document.getElementById('estado-inicial');
+  if (estadoSel) {
+    estadoSel.innerHTML = estados.map((e, i) =>
+      `<option value="${e}" ${i === 0 ? 'selected' : ''}>${e}</option>`
+    ).join('');
+    document.getElementById('estado-inicial-wrap').classList.remove('hidden');
+  }
+
   // Reincidencia simulada
   const causaEl = document.getElementById('num-causa');
   if (causaEl) {
