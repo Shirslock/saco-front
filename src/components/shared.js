@@ -52,7 +52,6 @@ function renderSidebar(activePage) {
     { key: 'area-civil',         icon: 'gavel',             label: 'Área Civil',       href: 'area-civil.html' },
     { key: 'area-laboral',       icon: 'work',              label: 'Área Laboral',     href: 'area-laboral.html' },
     { key: 'gestion-penal',      icon: 'policy',            label: 'Área Penal',       href: 'gestion-penal.html' },
-    { key: 'alta-expediente',    icon: 'create_new_folder', label: 'Nuevo Expediente', href: 'alta-expediente.html' },
     { key: 'reports',            icon: 'analytics',         label: 'Previsión',        href: '#' },
   ];
 
@@ -95,10 +94,6 @@ function renderSidebar(activePage) {
     </div>
     <nav class="flex-1 space-y-1 px-3">${items}</nav>
     <div class="px-4 mt-6 space-y-3">
-      <a href="alta-expediente.html" class="w-full py-3 bg-gradient-to-br from-primary to-primary-dim text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:brightness-105 active:scale-95 flex items-center justify-center gap-2 transition-all">
-        <span class="material-symbols-outlined text-sm">add_circle</span>
-        Nuevo Expediente
-      </a>
       <div class="px-2 py-4 border-t border-outline-variant/20 flex items-center gap-3">
         <div id="sidebar-user-avatar" class="w-8 h-8 rounded-full ${avatarCls} flex items-center justify-center font-bold text-xs flex-shrink-0">${iniciales}</div>
         <div class="min-w-0">

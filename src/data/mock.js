@@ -495,9 +495,8 @@ const FIELD_DEFINITIONS = {
   },
   importe: {
     label: 'Importe / Monto de la Demanda',
-    type: 'text',
-    placeholder: '$ 0',
-    onInput: 'formatCurrency(this)'
+    type: 'currency',
+    placeholder: '0',
   },
 
   // ── DEMANDA extra (Civil / Laboral) ────────────────────────────────────
@@ -734,7 +733,7 @@ const FORM_CONFIG = {
       'penal_tipo_hecho',
       'penal_lugar_hecho',
       'penal_damnificada',
-      'datos_empleado',
+      'penal_empleado',
       'penal_tipo_solicitud_memo:full',
       'penal_solicitud_desc:full',
       'penal_sumario',

@@ -226,7 +226,7 @@ document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('mesa
 document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Mesa SACO', 'Mesa SACO');
 
 // ── Labels de canal ────────────────────────────────────────────────────────
-const canalLabels = { EE_GDE:'EE GDE', MEMO_GDE:'MEMO GDE', MAIL:'Mail' };
+const canalLabels = { EE_GDE:'EE GDE', MEMO_GDE:'Memo GDE', MAIL:'Mail' };
 
 const areaColors = {
   CIVIL:   'bg-primary-container/60 text-on-primary-container',
@@ -236,7 +236,7 @@ const areaColors = {
 
 // ── Poblar filtros dinámicamente desde los datos ───────────────────────────
 function poblarFiltros() {
-  const todos = window.SACO.QUEUE_MESA;
+  const todos = window.SACO.EXPEDIENTES_ABOGADO;
 
   const tipos = [...new Set(todos.map(e => e.tipo))].sort();
   const tipoSel = document.getElementById('f-tipo');
@@ -259,7 +259,7 @@ function poblarFiltros() {
 
 // ── Métricas ───────────────────────────────────────────────────────────────
 function renderMetricas() {
-  const todos = window.SACO.QUEUE_MESA;
+  const todos = window.SACO.EXPEDIENTES_ABOGADO;
   document.getElementById('metric-total').textContent   = todos.length;
   document.getElementById('metric-civil').textContent   = todos.filter(e => e.area === 'CIVIL').length;
   document.getElementById('metric-laboral').textContent = todos.filter(e => e.area === 'LABORAL').length;
@@ -288,13 +288,13 @@ function renderTabla(datos) {
       </td>
       <td class="px-6 py-4 text-xs text-on-surface-variant">${e.tipo.replace(/_/g, ' ')}</td>
       <td class="px-6 py-4">
-        <span class="font-mono text-[10px] text-on-surface-variant">${e.ref || '—'}</span>
+        <span class="font-mono text-[10px] text-on-surface-variant">${e.ref_gde || e.gde || '—'}</span>
       </td>
       <td class="px-6 py-4">
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">${canalLabels[e.canal] || '—'}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">${canalLabels[e.canal_ingreso] || e.canal_ingreso || '—'}</span>
       </td>
       <td class="px-6 py-4 text-xs text-on-surface">${e.abogado}</td>
-      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.fecha}</td>
+      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.fecha_recepcion}</td>
       <td class="px-6 py-4 text-right">
         <button
           onclick="event.stopPropagation(); window.location='detalle-expediente.html'"
@@ -316,16 +316,16 @@ function applyFilters() {
   const fechaDesde = document.getElementById('f-fecha-desde').value;
   const fechaHasta = document.getElementById('f-fecha-hasta').value;
 
-  const filtrado = window.SACO.QUEUE_MESA.filter(e => {
+  const filtrado = window.SACO.EXPEDIENTES_ABOGADO.filter(e => {
     if (search && !e.caratula.toLowerCase().includes(search) &&
         !e.id.toLowerCase().includes(search) &&
         !(e.numero_causa || '').toLowerCase().includes(search)) return false;
     if (tipo    && e.tipo !== tipo)               return false;
-    if (gde     && !(e.ref || '').toLowerCase().includes(gde)) return false;
-    if (canal   && e.canal !== canal)     return false;
+    if (gde     && !(e.ref_gde || e.gde || '').toLowerCase().includes(gde)) return false;
+    if (canal   && e.canal_ingreso !== canal)     return false;
     if (abogado && e.abogado !== abogado)         return false;
-    if (fechaDesde && e.fecha < fechaDesde) return false;
-    if (fechaHasta && e.fecha > fechaHasta) return false;
+    if (fechaDesde && e.fecha_recepcion < fechaDesde) return false;
+    if (fechaHasta && e.fecha_recepcion > fechaHasta) return false;
     return true;
   });
 
