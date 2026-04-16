@@ -362,7 +362,7 @@ const ROL_ACCESOS = {
     puedeReasignar: true, verTodaBandeja: true, inicio: 'dashboard',
   },
   ADMINISTRATIVO: {
-    nav: ['mesa-saco','alta-expediente'],
+    nav: ['mesa-saco'],
     puedeReasignar: false, verTodaBandeja: false, inicio: 'mesa-saco',
   },
   COORDINADOR: {

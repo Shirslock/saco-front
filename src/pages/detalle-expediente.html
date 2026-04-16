@@ -96,23 +96,35 @@ tailwind.config = {
   <!-- ── Bento Grid ────────────────────────────────────────────────────── -->
   <div class="grid grid-cols-12 gap-6">
 
-    <!-- ── Columna izquierda: tabs ──────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-4 flex flex-col gap-5">
-
-      <div class="bg-surface-container-lowest rounded-xl shadow-card">
-
-        <!-- Tab headers -->
-        <div class="flex border-b border-outline-variant/15 px-6 pt-4 gap-6">
-          <button onclick="setTabIzq('datos')"   id="ti-datos"    class="tab-active pb-3 text-sm transition-colors">Datos</button>
-          <button onclick="setTabIzq('vinculos')" id="ti-vinculos" class="tab-inactive pb-3 text-sm transition-colors">Vínculos</button>
-          <button onclick="setTabIzq('estados')"  id="ti-estados"  class="tab-inactive pb-3 text-sm transition-colors">Estados</button>
-        </div>
-
-        <!-- Tab Datos -->
-        <div id="panel-izq-datos" class="p-6">
+      <!-- Metadata -->
+      <div class="col-span-12 lg:col-span-4">
+        <div class="bg-surface-container-lowest rounded-xl shadow-card p-6">
           <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant mb-5">Datos del Expediente</h3>
           <dl id="metadata-list" class="space-y-3"></dl>
         </div>
+      </div>
+
+      <!-- Sub-tabs derecha -->
+      <div class="col-span-12 lg:col-span-8">
+        <div class="bg-surface-container-lowest rounded-xl shadow-card">
+          <div class="flex border-b border-outline-variant/15 px-6 pt-4 gap-6">
+            <button onclick="setTabDatos('info')"     id="dt-info"     class="tab-active pb-3 text-sm transition-colors">Información</button>
+            <button onclick="setTabDatos('vinculos')" id="dt-vinculos" class="tab-inactive pb-3 text-sm transition-colors">Vínculos</button>
+          </div>
+
+          <!-- Sub-panel Info -->
+          <div id="subpanel-info" class="p-6">
+            <div class="mb-5">
+              <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Observaciones</label>
+              <textarea id="obs-area" rows="5"
+                class="obs-area w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-primary/20"
+                placeholder="Sin observaciones..."></textarea>
+              <button onclick="guardarObs()" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+                <span class="material-symbols-outlined text-[14px]">save</span> Guardar
+              </button>
+            </div>
+            <div id="vinculos-preview"></div>
+          </div>
 
         <!-- Tab Vínculos -->
         <div id="panel-izq-vinculos" class="hidden p-6">
@@ -259,7 +271,62 @@ tailwind.config = {
       <tbody id="docs-tbody"></tbody>
     </table>
   </div>
+  <!-- ── Panel: Documentos ─────────────────────────────────────────────────── -->
+  <div id="panel-docs" class="hidden bg-surface-container-lowest rounded-xl shadow-card p-7">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="font-headline font-bold text-on-surface">Repositorio GDE</h3>
+      <button onclick="document.getElementById('file-input-det').click()" class="flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+        <span class="material-symbols-outlined text-[16px]">upload_file</span> Subir
+      </button>
+    </div>
+    <table class="w-full text-left border-separate border-spacing-y-1.5">
+      <thead>
+        <tr class="bg-surface-container-low">
+          <th class="px-4 py-3 rounded-l-lg text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Archivo</th>
+          <th class="px-4 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Tipo GDE</th>
+          <th class="px-4 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+          <th class="px-4 py-3 text-right text-[10px] font-bold text-on-surface-variant uppercase tracking-wider rounded-r-lg">Tamaño</th>
+          <th class="px-4 py-3 rounded-r-lg"></th>
+        </tr>
+      </thead>
+      <tbody id="docs-tbody"></tbody>
+    </table>
+  </div>
 
+  <!-- ── Panel: Previsión ──────────────────────────────────────────────────── -->
+  <div id="panel-prevision" class="hidden bg-surface-container-lowest rounded-xl shadow-card p-7">
+    <h3 class="font-headline font-bold text-on-surface mb-5">Previsión Económica</h3>
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-surface-container-low rounded-xl p-4">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Monto Demanda</p>
+        <p class="text-xl font-black text-on-surface">$4.200.000</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">Monto original (inmutable)</p>
+      </div>
+      <div class="bg-surface-container-low rounded-xl p-4">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Monto Actualizado</p>
+        <p class="text-xl font-black text-primary">$5.800.000</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">Diciembre 2025</p>
+      </div>
+      <div class="bg-surface-container-low rounded-xl p-4">
+        <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Pronóstico</p>
+        <p class="text-xl font-black text-tertiary">Desfavorable</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">Estado: En Prueba</p>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs border-separate border-spacing-y-1">
+        <thead>
+          <tr class="bg-surface-container-low">
+            <th class="px-4 py-3 rounded-l-lg font-bold text-on-surface-variant uppercase tracking-wider">Año</th>
+            <th class="px-4 py-3 font-bold text-on-surface-variant uppercase tracking-wider">Estado Procesal</th>
+            <th class="px-4 py-3 font-bold text-on-surface-variant uppercase tracking-wider">Pronóstico</th>
+            <th class="px-4 py-3 font-bold text-on-surface-variant uppercase tracking-wider rounded-r-lg">Monto dic.</th>
+          </tr>
+        </thead>
+        <tbody id="prevision-tbody"></tbody>
+      </table>
+    </div>
+  </div>
   <!-- ── Panel: Previsión ──────────────────────────────────────────────────── -->
   <div id="panel-prevision" class="hidden bg-surface-container-lowest rounded-xl shadow-card p-7">
     <h3 class="font-headline font-bold text-on-surface mb-5">Previsión Económica</h3>
@@ -351,6 +418,11 @@ const timelineItemMap = {};
 
 function renderMovimiento(t, uid, esActivo) {
   timelineItemMap[uid] = t;
+  const timelineItemMap = {};
+}
+
+function renderMovimiento(t, uid, esActivo) {
+  timelineItemMap[uid] = t;
   const expandido = esActivo;
   const tieneContenido = t.desc || t.doc || (t.subMovimientos && t.subMovimientos.length > 0);
   const subMov = (t.subMovimientos || []).map(s => `
@@ -371,7 +443,6 @@ function renderMovimiento(t, uid, esActivo) {
 
   return `
     <div class="relative">
-      <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${esActivo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
       <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${esActivo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
       <div class="flex flex-col md:flex-row md:items-start gap-3">
         <span class="text-xs font-bold ${esActivo?'text-primary':'text-on-surface-variant'} whitespace-nowrap pt-0.5">${t.fecha}</span>
@@ -453,6 +524,11 @@ function renderTimeline(filtroEstado = null) {
 function toggleMovimiento(uid) {
   const body = document.getElementById(`mov-body-${uid}`);
   const chevron = document.getElementById(`chevron-${uid}`);
+}
+
+function toggleMovimiento(uid) {
+  const body = document.getElementById(`mov-body-${uid}`);
+  const chevron = document.getElementById(`chevron-${uid}`);
   if (!body) return;
   const oculto = body.classList.toggle('hidden');
   if (chevron) chevron.classList.toggle('rotate-90', !oculto);
@@ -472,8 +548,11 @@ function setTabMain(tab) {
 function setTabDatos(tab) {
   ['info','vinculos'].forEach(t => {
     document.getElementById(`subpanel-${t}`).classList.toggle('hidden', t !== tab);
+
     const btn = document.getElementById(`dt-${t}`);
-    btn.className = t === tab ? 'tab-active pb-3 text-sm transition-colors' : 'tab-inactive pb-3 text-sm transition-colors';
+    btn.className = t === tab
+      ? 'tab-active pb-3 text-sm transition-colors'
+      : 'tab-inactive pb-3 text-sm transition-colors';
   });
 }
 
@@ -484,6 +563,38 @@ function poblarFiltroEstados() {
   if (!sel) return;
   sel.innerHTML = '<option value="">Todos los estados</option>' +
     estados.map(e => `<option value="${e}">${e.replace(/_/g,' ')}</option>`).join('');
+}
+
+// ── Observaciones ──────────────────────────────────────────────────────────
+function guardarObs() {
+  exp.observaciones = document.getElementById('obs-area').value;
+  SACO_UI.showToast('Observaciones guardadas.', 'success');
+}
+
+// ── Preview de vínculos en sub-panel Info ──────────────────────────────────
+function renderVinculosPreview() {
+  const container = document.getElementById('vinculos-preview');
+  if (!container) return;
+  if (!exp.vinculos || exp.vinculos.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  const preview = exp.vinculos.slice(0, 2);
+  container.innerHTML = `
+    <div class="mt-4 pt-4 border-t border-outline-variant/10">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Vínculos (${exp.vinculos.length})</p>
+        <button onclick="setTabDatos('vinculos')" class="text-xs text-primary font-bold hover:underline">Ver todos</button>
+      </div>
+      ${preview.map(v => `
+        <div class="p-3 bg-surface-container-low rounded-lg mb-2 flex items-center justify-between">
+          <div>
+            <span class="font-mono text-xs font-bold text-on-surface">${v.id}</span>
+            <p class="text-[10px] text-on-surface-variant line-clamp-1">${v.caratula}</p>
+          </div>
+          ${SACO_UI.areaBadge(v.area)}
+        </div>`).join('')}
+    </div>`;
 }
 
 // ── Observaciones ──────────────────────────────────────────────────────────
@@ -636,13 +747,19 @@ function confirmarVinculo() {
   renderVinculosPreview();
   setTabMain('datos');
   setTabDatos('vinculos');
+  renderVinculosPreview();
+  setTabMain('datos');
+  setTabDatos('vinculos');
   SACO_UI.showToast('Expediente vinculado correctamente', 'success');
   vincSeleccionado = null;
 }
 
 renderTimeline();
 poblarFiltroEstados();
+poblarFiltroEstados();
 renderVinculos();
+renderVinculosPreview();
+document.getElementById('obs-area').value = exp.observaciones || '';
 renderVinculosPreview();
 document.getElementById('obs-area').value = exp.observaciones || '';
 
@@ -684,15 +801,6 @@ function renderDocs() {
     </tr>`).join('');
 }
 
-// ── Tabs detalle ───────────────────────────────────────────────────────────
-function setTabDet(tab) {
-  ['timeline','docs','prevision'].forEach(t => {
-    document.getElementById(`panel-${t}`).classList.toggle('hidden', t !== tab);
-    const btn = document.getElementById(`dt-${t}`);
-    btn.className = t === tab ? 'tab-active pb-3 text-sm transition-colors' : 'tab-inactive pb-3 text-sm transition-colors';
-  });
-  if (tab === 'docs') renderDocs();
-}
 
 // ── Modal nuevo movimiento ─────────────────────────────────────────────────
 function modalMovimiento() {
@@ -759,9 +867,9 @@ function guardarMovimiento() {
 
   exp.timeline.forEach(m => { m.activo = false; });
   exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: docLabel, activo: true, subMovimientos: [], estadoExpediente: estadoActual });
-  exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: docLabel, activo: true, subMovimientos: [], estadoExpediente: estadoActual });
   SACO_UI.closeModal();
   renderTimeline();
+  poblarFiltroEstados();
   poblarFiltroEstados();
   SACO_UI.showToast('Movimiento registrado correctamente.', 'success');
 }
@@ -805,7 +913,6 @@ function renderSubMovimientos(uid) {
 
 function mostrarReply(uid) {
   document.getElementById(`reply-btn-${uid}`).classList.add('hidden');
-  document.getElementById(`reply-form-${uid}`).classList.remove('hidden');
 }
 
 function cancelarReply(uid) {
@@ -816,17 +923,25 @@ function cancelarReply(uid) {
 function guardarSubMovimiento(uid) {
   const t = timelineItemMap[uid];
   if (!t) return;
+
   const tipo  = document.getElementById(`sub-tipo-${uid}`).value;
   const desc  = document.getElementById(`sub-desc-${uid}`).value.trim();
   const gde   = document.getElementById(`sub-gde-${uid}`).value.trim();
-  if (!desc) { SACO_UI.showToast('Ingresá una descripción.', 'warn'); return; }
+
+  if (!desc) {
+    SACO_UI.showToast('Ingresá una descripción.', 'warn');
+    return;
+  }
 
   let docLabel = gde || null;
+
   if (subFilesSelected[uid]) {
     const file = subFilesSelected[uid];
-    const sizeStr = file.size >= 1024*1024
-      ? (file.size/(1024*1024)).toFixed(1)+' MB'
-      : Math.round(file.size/1024)+' KB';
+
+    const sizeStr = file.size >= 1024 * 1024
+      ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+      : Math.round(file.size / 1024) + ' KB';
+
     exp.documentos.unshift({
       nombre: file.name,
       tipo: 'Adjunto',
@@ -835,14 +950,18 @@ function guardarSubMovimiento(uid) {
       icon: 'picture_as_pdf',
       color: 'error'
     });
-    docLabel = gde ? gde+' · '+file.name : file.name;
+
+    docLabel = gde ? `${gde} · ${file.name}` : file.name;
     subFilesSelected[uid] = null;
   }
 
   const subMov = {
-    fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`,
+    fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })}`,
     tipo,
-    titulo: tipo.replace(/_/g,' '),
+    titulo: tipo.replace(/_/g, ' '),
     desc,
     doc: docLabel,
   };
@@ -852,10 +971,15 @@ function guardarSubMovimiento(uid) {
 
   renderSubMovimientos(uid);
   cancelarReply(uid);
+
   document.getElementById(`sub-desc-${uid}`).value = '';
   document.getElementById(`sub-gde-${uid}`).value = '';
 
-  SACO_SYNC.syncEmit('MOVIMIENTO_AGREGADO', { expedienteId: exp.id, movimiento: subMov });
+  SACO_SYNC.syncEmit('MOVIMIENTO_AGREGADO', {
+    expedienteId: exp.id,
+    movimiento: subMov
+  });
+
   SACO_UI.showToast('Sub-movimiento registrado.', 'success');
 }
 
@@ -936,6 +1060,7 @@ function confirmarCambioEstado() {
 
   // 4. Re-renderizar timeline y filtro
   renderTimeline();
+  poblarFiltroEstados();
   poblarFiltroEstados();
 
   // 5. Emitir evento de sincronización
