@@ -411,7 +411,8 @@ function renderField(fieldKey, fullWidth = false) {
  */
 function renderGroup(group) {
   // Si el grupo tiene visibilidad condicional por tipo, evaluar ahora
-  const isVisible = !group.visibleWhenTipo || state.tipo === group.visibleWhenTipo;
+  const isVisible = !group.visibleWhenTipo || state.tipo === group.visibleWhenTipo
+    || (group.visibleWhenTipo === 'DEMANDA' && ['DEMANDA_CIVIL','DEMANDA_LABORAL'].includes(state.tipo));
   const hidden = isVisible ? '' : ' hidden';
   const dataAttr = group.visibleWhenTipo ? ` data-visible-when-tipo="${group.visibleWhenTipo}"` : '';
 
@@ -601,7 +602,7 @@ function setCanal(c) {
   document.getElementById('canal-info-text').textContent = infos[c];
   document.getElementById('canal-info').classList.remove('hidden');
 
-  // Re-poblar tipos y re-renderizar form si hay área
+  // Re-filtrar tipos y re-renderizar form si hay área
   if (state.area) {
     poblarTipos(state.area, c);
     renderDynamicForm();
@@ -613,11 +614,13 @@ function setCanal(c) {
 // ── Poblar tipos ────────────────────────────────────────────────────────────
 function poblarTipos(area, canal) {
   const todos = window.SACO.TIPOS_GESTION[area] || [];
-  const filtrados = todos.filter(t => t.canales.includes(canal));
+  const filtrados = canal ? todos.filter(t => t.canales.includes(canal)) : todos;
   const sel = document.getElementById('tipo-select');
   const prevVal = sel.value;
   sel.innerHTML = `<option value="">— Seleccioná tipo de gestión —</option>` +
-    filtrados.map(t => `<option value="${t.code}">${t.label}</option>`).join('');
+    filtrados.map(t =>
+      `<option value="${t.code}" data-canal="${t.canal}" data-canales="${t.canales.join(',')}">${t.label}</option>`
+    ).join('');
   if (filtrados.some(t => t.code === prevVal)) sel.value = prevVal;
   else { state.tipo = ''; document.getElementById('res-tipo').textContent = '—'; }
 }
@@ -672,11 +675,27 @@ function onTipoChange() {
   state.tipo = sel.value;
   document.getElementById('res-tipo').textContent = sel.options[sel.selectedIndex]?.text || '—';
 
-  // Mostrar/ocultar grupos condicionales al tipo
+  // Mostrar/ocultar grupos condicionales (DEMANDA_CIVIL/LABORAL activan el grupo DEMANDA)
   document.querySelectorAll('[data-visible-when-tipo]').forEach(el => {
     const trigger = el.dataset.visibleWhenTipo;
-    el.classList.toggle('hidden', state.tipo !== trigger);
+    const match = state.tipo === trigger
+      || (trigger === 'DEMANDA' && ['DEMANDA_CIVIL','DEMANDA_LABORAL'].includes(state.tipo));
+    el.classList.toggle('hidden', !match);
   });
+
+  const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
+
+  // Verificar si el canal actual es válido; informar al usuario antes de auto-corregirlo
+  if (tipoData && tipoData.canales && state.canal && !tipoData.canales.includes(state.canal)) {
+    const lbls = { EE_GDE: 'EE GDE', MEMO_GDE: 'Memo GDE', MAIL: 'Mail' };
+    const canalesLabel = tipoData.canales.map(c => lbls[c]).join(' o ');
+    SACO_UI.showToast(`Este tipo de gestión ingresa por ${canalesLabel}.`, 'info');
+  }
+
+  // Auto-set canal al sugerido por el tipo
+  if (tipoData && tipoData.canal) {
+    setCanal(tipoData.canal);
+  }
 
   // Reincidencia simulada: si el campo num-causa existe y empieza con 'FSM'
   const causaEl = document.getElementById('num-causa');
@@ -894,6 +913,10 @@ function crearExpediente() {
 
   if (errores.length) { SACO_UI.showToast(errores[0], 'warn'); return; }
 
+  const estadoInicial = window.SACO.getEstadosPorTipo
+    ? (window.SACO.getEstadosPorTipo(state.tipo)[0] || 'Recepcionado')
+    : 'Recepcionado';
+
   const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[state.area];
   const n = ++state.numerosActivos[state.area];
   const numInterno = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
@@ -917,7 +940,7 @@ function crearExpediente() {
     }
   }
 
-  SACO_UI.showToast(`Expediente ${numInterno} creado exitosamente.`, 'success');
+  SACO_UI.showToast(`Expediente ${numInterno} creado — estado inicial: ${estadoInicial}.`, 'success');
   setTimeout(() => { window.location.href = 'bandeja-abogado.html'; }, 1500);
 }
 

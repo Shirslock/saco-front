@@ -1,45 +1,46 @@
 // ── SACO Mock Data ─────────────────────────────────────────────────────────
 
-// ── Matriz canal × área (fuente de verdad del filtro de tipos) ─────────────
-// canales: array → el tipo aparece cuando el canal activo está en ese array
+// ── Matriz canal × área (Matriz_Actualizada.xlsx — Abril 2026) ──────────────
+// canal: sugerido por defecto | canales: todos los canales válidos para el tipo
 const TIPOS_GESTION = {
   CIVIL: [
-    { code: 'OFICIO',          label: 'Oficio',                 canales: ['EE_GDE'] },
-    { code: 'CARTA_DOC',       label: 'Carta Documento',        canales: ['EE_GDE'] },
-    { code: 'MEDIACION',       label: 'Mediación',              canales: ['EE_GDE', 'MEMO_GDE'] },
-    { code: 'COBRO_CANON',     label: 'Cobro de Cánones',       canales: ['EE_GDE'] },
-    { code: 'DEMANDA',         label: 'Demanda',                canales: ['EE_GDE'] },
-    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',     canales: ['MEMO_GDE'] },
-    { code: 'DEFENSA_CIVIL',   label: 'Defensa Civil',          canales: ['MEMO_GDE'] },
-    { code: 'RECUPERO',        label: 'Recupero de Daños',      canales: ['MEMO_GDE'] },
-    { code: 'RECLAMO_CONTRAT', label: 'Reclamo a Contratistas', canales: ['MEMO_GDE'] },
-    { code: 'EJECUCION_GAR',   label: 'Ejecución de Garantía',  canales: ['MEMO_GDE'] },
-    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',     canales: ['MEMO_GDE'] },
-    { code: 'OTROS',           label: 'Otros',                  canales: ['EE_GDE', 'MEMO_GDE'] },
+    // Externos
+    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'CARTA_DOC',          label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'BENEFICIO_LITIGAR',  label: 'Beneficios de litigar sin gastos', canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEMANDA_CIVIL',      label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    // Internos
+    { code: 'COBRO_CANON',        label: 'Cobro de Cánones',                 canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'RECLAMO_CONTRAT',    label: 'Reclamo a Contratistas',           canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'LANZAMIENTO',        label: 'Lanzamientos',                     canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'RECUPERO',           label: 'Recuperos',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'EJECUCION_GAR',      label: 'Ejecución de Pólizas',             canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEFENSA_CIVIL',      label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
   ],
   LABORAL: [
-    { code: 'OFICIO',          label: 'Oficio',                 canales: ['EE_GDE'] },
-    { code: 'CARTA_DOC',       label: 'Carta Documento',        canales: ['EE_GDE'] },
-    { code: 'MEDIACION',       label: 'Mediación',              canales: ['EE_GDE', 'MEMO_GDE'] },
-    { code: 'DEMANDA',         label: 'Demanda',                canales: ['EE_GDE'] },
-    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',     canales: ['MEMO_GDE'] },
-    { code: 'DESAFUERO',       label: 'Desafuero',              canales: ['MEMO_GDE'] },
-    { code: 'CONSIGNACION',    label: 'Consignación',           canales: ['MEMO_GDE'] },
-    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',     canales: ['MEMO_GDE'] },
-    { code: 'OTROS',           label: 'Otros',                  canales: ['EE_GDE', 'MEMO_GDE'] },
+    // Externos
+    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'CARTA_DOC',          label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'DEMANDA_CIVIL',      label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEMANDA_LABORAL',    label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    // Internos
+    { code: 'CONSIGNACION',       label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'DESAFUERO',          label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
   ],
   PENAL: [
-    // EE GDE
-    { code: 'OFICIO',          label: 'Oficio',                 canales: ['EE_GDE'] },
-    { code: 'MEDIACION',       label: 'Mediación',              canales: ['EE_GDE', 'MEMO_GDE'] },
-    // MEMO GDE
-    { code: 'DEFENSA_PENAL',   label: 'Defensa Penal',          canales: ['MEMO_GDE'] },
-    { code: 'SOLICITUD_AREAS', label: 'Solicitud de Áreas',     canales: ['MEMO_GDE'] },
-    { code: 'QUERELLA',        label: 'Querella',               canales: ['MEMO_GDE'] },
-    { code: 'ASISTENCIA_TEC',  label: 'Asistencia Técnica',     canales: ['MEMO_GDE'] },
-    { code: 'OTROS',           label: 'Otros',                  canales: ['EE_GDE', 'MEMO_GDE'] },
-    // MAIL
-    { code: 'CARTA_SUCESO',    label: 'Carta Suceso (SAE)',     canales: ['MAIL'] },
+    // Externos
+    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    // Internos
+    { code: 'QUERELLA',           label: 'Querellas',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'DEFENSA_PENAL',      label: 'Defensas Penales',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'CARTA_SUCESO',       label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
+    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTROS',              label: 'Otros',                            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
   ],
 };
 
@@ -1123,6 +1124,55 @@ const ESTADOS_POR_TIPO = {
     'Recurso de revisión',
     'Recurso de reposición',
     'Recurso de inconstitucionalidad',
+  ],
+  BENEFICIO_LITIGAR: [
+    'Recepcionado',
+    'Asignación al letrado',
+    'En análisis',
+  ],
+  LANZAMIENTO: [
+    'Recepcionado',
+    'Asignación al letrado',
+    'En análisis',
+    'Juicio iniciado',
+    'Espacio recuperado extrajudicialmente',
+    'Devuelto al sector requirente',
+  ],
+  DEMANDA_CIVIL: [
+    'Inicio',
+    'Traba de litis',
+    'Prueba',
+    'Alegato',
+    'Sentencia 1° favorable',
+    'Sentencia 1° desfavorable',
+    'Apelación',
+    'Sentencia 2° favorable',
+    'Sentencia 2° desfavorable',
+    'Recurso Extraordinario Federal',
+    'Previsionado',
+    'Recurso de Queja',
+    'Finalizado',
+  ],
+  DEMANDA_LABORAL: [
+    'Inicio',
+    'Traba de litis',
+    'Prueba',
+    'Alegato',
+    'Sentencia 1° favorable',
+    'Sentencia 1° desfavorable',
+    'Apelación',
+    'Sentencia 2° favorable',
+    'Sentencia 2° desfavorable',
+    'Recurso Extraordinario Federal',
+    'Previsionado',
+    'Recurso de Queja',
+    'Finalizado',
+  ],
+  PEDIDO_CAUSA_PENAL: [
+    'Solicitud enviada',
+    'Solicitud tramitada',
+    'Solicitud pendiente',
+    'Solicitud cumplida',
   ],
   CARTA_SUCESO: [
     'Recepcionado',
