@@ -482,6 +482,30 @@ function renderDynamicForm() {
   document.getElementById('asignacion-section').classList.remove('hidden');
   document.getElementById('docs-section').classList.remove('hidden');
   document.getElementById('actions-row').classList.remove('hidden');
+
+  // Inyectar alerta de N° causa duplicada junto al campo num-causa
+  const numCausaEl = document.getElementById('num-causa');
+  if (numCausaEl) {
+    const parentDiv = numCausaEl.parentElement;
+    if (parentDiv) {
+      parentDiv.insertAdjacentHTML('afterend', `
+        <div id="alerta-causa-duplicada" class="hidden md:col-span-2 p-4 bg-amber-50 rounded-xl border border-amber-200">
+          <div class="flex items-start gap-3 mb-3">
+            <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
+            <div>
+              <p class="text-sm font-bold text-amber-800">N° de causa ya registrado en el sistema</p>
+              <p class="text-xs text-amber-700 mt-0.5">Existe al menos un expediente con ese número de causa. Podés vincularlos al crear el nuevo expediente.</p>
+            </div>
+          </div>
+          <div id="lista-duplicados" class="space-y-2 mb-3"></div>
+          <button id="btn-vincular-confirmado"
+            class="hidden text-xs font-bold px-3 py-1.5 bg-amber-100 text-amber-800 rounded-lg border border-amber-300 hover:bg-amber-200 transition-colors inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px]">link</span>
+            <span>Vincular con — al crear</span>
+          </button>
+        </div>`);
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -495,6 +519,8 @@ let state = {
   abogado: '',
   numerosActivos: { CIVIL: 88, LABORAL: 31, PENAL: 102 },
 };
+
+let expedienteParaVincular = null;
 
 // ── Canal ──────────────────────────────────────────────────────────────────
 function setCanal(c) {
@@ -710,6 +736,59 @@ function formatCurrency(input) {
   input.setSelectionRange(input.value.length, input.value.length);
 }
 
+// ── Detección de N° causa duplicado ─────────────────────────────────────────
+function onNumeroCausaChange(valor) {
+  updateResumen();
+  const trimmed = valor.trim();
+  if (!trimmed || trimmed.toUpperCase() === 'SS SOFSE') { ocultarAlertaDuplicado(); return; }
+  const todos = [
+    ...window.SACO.EXPEDIENTES_ABOGADO,
+    ...window.SACO.QUEUE_MESA,
+  ];
+  const duplicados = todos.filter(e =>
+    e.numero_causa && e.numero_causa.toLowerCase() === trimmed.toLowerCase()
+  );
+  if (duplicados.length > 0) mostrarAlertaDuplicado(duplicados);
+  else ocultarAlertaDuplicado();
+}
+
+function mostrarAlertaDuplicado(duplicados) {
+  const alerta = document.getElementById('alerta-causa-duplicada');
+  const lista  = document.getElementById('lista-duplicados');
+  if (!alerta || !lista) return;
+  lista.innerHTML = duplicados.map(e => `
+    <div class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs font-bold text-on-surface">${e.id || e.ref}</span>
+          ${e.area ? SACO_UI.areaBadge(e.area) : ''}
+        </div>
+        <p class="text-xs text-on-surface-variant mt-0.5 line-clamp-1">${e.caratula}</p>
+      </div>
+      <button onclick="seleccionarParaVincularDesdeAlta('${e.id || e.ref}')"
+        class="text-[11px] font-bold text-primary hover:underline flex-shrink-0 ml-3">
+        Vincular
+      </button>
+    </div>`).join('');
+  alerta.classList.remove('hidden');
+}
+
+function ocultarAlertaDuplicado() {
+  document.getElementById('alerta-causa-duplicada')?.classList.add('hidden');
+  expedienteParaVincular = null;
+}
+
+function seleccionarParaVincularDesdeAlta(id) {
+  expedienteParaVincular = id;
+  const encontrado = window.SACO.getExpedienteById(id);
+  const btn = document.getElementById('btn-vincular-confirmado');
+  if (btn && encontrado) {
+    btn.innerHTML = `<span class="material-symbols-outlined text-[14px]">link</span> Vincular con ${id} al crear`;
+    btn.classList.remove('hidden');
+  }
+  SACO_UI.showToast(`Al crear el expediente se vinculará automáticamente con ${id}.`, 'info');
+}
+
 // ── Resumen live ────────────────────────────────────────────────────────────
 function updateResumen() {
   document.getElementById('res-canal').textContent = state.canal || '—';
@@ -766,6 +845,26 @@ function crearExpediente() {
   const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[state.area];
   const n = ++state.numerosActivos[state.area];
   const numInterno = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
+
+  // Si hay un expediente para vincular, agregar relación bidireccional
+  if (expedienteParaVincular) {
+    const expDestino = window.SACO.getExpedienteById(expedienteParaVincular);
+    if (expDestino) {
+      if (!expDestino.vinculos) expDestino.vinculos = [];
+      expDestino.vinculos.push({
+        id: numInterno,
+        area: state.area,
+        tipo: state.tipo,
+        caratula: document.getElementById('caratula')?.value || '',
+        estado: 'EN_TRAMITE',
+        estadoLabel: 'Recepcionado',
+        tipo_relacion: 'MISMA_CAUSA',
+        numero_causa: document.getElementById('num-causa')?.value || '',
+        abogado: document.getElementById('abogado-select')?.value || '',
+      });
+      SACO_UI.showToast(`Expediente vinculado con ${expedienteParaVincular}.`, 'success');
+    }
+  }
 
   SACO_UI.showToast(`Expediente ${numInterno} creado exitosamente.`, 'success');
   setTimeout(() => { window.location.href = 'bandeja-abogado.html'; }, 1500);

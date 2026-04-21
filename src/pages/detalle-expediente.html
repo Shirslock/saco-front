@@ -82,8 +82,9 @@ tailwind.config = {
 
   <!-- ── Tabs principales ─────────────────────────────────────────────────── -->
   <div class="flex border-b border-outline-variant/15 gap-6 mb-6">
-    <button onclick="setTabMain('datos')"     id="mt-datos"     class="tab-active pb-3 text-sm transition-colors">Datos</button>
-    <button onclick="setTabMain('timeline')"  id="mt-timeline"  class="tab-inactive pb-3 text-sm transition-colors">Timeline del Caso</button>
+    <button onclick="setTabMain('datos')"          id="mt-datos"          class="tab-active pb-3 text-sm transition-colors">Datos</button>
+    <button onclick="setTabMain('intervinientes')" id="mt-intervinientes" class="tab-inactive pb-3 text-sm transition-colors">Intervinientes</button>
+    <button onclick="setTabMain('timeline')"       id="mt-timeline"       class="tab-inactive pb-3 text-sm transition-colors">Timeline del Caso</button>
     <button onclick="setTabMain('docs')"      id="mt-docs"      class="tab-inactive pb-3 text-sm transition-colors">Documentos</button>
     <button onclick="setTabMain('prevision')" id="mt-prevision" class="tab-inactive pb-3 text-sm transition-colors">Previsión Económica</button>
   </div>
@@ -221,6 +222,43 @@ tailwind.config = {
     </table>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PANEL: INTERVINIENTES
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="panel-intervinientes" class="hidden bg-surface-container-lowest rounded-xl shadow-card p-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h3 class="font-headline font-bold text-on-surface">Intervinientes de la Causa</h3>
+        <p class="text-xs text-on-surface-variant mt-1">Todos los participantes vinculados a este expediente</p>
+      </div>
+      <button onclick="abrirModalAgregarInterviniente()"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-xl hover:brightness-105 active:scale-[0.98] transition-all">
+        <span class="material-symbols-outlined text-[16px]">person_add</span>
+        Agregar Interviniente
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-surface-container-low/60">
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Nombre / Razón Social</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Rol Procesal</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Documento</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Representado por</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Contacto</th>
+            <th class="px-5 py-3.5"></th>
+          </tr>
+        </thead>
+        <tbody id="intervinientes-tbody" class="divide-y divide-outline-variant/5"></tbody>
+      </table>
+    </div>
+    <div id="intervinientes-empty" class="hidden text-center py-12">
+      <span class="material-symbols-outlined text-4xl text-outline-variant">group</span>
+      <p class="text-sm text-on-surface-variant mt-2">No hay intervinientes registrados en este expediente</p>
+      <button onclick="abrirModalAgregarInterviniente()" class="mt-4 text-sm font-bold text-primary hover:underline">Agregar el primero</button>
+    </div>
+  </div>
+
 </div><!-- /main inner -->
 </main>
 
@@ -234,6 +272,22 @@ tailwind.config = {
 (function initUser() {
   const u = SACO_SYNC.getCurrentUser();
   if (u) window.SACO.CURRENT_USER = u;
+})();
+
+// ── Soporte para navegación entre expedientes vinculados ──────────────────────
+(function cargarExpedienteActivo() {
+  const idEnUrl = new URLSearchParams(location.search).get('id');
+  if (idEnUrl) {
+    const encontrado = window.SACO.getExpedienteById(idEnUrl);
+    if (encontrado) {
+      window.SACO.EXPEDIENTE_DETALLE = Object.assign({
+        timeline: [],
+        documentos: [],
+        vinculos: [],
+        intervinientes: [],
+      }, encontrado);
+    }
+  }
 })();
 
 const exp = window.SACO.EXPEDIENTE_DETALLE;
@@ -250,14 +304,15 @@ document.getElementById('h-area-badge').innerHTML  = SACO_UI.areaBadge(exp.area)
 // TABS PRINCIPALES
 // ─────────────────────────────────────────────────────────────────────────────
 function setTabMain(tab) {
-  ['datos','timeline','docs','prevision'].forEach(t => {
+  ['datos','intervinientes','timeline','docs','prevision'].forEach(t => {
     document.getElementById(`panel-${t}`).classList.toggle('hidden', t !== tab);
     document.getElementById(`mt-${t}`).className =
       t === tab ? 'tab-active pb-3 text-sm transition-colors'
                 : 'tab-inactive pb-3 text-sm transition-colors';
   });
-  if (tab === 'docs') renderDocs();
-  if (tab === 'prevision') renderPrevision();
+  if (tab === 'docs')           renderDocs();
+  if (tab === 'prevision')      renderPrevision();
+  if (tab === 'intervinientes') renderIntervinientes();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -705,18 +760,19 @@ function renderVinculos() {
   }
   const tipoLabels = { MISMA_CAUSA:'Misma Causa', MISMO_SINIESTRO:'Mismo Siniestro', DERIVACION:'Derivación', CONEXO:'Conexo' };
   container.innerHTML = exp.vinculos.map(v => `
-    <div onclick="window.location='detalle-expediente.html'"
+    <div onclick="window.SACO.abrirExpediente('${v.id}')"
       class="p-4 bg-surface-container-low rounded-xl hover:bg-surface-container cursor-pointer transition-colors border-l-4 border-primary/30 hover:border-primary group mb-3">
       <div class="flex items-start justify-between mb-2">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="font-mono text-xs font-bold text-on-surface">${v.id}</span>
           ${SACO_UI.areaBadge(v.area)}
           <span class="text-[10px] font-bold px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-full">${tipoLabels[v.tipo_relacion]||v.tipo_relacion}</span>
+          ${v.tipo_relacion === 'MISMO_SINIESTRO' ? `<span class="text-[9px] font-black px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded uppercase tracking-tight inline-flex items-center gap-0.5"><span class="material-symbols-outlined" style="font-size:10px">link</span> Mismo siniestro</span>` : ''}
         </div>
         <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-[16px]">open_in_new</span>
       </div>
       <p class="text-xs text-on-surface-variant line-clamp-2 leading-snug">${v.caratula}</p>
-      <div class="mt-2">${SACO_UI.estadoBadge(v.estado, v.estado.replace(/_/g,' '))}</div>
+      <div class="mt-2">${v.estadoLabel ? SACO_UI.estadoBadgeCustom(v.estadoLabel) : SACO_UI.estadoBadge(v.estado, v.estado.replace(/_/g,' '))}</div>
     </div>`).join('');
 }
 
@@ -823,6 +879,145 @@ function confirmarVinculo() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// INTERVINIENTES
+// ─────────────────────────────────────────────────────────────────────────────
+const ROL_COLORS = {
+  'Actor':          'bg-primary-container/60 text-on-primary-container',
+  'Demandado':      'bg-error-container/30 text-on-error-container',
+  'Imputado':       'bg-error-container/30 text-on-error-container',
+  'Denunciante':    'bg-secondary-container text-on-secondary-fixed',
+  'Perito':         'bg-tertiary-container text-on-tertiary-fixed',
+  'Tercero citado': 'bg-surface-container-high text-on-surface-variant',
+  'Querellante':    'bg-primary-container/60 text-on-primary-container',
+  'Testigo':        'bg-surface-container text-on-surface-variant',
+};
+
+const ROLES_PROCESALES = [
+  'Actor','Demandado','Imputado','Denunciante',
+  'Perito','Tercero citado','Querellante','Testigo','Otro',
+];
+
+function renderIntervinientes() {
+  const lista = exp.intervinientes || [];
+  const tbody = document.getElementById('intervinientes-tbody');
+  const empty = document.getElementById('intervinientes-empty');
+  if (!tbody) return;
+
+  if (!lista.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = lista.map((inv, i) => {
+    const rolCls = ROL_COLORS[inv.rol_procesal] || 'bg-surface-container text-on-surface-variant';
+    const contacto = [inv.contacto_email, inv.contacto_telefono].filter(Boolean).join(' · ') || '—';
+    return `
+      <tr class="hover:bg-surface-container-highest transition-colors group">
+        <td class="px-5 py-4">
+          <p class="text-sm font-semibold text-on-surface">${inv.nombre}</p>
+          ${inv.observaciones ? `<p class="text-[10px] text-on-surface-variant mt-0.5 line-clamp-1 italic">${inv.observaciones}</p>` : ''}
+        </td>
+        <td class="px-5 py-4">
+          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${rolCls}">${inv.rol_procesal}</span>
+        </td>
+        <td class="px-5 py-4 text-xs text-on-surface-variant font-mono">${inv.tipo_documento} ${inv.numero_documento}</td>
+        <td class="px-5 py-4 text-xs text-on-surface-variant">${inv.representado_por || '—'}</td>
+        <td class="px-5 py-4 text-xs text-on-surface-variant">${contacto}</td>
+        <td class="px-5 py-4 text-right">
+          <button onclick="eliminarInterviniente(${i})"
+            class="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-error-container/20 rounded text-error">
+            <span class="material-symbols-outlined text-[16px]">delete</span>
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function abrirModalAgregarInterviniente() {
+  SACO_UI.showModal('Agregar Interviniente', `
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Nombre / Razón Social *</label>
+          <input id="inv-nombre" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Ej: Juan Carlos Martínez"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Rol Procesal *</label>
+          <select id="inv-rol" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none">
+            <option value="">— Seleccioná —</option>
+            ${ROLES_PROCESALES.map(r => `<option value="${r}">${r}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Tipo de Documento</label>
+          <select id="inv-tipo-doc" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none">
+            <option>DNI</option><option>CUIT</option><option>CUIL</option><option>Pasaporte</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Número de Documento</label>
+          <input id="inv-num-doc" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="XX.XXX.XXX"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Email</label>
+          <input id="inv-email" type="email" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="correo@ejemplo.com"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Teléfono</label>
+          <input id="inv-tel" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="011-XXXX-XXXX"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Domicilio</label>
+          <input id="inv-domicilio" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Calle, número, piso, ciudad"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Representado por</label>
+          <input id="inv-representado" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Letrado o institución que lo representa"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Observaciones</label>
+          <textarea id="inv-obs" rows="2" class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Notas adicionales..."></textarea>
+        </div>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="guardarInterviniente()" class="px-6 py-2 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-lg">Guardar</button>`
+  );
+}
+
+function guardarInterviniente() {
+  const nombre = document.getElementById('inv-nombre').value.trim();
+  const rol    = document.getElementById('inv-rol').value;
+  if (!nombre || !rol) { SACO_UI.showToast('Nombre y rol procesal son obligatorios.', 'warn'); return; }
+  const nuevo = {
+    id: 'INT-' + String(Date.now()).slice(-4),
+    nombre,
+    rol_procesal:       rol,
+    tipo_documento:     document.getElementById('inv-tipo-doc').value,
+    numero_documento:   document.getElementById('inv-num-doc').value,
+    contacto_email:     document.getElementById('inv-email').value,
+    contacto_telefono:  document.getElementById('inv-tel').value,
+    contacto_domicilio: document.getElementById('inv-domicilio').value,
+    representado_por:   document.getElementById('inv-representado').value,
+    observaciones:      document.getElementById('inv-obs').value,
+  };
+  if (!exp.intervinientes) exp.intervinientes = [];
+  exp.intervinientes.push(nuevo);
+  SACO_UI.closeModal();
+  renderIntervinientes();
+  SACO_UI.showToast(`${nombre} agregado como ${rol}.`, 'success');
+}
+
+function eliminarInterviniente(index) {
+  const nombre = exp.intervinientes[index]?.nombre;
+  exp.intervinientes.splice(index, 1);
+  renderIntervinientes();
+  SACO_UI.showToast(`${nombre} eliminado.`, 'info');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // BOTÓN REASIGNAR — visibilidad según rol
 // ─────────────────────────────────────────────────────────────────────────────
 function updateReasignarBtn() {
@@ -849,6 +1044,7 @@ SACO_SYNC.syncListen(({ type, payload }) => {
 renderTimeline();
 poblarFiltroEstados();
 renderVinculosPreview();
+renderIntervinientes();
 </script>
 </body>
 </html>
