@@ -118,12 +118,6 @@ tailwind.config = {
             </select>
           </div>
 
-          <!-- Estado inicial (se puebla al seleccionar tipo) -->
-          <div id="estado-inicial-wrap" class="hidden">
-            <label class="field-label">Estado Inicial</label>
-            <select id="estado-inicial" class="field-input"></select>
-          </div>
-
         </div>
 
         <!-- Info canal -->
@@ -608,32 +602,26 @@ function setCanal(c) {
   document.getElementById('canal-info-text').textContent = infos[c];
   document.getElementById('canal-info').classList.remove('hidden');
 
-  // Re-renderizar form si hay área; verificar compatibilidad si hay tipo seleccionado
+  // Re-filtrar tipos y re-renderizar form si hay área
   if (state.area) {
+    poblarTipos(state.area, c);
     renderDynamicForm();
-    if (state.tipo) {
-      const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
-      if (tipoData && !tipoData.canales.includes(c)) {
-        const lbls = { EE_GDE: 'EE GDE', MEMO_GDE: 'Memo GDE', MAIL: 'Mail' };
-        const canalesLabel = tipoData.canales.map(ch => lbls[ch]).join(' o ');
-        SACO_UI.showToast(`Este tipo de gestión ingresa por ${canalesLabel}.`, 'info');
-      }
-    }
   }
 
   updateResumen();
 }
 
 // ── Poblar tipos ────────────────────────────────────────────────────────────
-function poblarTipos(area) {
-  const tipos = window.SACO.TIPOS_GESTION[area] || [];
+function poblarTipos(area, canal) {
+  const todos = window.SACO.TIPOS_GESTION[area] || [];
+  const filtrados = canal ? todos.filter(t => t.canales.includes(canal)) : todos;
   const sel = document.getElementById('tipo-select');
   const prevVal = sel.value;
   sel.innerHTML = `<option value="">— Seleccioná tipo de gestión —</option>` +
-    tipos.map(t =>
+    filtrados.map(t =>
       `<option value="${t.code}" data-canal="${t.canal}" data-canales="${t.canales.join(',')}">${t.label}</option>`
     ).join('');
-  if (tipos.some(t => t.code === prevVal)) sel.value = prevVal;
+  if (filtrados.some(t => t.code === prevVal)) sel.value = prevVal;
   else { state.tipo = ''; document.getElementById('res-tipo').textContent = '—'; }
 }
 
@@ -651,7 +639,7 @@ function setArea(a) {
   });
 
   // Tipos
-  poblarTipos(a);
+  poblarTipos(a, state.canal);
 
   // Letrados
   const abogs = window.SACO.ABOGADOS[a] || [];
@@ -707,17 +695,6 @@ function onTipoChange() {
   // Auto-set canal al sugerido por el tipo
   if (tipoData && tipoData.canal) {
     setCanal(tipoData.canal);
-  }
-
-  // Poblar estados iniciales
-  const estados = window.SACO.getEstadosPorTipo(state.tipo);
-  const estadoSel = document.getElementById('estado-inicial');
-  const estadoWrap = document.getElementById('estado-inicial-wrap');
-  if (estadoSel && estadoWrap) {
-    estadoSel.innerHTML = estados.map((e, i) =>
-      `<option value="${e}" ${i === 0 ? 'selected' : ''}>${e}</option>`
-    ).join('');
-    estadoWrap.classList.remove('hidden');
   }
 
   // Reincidencia simulada: si el campo num-causa existe y empieza con 'FSM'
@@ -936,6 +913,10 @@ function crearExpediente() {
 
   if (errores.length) { SACO_UI.showToast(errores[0], 'warn'); return; }
 
+  const estadoInicial = window.SACO.getEstadosPorTipo
+    ? (window.SACO.getEstadosPorTipo(state.tipo)[0] || 'Recepcionado')
+    : 'Recepcionado';
+
   const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[state.area];
   const n = ++state.numerosActivos[state.area];
   const numInterno = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
@@ -959,7 +940,7 @@ function crearExpediente() {
     }
   }
 
-  SACO_UI.showToast(`Expediente ${numInterno} creado exitosamente.`, 'success');
+  SACO_UI.showToast(`Expediente ${numInterno} creado — estado inicial: ${estadoInicial}.`, 'success');
   setTimeout(() => { window.location.href = 'bandeja-abogado.html'; }, 1500);
 }
 
