@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nuevo Expediente | SOFSE SACO</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "primary":"#256386","primary-dim":"#1d4e6b","primary-container":"#c5e0ea","on-primary":"#ffffff","on-primary-container":"#1b3a5c","on-primary-fixed":"#0f2a42",
+      "secondary":"#3a70a9","secondary-container":"#dbeafe","on-secondary-fixed":"#1e3a5f","secondary-dim":"#2d5987",
+      "tertiary":"#6d8eb0","tertiary-container":"#e0e7ef","on-tertiary-fixed":"#3a4f6a","tertiary-dim":"#5a7a9e",
+      "surface":"#f0f7f8","surface-container-lowest":"#ffffff","surface-container-low":"#f0f7f8","surface-container":"#e2eff5","surface-container-high":"#d4e6ef","surface-container-highest":"#c5dde9",
+      "background":"#f0f7f8","on-background":"#1b3a5c","on-surface":"#1b3a5c","on-surface-variant":"#4f6080",
+      "outline":"#6d8eb0","outline-variant":"#bcc0c9",
+      "error":"#cd5055","error-container":"#fee2e2","on-error-container":"#7f1d1d",
+      "inverse-surface":"#1b3a5c",
+      "header":"#242D4F",
+    },
+    fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
+    borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
+  body { font-family:'Inter',sans-serif; }
+  h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
+  .shadow-card { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
+  .step-badge { width:2rem;height:2rem;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.875rem; }
+  input,select,textarea { font-family:'Inter',sans-serif; }
+  .field-label { display:block;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#566166;margin-bottom:0.375rem; }
+  .field-label-suffix { font-weight:400;text-transform:none;letter-spacing:0;font-size:0.6rem;color:#717c82;margin-left:0.25rem; }
+  .field-input { width:100%;background:#f0f4f7;border:none;border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.875rem;transition:box-shadow .15s; }
+  .field-input:focus { outline:none;box-shadow:0 0 0 2px rgba(58,95,148,0.2); }
+  .field-input.error { box-shadow:0 0 0 2px rgba(159,64,61,0.4); }
+  .saco-card { background:#fff;border-radius:0.75rem;padding:2rem;box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
+  .field-group { padding:1rem;border-radius:0.75rem;background:#f0f4f7;border-left-width:4px;margin-bottom:0; }
+  .field-hint { font-size:0.625rem;color:#717c82;margin-top:0.25rem; }
+  .toggle-wrap { display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem; }
+  .toggle-wrap input[type=checkbox] { accent-color:#3a5f94; }
+</style>
+</head>
+<body class="bg-[#f0f7f8] text-[#1b3a5c]">
+
+<div id="sidebar-mount"></div>
+<div id="topbar-mount"></div>
+
+<main class="ml-64 min-h-screen" style="padding-top:64px">
+<div class="px-10 py-8 max-w-[1400px] mx-auto">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <nav class="flex items-center gap-2 text-xs text-[#4f6080] mb-2 font-medium uppercase tracking-wide">
+        <a href="mesa-saco.html" class="hover:text-[#256386] transition-colors">Mesa SACO</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="text-[#256386]">Nuevo Expediente</span>
+      </nav>
+      <h1 class="text-3xl font-headline font-extrabold text-[#1b3a5c] tracking-tight">Nuevo Ingreso de Expediente</h1>
+      <p class="text-[#4f6080] text-sm mt-1">Completá los datos según el canal y tipo de gestión.</p>
+    </div>
+    <a href="mesa-saco.html" class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#bcc0c9] text-[#4f6080] font-semibold hover:bg-surface-container-high transition-colors text-sm">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+      Cancelar
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+
+    <!-- ── Columna formulario ──────────────────────────────────────────── -->
+    <div class="xl:col-span-8 flex flex-col gap-6">
+
+      <!-- ── Sección 1: Origen y Tipo ───────────────────────────────────── -->
+      <div class="saco-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-[#c5e0ea] text-[#256386]">1</div>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Origen y Tipo de Gestión</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <!-- Canal -->
+          <div>
+            <label class="field-label">Canal de Ingreso</label>
+            <div class="flex p-1 bg-[#e2eff5] rounded-xl gap-1" id="canal-selector">
+              <button onclick="setCanal('EE_GDE')"   class="canal-btn flex-1 py-2.5 text-sm font-bold rounded-lg bg-surface-container-lowest shadow-sm text-[#256386] transition-all" data-val="EE_GDE">EE GDE</button>
+              <button onclick="setCanal('MEMO_GDE')" class="canal-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-on-surface transition-all" data-val="MEMO_GDE">Memo GDE</button>
+              <button onclick="setCanal('MAIL')"     class="canal-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-on-surface transition-all" data-val="MAIL">Mail</button>
+            </div>
+          </div>
+
+          <!-- Ref EE/Memo/Mail -->
+          <div>
+            <label class="field-label" id="ref-label">N° Expediente Electrónico (GDE)</label>
+            <input id="ref-input" class="field-input font-mono" placeholder="EX-2026-XXXXXXX-APN-SACO#SOFSE"/>
+          </div>
+
+          <!-- Área -->
+          <div>
+            <label class="field-label">Área Jurídica</label>
+            <div class="flex p-1 bg-[#e2eff5] rounded-xl gap-1" id="area-selector">
+              <button onclick="setArea('CIVIL')"   class="area-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-on-surface transition-all rounded-lg" data-val="CIVIL">Civil</button>
+              <button onclick="setArea('LABORAL')" class="area-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-on-surface transition-all rounded-lg" data-val="LABORAL">Laboral</button>
+              <button onclick="setArea('PENAL')"   class="area-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-on-surface transition-all rounded-lg" data-val="PENAL">Penal</button>
+            </div>
+          </div>
+
+          <!-- Tipo de gestión -->
+          <div>
+            <label class="field-label">Tipo de Gestión</label>
+            <select id="tipo-select" onchange="onTipoChange()" class="field-input">
+              <option value="">— Seleccioná área primero —</option>
+            </select>
+          </div>
+
+          <!-- Estado inicial (se puebla al seleccionar tipo) -->
+          <div id="estado-inicial-wrap" class="hidden">
+            <label class="field-label">Estado Inicial</label>
+            <select id="estado-inicial" class="field-input"></select>
+          </div>
+
+        </div>
+
+        <!-- Info canal -->
+        <div id="canal-info" class="hidden mt-4 p-3 bg-[#c5e0ea]/40 rounded-lg flex items-start gap-2">
+          <span class="material-symbols-outlined text-[#256386] text-[18px] mt-0.5" style="font-variation-settings:'FILL' 1;">info</span>
+          <p class="text-xs text-[#1b3a5c]" id="canal-info-text"></p>
+        </div>
+      </div>
+
+      <!-- ── Sección 2: Campos dinámicos ────────────────────────────────── -->
+      <div id="dynamic-section" class="hidden saco-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-[#c5e0ea] text-[#256386]">2</div>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Detalles del Caso</h3>
+        </div>
+        <div id="dynamic-form" class="space-y-5"></div>
+      </div>
+
+      <!-- ── Sección 3: Asignación ───────────────────────────────────────── -->
+      <div id="asignacion-section" class="hidden saco-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-[#c5e0ea] text-[#256386]">3</div>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Asignación de Letrado</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="field-label">Letrado Asignado</label>
+            <select id="abogado-select" class="field-input">
+              <option value="">— Seleccioná área primero —</option>
+            </select>
+            <p class="text-[10px] text-[#4f6080] mt-1" id="asignacion-regla"></p>
+          </div>
+          <div class="p-4 bg-[#f0f7f8] rounded-xl flex items-start gap-3">
+            <span class="material-symbols-outlined text-[#256386] text-2xl mt-0.5" style="font-variation-settings:'FILL' 1;">info</span>
+            <div id="asignacion-info">
+              <p class="text-xs font-bold text-[#4f6080] uppercase tracking-tight">Regla de asignación</p>
+              <p class="text-[11px] text-[#4f6080] mt-1">Seleccioná el área para ver la regla aplicable.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="reincidencia-alert" class="hidden mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 flex items-start gap-3">
+          <span class="material-symbols-outlined text-amber-600 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
+          <div>
+            <p class="text-sm font-bold text-amber-800">Reincidencia detectada</p>
+            <p class="text-xs text-amber-700 mt-0.5">El N° de Causa ingresado tiene expedientes previos. Se sugiere asignar al mismo letrado.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Sección 4: Documentación ────────────────────────────────────── -->
+      <div id="docs-section" class="hidden saco-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-[#c5e0ea] text-[#256386]">4</div>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Documentación Adjunta</h3>
+        </div>
+
+        <div id="drop-zone"
+          class="border-2 border-dashed border-[#bcc0c9] rounded-xl p-12 text-center bg-surface-container-low/50 hover:bg-surface-container transition-all cursor-pointer group"
+          ondragover="event.preventDefault();this.classList.add('border-[#256386]/50','bg-[#c5e0ea]/20')"
+          ondragleave="this.classList.remove('border-[#256386]/50','bg-[#c5e0ea]/20')"
+          ondrop="handleDrop(event)"
+          onclick="document.getElementById('file-input').click()">
+          <span class="material-symbols-outlined text-5xl text-outline-variant group-hover:text-[#256386] transition-colors mb-3 block">cloud_upload</span>
+          <h4 class="text-sm font-bold text-[#1b3a5c] mb-1">Arrastrá y soltá los archivos aquí</h4>
+          <p class="text-xs text-[#4f6080]">PDF, DOCX hasta 25 MB — el PDF principal quedará como Documento GDE vinculado</p>
+          <input type="file" id="file-input" class="hidden" multiple accept=".pdf,.docx" onchange="handleFiles(this.files)"/>
+        </div>
+        <ul id="file-list" class="mt-4 space-y-2"></ul>
+      </div>
+
+      <!-- Acciones -->
+      <div id="actions-row" class="hidden flex justify-end gap-3 pt-2">
+        <a href="mesa-saco.html" class="px-5 py-3 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-xl transition-colors">Cancelar</a>
+        <button onclick="crearExpediente()" class="bg-[#256386] hover:bg-[#1d4e6b] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined">task_alt</span>
+          Crear Expediente
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ── Sidebar resumen ─────────────────────────────────────────────── -->
+    <aside class="xl:col-span-4 flex flex-col gap-5 sticky top-20">
+
+      <!-- Flujo de proceso -->
+      <div class="bg-surface-container-low rounded-xl p-5 border border-[#bcc0c9]/40">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-[#256386]">auto_stories</span>
+          <h4 class="font-headline font-bold text-[#1b3a5c] text-sm">Flujo de Proceso</h4>
+        </div>
+        <div class="space-y-4">
+          <div class="relative pl-6 pb-4 border-l-2 border-[#256386]/20">
+            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#256386] border-4 border-surface-container-low"></div>
+            <p class="text-xs font-bold text-[#256386]">1. Ingreso GDE / Mail</p>
+            <p class="text-[11px] text-[#4f6080] mt-1">EE, Memo o Mail de Carta Suceso llega a Mesa SACO.</p>
+          </div>
+          <div class="relative pl-6 pb-4 border-l-2 border-[#256386]/20">
+            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-container border-4 border-surface-container-low"></div>
+            <p class="text-xs font-bold text-[#4f6080]">2. Clasificación y Apertura</p>
+            <p class="text-[11px] text-[#4f6080] mt-1">Mesa SACO clasifica por área y tipo. Se genera N° interno.</p>
+          </div>
+          <div class="relative pl-6">
+            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-container border-4 border-surface-container-low"></div>
+            <p class="text-xs font-bold text-[#4f6080]">3. Asignación al Letrado</p>
+            <p class="text-[11px] text-[#4f6080] mt-1">Civil/Laboral: FIFO secuencial. Penal: por línea ferroviaria.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen en tiempo real -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-card">
+        <h4 class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-4">Resumen del Nuevo Registro</h4>
+        <dl class="space-y-3">
+          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
+            <dt class="text-[11px] text-[#4f6080]">N° Interno</dt>
+            <dd class="text-[11px] font-bold text-[#256386] font-mono" id="res-numero">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
+            <dt class="text-[11px] text-[#4f6080]">Área</dt>
+            <dd class="text-[11px] font-bold" id="res-area">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
+            <dt class="text-[11px] text-[#4f6080]">Tipo de gestión</dt>
+            <dd class="text-[11px] font-bold" id="res-tipo">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
+            <dt class="text-[11px] text-[#4f6080]">Canal</dt>
+            <dd class="text-[11px] font-bold" id="res-canal">—</dd>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
+            <dt class="text-[11px] text-[#4f6080]">Letrado</dt>
+            <dd class="text-[11px] font-bold" id="res-abogado">—</dd>
+          </div>
+          <div class="flex justify-between items-start py-2">
+            <dt class="text-[11px] text-[#4f6080]">Carátula</dt>
+            <dd class="text-[11px] font-semibold text-right max-w-[180px] leading-snug" id="res-caratula">—</dd>
+          </div>
+        </dl>
+        <div class="mt-4 p-3 bg-[#e0e7ef]/30 rounded-lg">
+          <div class="flex items-center gap-2 text-[#3a4f6a] text-[10px] font-bold">
+            <span class="material-symbols-outlined text-[14px]">lock</span>
+            DATOS PROTEGIDOS
+          </div>
+          <p class="text-[9px] text-[#3a4f6a] mt-1">Expediente visible solo por el área asignada y auditoría.</p>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SCRIPTS
+     Orden: mock.js → sync.js → shared.js → (inline form-config + logic)
+════════════════════════════════════════════════════════════════════════════ -->
+<script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
+<script src="../components/shared.js"></script>
+
+<script>
+
+/**
+ * Renderiza un campo individual dado su fieldKey (string).
+ * Devuelve un string de HTML.
+ *
+ * @param {string} fieldKey  - clave en FIELD_DEFINITIONS
+ * @param {boolean} fullWidth - true si debe ocupar col-span-2
+ * @returns {string} HTML
+ */
+function renderField(fieldKey, fullWidth = false) {
+  const def = window.SACO.FIELD_DEFINITIONS[fieldKey];
+  if (!def) { console.warn('[SACO] Campo no definido:', fieldKey); return ''; }
+
+  const colClass = fullWidth ? 'col-span-2' : '';
+  const hiddenClass = (def.hiddenByDefault || def.hidden) ? ' hidden' : '';
+  const id = def.id || fieldKey.replace(/_/g, '-');
+  const mono = def.mono ? ' font-mono' : '';
+
+  const labelSuffix = def.labelSuffix
+    ? `<span class="field-label-suffix">${def.labelSuffix}</span>`
+    : '';
+  const labelHTML = `<label class="field-label" for="${id}">${def.label}${labelSuffix}</label>`;
+
+  let inputHTML = '';
+
+  switch (def.type) {
+    case 'text': {
+      const oninput = def.onInput ? ` oninput="${def.onInput}"` : '';
+      inputHTML = `<input id="${id}" class="field-input${mono}" placeholder="${def.placeholder || ''}"${oninput}/>`;
+      if (def.hint) inputHTML += `<p class="field-hint">${def.hint}</p>`;
+      break;
+    }
+    case 'date': {
+      const today = def.defaultToday ? new Date().toISOString().split('T')[0] : '';
+      inputHTML = `<input id="${id}" class="field-input" type="date" value="${today}"/>`;
+      break;
+    }
+    case 'select': {
+      const onchange = def.onChange ? ` onchange="${def.onChange}"` : '';
+      const opts = (def.options || []).map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+      inputHTML = `<select id="${id}" class="field-input"${onchange}>${opts}</select>`;
+      break;
+    }
+    case 'select-dynamic': {
+      const onchange = def.onChange ? ` onchange="${def.onChange}"` : '';
+      const placeholder = def.placeholder ? `<option value="">${def.placeholder}</option>` : '';
+      const opts = (def.optionsFn ? def.optionsFn() : []).map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+      inputHTML = `<select id="${id}" class="field-input"${onchange}>${placeholder}${opts}</select>`;
+      break;
+    }
+    case 'textarea': {
+      const rows = def.rows || 3;
+      inputHTML = `<textarea id="${id}" class="field-input resize-none" rows="${rows}" placeholder="${def.placeholder || ''}"></textarea>`;
+      break;
+    }
+    case 'toggle-input': {
+      const toggleId = `toggle-${id}`;
+      inputHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <label for="${toggleId}" class="text-xs text-[#4f6080] font-medium cursor-pointer">
+            ${def.toggleLabel}
+          </label>
+
+          <button type="button"
+            id="${toggleId}"
+            role="switch"
+            aria-checked="false"
+            onclick="toggleSwitch('${id}', '${toggleId}')"
+            class="relative inline-flex h-5 w-9 items-center rounded-full bg-[#bcc0c9]/60 transition-colors">
+
+            <span class="sr-only">${def.toggleLabel}</span>
+
+            <span
+              class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-0.5"
+              id="${toggleId}-dot">
+            </span>
+          </button>
+        </div>
+
+        <input id="${id}" class="field-input${mono} hidden" placeholder="${def.placeholder || ''}"/>
+      `;
+      break;
+    }
+    case 'currency': {
+      inputHTML = `
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium">$</span>
+          <input id="${id}"
+            class="field-input pl-7"
+            placeholder="${def.placeholder || '0'}"
+            oninput="formatCurrency(this)"/>
+        </div>
+      `;
+      break;
+    }
+    case 'checkbox': {
+      // Render como toggle visual sin campo de texto asociado
+      const toggleId = `toggle-${id}`;
+      // Para checkbox simple no necesitamos labelHTML arriba — lo reemplazamos inline
+      return `<div class="${colClass}${hiddenClass}">
+        <div class="flex items-center justify-between p-3 bg-[#f0f7f8] rounded-lg">
+          <label for="${toggleId}" class="text-xs font-medium text-[#1b3a5c] cursor-pointer flex-1">${def.label}</label>
+          <button type="button"
+            id="${toggleId}"
+            role="switch"
+            aria-checked="false"
+            onclick="toggleCheckbox('${id}', '${toggleId}')"
+            class="relative inline-flex h-5 w-9 items-center rounded-full bg-[#bcc0c9]/60 transition-colors flex-shrink-0">
+            <span class="sr-only">${def.label}</span>
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-0.5" id="${toggleId}-dot"></span>
+          </button>
+          <input type="hidden" id="${id}" value="false"/>
+        </div>
+      </div>`;
+    }
+    default:
+      console.warn('[SACO] Tipo de campo desconocido:', def.type);
+      return '';
+  }
+
+  return `<div class="${colClass}${hiddenClass}">${labelHTML}${inputHTML}</div>`;
+}
+
+/**
+ * Renderiza un bloque agrupado.
+ * @param {Object} group - { group, icon, color, fields, visibleWhenTipo? }
+ * @returns {string} HTML
+ */
+function renderGroup(group) {
+  // Si el grupo tiene visibilidad condicional por tipo, evaluar ahora
+  const isVisible = !group.visibleWhenTipo || state.tipo === group.visibleWhenTipo
+    || (group.visibleWhenTipo === 'DEMANDA' && ['DEMANDA_CIVIL','DEMANDA_LABORAL'].includes(state.tipo));
+  const hidden = isVisible ? '' : ' hidden';
+  const dataAttr = group.visibleWhenTipo ? ` data-visible-when-tipo="${group.visibleWhenTipo}"` : '';
+
+  const fieldsHTML = group.fields.map(entry => {
+    const [fKey, modifier] = typeof entry === 'string' ? entry.split(':') : [null, null];
+    const isFull = modifier === 'full';
+    return renderField(fKey, isFull);
+  }).join('');
+
+  return `
+  <div class="col-span-2${hidden} field-group border-l-4 ${group.color}"${dataAttr}>
+    <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wide flex items-center gap-2 mb-4">
+      <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">${group.icon}</span>
+      ${group.group}
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${fieldsHTML}</div>
+  </div>`;
+}
+
+/**
+ * Renderiza el formulario dinámico completo según área y canal activos.
+ * Inserta el resultado en #dynamic-form.
+ */
+function renderDynamicForm() {
+  if (!state.area) return;
+
+  // Obtener la config correcta
+  let entries = [];
+  if (state.area === 'PENAL') {
+    entries = window.SACO.FORM_CONFIG.PENAL[state.canal] || [];
+  } else {
+    entries = window.SACO.FORM_CONFIG[state.area].common;
+  }
+
+  // Renderizar
+  const html = entries.map(entry => {
+    if (typeof entry === 'object' && entry.group) {
+      return renderGroup(entry);
+    }
+    const [fieldKey, modifier] = entry.split(':');
+    const isFull = modifier === 'full';
+    return renderField(fieldKey, isFull);
+  }).join('');
+
+  document.getElementById('dynamic-form').innerHTML =
+    `<div class="grid grid-cols-1 md:grid-cols-2 gap-5">${html}</div>`;
+
+  // Restaurar fecha de recepción (defaultToday) — el input existe ahora
+  const fechaRecepEl = document.getElementById('fecha-recepcion');
+  if (fechaRecepEl && !fechaRecepEl.value) {
+    fechaRecepEl.value = new Date().toISOString().split('T')[0];
+  }
+
+  // Inicializar campos condicionales DESPUÉS de que el DOM existe
+  const tipoSolicitudEE   = document.getElementById('penal-tipo-solicitud-ee');
+  const tipoSolicitudMemo = document.getElementById('penal-tipo-solicitud-memo');
+  if (tipoSolicitudEE)   onTipoSolicitudChange(tipoSolicitudEE);
+  if (tipoSolicitudMemo) onTipoSolicitudChange(tipoSolicitudMemo);
+
+  // Re-evaluar grupos condicionales por tipo si ya hay uno seleccionado
+  if (state.tipo) {
+    document.querySelectorAll('[data-visible-when-tipo]').forEach(el => {
+      el.classList.toggle('hidden', state.tipo !== el.dataset.visibleWhenTipo);
+    });
+  }
+
+  // Mostrar secciones
+  document.getElementById('dynamic-section').classList.remove('hidden');
+  document.getElementById('asignacion-section').classList.remove('hidden');
+  document.getElementById('docs-section').classList.remove('hidden');
+  document.getElementById('actions-row').classList.remove('hidden');
+
+  // Inyectar alerta de N° causa duplicada junto al campo num-causa
+  const numCausaEl = document.getElementById('num-causa');
+  if (numCausaEl) {
+    const parentDiv = numCausaEl.parentElement;
+    if (parentDiv && !document.getElementById('alerta-causa-duplicada')) {
+      parentDiv.insertAdjacentHTML('afterend', `
+        <div id="alerta-causa-duplicada" class="hidden md:col-span-2 p-4 bg-amber-50 rounded-xl border border-amber-200">
+          <div class="flex items-start gap-3 mb-3">
+            <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
+            <div>
+              <p class="text-sm font-bold text-amber-800">N° de causa ya registrado en el sistema</p>
+              <p class="text-xs text-amber-700 mt-0.5">Existe al menos un expediente con ese número de causa. Podés vincularlos al crear el nuevo expediente.</p>
+            </div>
+          </div>
+          <div id="causa-duplicada-lista" class="space-y-2 mb-3"></div>
+        </div>`);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ESTADO Y LÓGICA DE NEGOCIO
+// ─────────────────────────────────────────────────────────────────────────────
+
+
+
+// ── Detección de N° causa duplicado ──────────────────────────────────────────
+function onNumeroCausaChange(valor) {
+  if (!valor || valor.trim() === '' || valor.trim().toUpperCase() === 'SS SOFSE') {
+    ocultarAlertaDuplicado();
+    return;
+  }
+  const duplicados = window.SACO.buscarPorNumeroCausa(valor.trim());
+  if (duplicados.length) {
+    mostrarAlertaDuplicado(duplicados);
+  } else {
+    ocultarAlertaDuplicado();
+    expedienteParaVincular = null;
+  }
+}
+
+function mostrarAlertaDuplicado(duplicados) {
+  const alerta = document.getElementById('alerta-causa-duplicada');
+  const lista  = document.getElementById('causa-duplicada-lista');
+  if (!alerta || !lista) return;
+  lista.innerHTML = duplicados.map(e => `
+    <div class="flex items-center justify-between bg-white rounded-lg p-2.5 border border-amber-100">
+      <div>
+        <span class="text-[11px] font-bold text-[#1b3a5c]">${e.numero_interno || e.id}</span>
+        <span class="mx-1 text-outline-variant">·</span>
+        <span class="text-[11px] text-[#4f6080]">${e.caratula || '—'}</span>
+      </div>
+      <button onclick="seleccionarVinculo('${e.id || e.numero_interno}')"
+        class="text-[10px] font-bold text-primary-dim border border-[#256386]/30 rounded-lg px-2.5 py-1 hover:bg-[#c5e0ea] transition-colors">
+        Vincular
+      </button>
+    </div>`).join('');
+  alerta.classList.remove('hidden');
+}
+
+function ocultarAlertaDuplicado() {
+  const alerta = document.getElementById('alerta-causa-duplicada');
+  if (alerta) alerta.classList.add('hidden');
+}
+
+function seleccionarVinculo(id) {
+  expedienteParaVincular = id;
+  const alerta = document.getElementById('alerta-causa-duplicada');
+  if (alerta) {
+    alerta.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-green-600 text-lg">check_circle</span>
+        <p class="text-[11px] font-bold text-[#14532d]">Expediente <span class="font-mono">${id}</span> se vinculará al crear.</p>
+        <button onclick="expedienteParaVincular=null;ocultarAlertaDuplicado()" class="ml-auto text-[10px] text-[#4f6080] hover:text-[#1b3a5c]">Cancelar</button>
+      </div>`;
+    alerta.classList.remove('hidden');
+  }
+  SACO_UI.showToast(`Se vinculará con ${id} al crear el expediente.`, 'info');
+}
+
+let state = {
+  canal: 'EE_GDE',
+  area: '',
+  tipo: '',
+  abogado: '',
+  numerosActivos: { CIVIL: 88, LABORAL: 31, PENAL: 102 },
+};
+
+let expedienteParaVincular = null;
+
+// ── Canal ──────────────────────────────────────────────────────────────────
+function setCanal(c) {
+  state.canal = c;
+
+  // Botones canal
+  document.querySelectorAll('.canal-btn').forEach(b => {
+    const active = b.dataset.val === c;
+    b.className = `canal-btn flex-1 py-2.5 text-sm rounded-lg transition-all
+      font-${active ? 'bold' : 'medium'}
+      ${active ? 'bg-surface-container-lowest shadow-sm text-primary' : 'text-[#4f6080] hover:text-on-surface'}`;
+  });
+
+  // Labels ref input
+  const labels = { EE_GDE: 'N° Expediente Electrónico (GDE)', MEMO_GDE: 'N° de Memo GDE', MAIL: 'Referencia de Mail / SAE' };
+  const placeholders = { EE_GDE: 'EX-2026-XXXXXXX-APN-SACO#SOFSE', MEMO_GDE: 'ME-2026-XXXXXXX-APN-SACO#SOFSE', MAIL: 'MAIL-SAE-2026-XXXX' };
+  document.getElementById('ref-label').textContent = labels[c];
+  document.getElementById('ref-input').placeholder = placeholders[c];
+
+  // Info canal
+  const infos = {
+    EE_GDE:   'Canal Externo: el EE fue creado por Mesa de Entradas General o el organismo notificante. Adjuntá el documento tipo OJ o EE.',
+    MEMO_GDE: 'Canal Interno: el Memo GDE fue generado por otra área de SOFSE (SGSySL, GCO, GAJ). Vinculá el número completo.',
+    MAIL:     'Canal Mail: Carta Suceso del sistema SAE de Seguridad. Adjuntá el PDF de la Carta Suceso y las fotos del suceso.',
+  };
+  document.getElementById('canal-info-text').textContent = infos[c];
+  document.getElementById('canal-info').classList.remove('hidden');
+
+  // Re-renderizar form si hay área; verificar compatibilidad si hay tipo seleccionado
+  if (state.area) {
+    renderDynamicForm();
+    if (state.tipo) {
+      const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
+      if (tipoData && !tipoData.canales.includes(c)) {
+        const lbls = { EE_GDE: 'EE GDE', MEMO_GDE: 'Memo GDE', MAIL: 'Mail' };
+        const canalesLabel = tipoData.canales.map(ch => lbls[ch]).join(' o ');
+        SACO_UI.showToast(`Este tipo de gestión ingresa por ${canalesLabel}.`, 'info');
+      }
+    }
+  }
+
+  updateResumen();
+}
+
+// ── Poblar tipos ────────────────────────────────────────────────────────────
+function poblarTipos(area) {
+  const tipos = window.SACO.TIPOS_GESTION[area] || [];
+  const sel = document.getElementById('tipo-select');
+  const prevVal = sel.value;
+  sel.innerHTML = `<option value="">— Seleccioná tipo de gestión —</option>` +
+    tipos.map(t =>
+      `<option value="${t.code}" data-canal="${t.canal}" data-canales="${t.canales.join(',')}">${t.label}</option>`
+    ).join('');
+  if (tipos.some(t => t.code === prevVal)) sel.value = prevVal;
+  else { state.tipo = ''; document.getElementById('res-tipo').textContent = '—'; }
+}
+
+// ── Área ────────────────────────────────────────────────────────────────────
+function setArea(a) {
+  state.area = a;
+  state.tipo = '';
+
+  // Botones área
+  document.querySelectorAll('.area-btn').forEach(b => {
+    const active = b.dataset.val === a;
+    b.className = `area-btn flex-1 py-2.5 text-sm rounded-lg transition-all
+      font-${active ? 'bold' : 'medium'}
+      ${active ? 'bg-surface-container-lowest shadow-sm text-primary' : 'text-[#4f6080] hover:text-on-surface'}`;
+  });
+
+  // Tipos
+  poblarTipos(a);
+
+  // Letrados
+  const abogs = window.SACO.ABOGADOS[a] || [];
+  const abogSel = document.getElementById('abogado-select');
+  abogSel.innerHTML = abogs.map((ab, i) =>
+    `<option value="${ab}">${ab}${i === 0 ? ' — siguiente en rotación' : ''}</option>`
+  ).join('');
+  state.abogado = abogs[0] || '';
+
+  // Regla asignación
+  const regla = a === 'PENAL'
+    ? 'Asignación por línea ferroviaria — el letrado se determina al seleccionar la línea.'
+    : 'Asignación secuencial FIFO — se sugiere el siguiente letrado disponible en el área.';
+  document.getElementById('asignacion-regla').textContent = regla;
+  document.getElementById('asignacion-info').innerHTML = `
+    <p class="text-xs font-bold text-[#4f6080] uppercase tracking-tight">Regla de asignación</p>
+    <p class="text-[11px] text-[#4f6080] mt-1">${regla}</p>`;
+
+  // N° interno preview
+  const n = state.numerosActivos[a] + 1;
+  const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[a];
+  document.getElementById('res-numero').textContent = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
+  document.getElementById('res-area').textContent = a;
+
+  // Render dinámico
+  renderDynamicForm();
+  updateResumen();
+}
+
+// ── Tipo de gestión ─────────────────────────────────────────────────────────
+function onTipoChange() {
+  const sel = document.getElementById('tipo-select');
+  state.tipo = sel.value;
+  document.getElementById('res-tipo').textContent = sel.options[sel.selectedIndex]?.text || '—';
+
+  // Mostrar/ocultar grupos condicionales (DEMANDA_CIVIL/LABORAL activan el grupo DEMANDA)
+  document.querySelectorAll('[data-visible-when-tipo]').forEach(el => {
+    const trigger = el.dataset.visibleWhenTipo;
+    const match = state.tipo === trigger
+      || (trigger === 'DEMANDA' && ['DEMANDA_CIVIL','DEMANDA_LABORAL'].includes(state.tipo));
+    el.classList.toggle('hidden', !match);
+  });
+
+  const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
+
+  // Verificar si el canal actual es válido; informar al usuario antes de auto-corregirlo
+  if (tipoData && tipoData.canales && state.canal && !tipoData.canales.includes(state.canal)) {
+    const lbls = { EE_GDE: 'EE GDE', MEMO_GDE: 'Memo GDE', MAIL: 'Mail' };
+    const canalesLabel = tipoData.canales.map(c => lbls[c]).join(' o ');
+    SACO_UI.showToast(`Este tipo de gestión ingresa por ${canalesLabel}.`, 'info');
+  }
+
+  // Auto-set canal al sugerido por el tipo
+  if (tipoData && tipoData.canal) {
+    setCanal(tipoData.canal);
+  }
+
+  // Poblar estados iniciales
+  const estados = window.SACO.getEstadosPorTipo(state.tipo);
+  const estadoSel = document.getElementById('estado-inicial');
+  const estadoWrap = document.getElementById('estado-inicial-wrap');
+  if (estadoSel && estadoWrap) {
+    estadoSel.innerHTML = estados.map((e, i) =>
+      `<option value="${e}" ${i === 0 ? 'selected' : ''}>${e}</option>`
+    ).join('');
+    estadoWrap.classList.remove('hidden');
+  }
+
+  // Reincidencia simulada: si el campo num-causa existe y empieza con 'FSM'
+  const causaEl = document.getElementById('num-causa');
+  if (causaEl) {
+    document.getElementById('reincidencia-alert').classList.toggle('hidden', !causaEl.value.startsWith('FSM'));
+  }
+
+  updateResumen();
+}
+
+// ── Línea ferroviaria (Penal) ───────────────────────────────────────────────
+function onLineaChange() {
+  if (state.area !== 'PENAL') return;
+  const lineaEl = document.getElementById('linea-ferroviaria');
+  if (!lineaEl) return;
+  const linea = window.SACO.LINEAS_FERROVIARIAS.find(l => l.code === lineaEl.value);
+  if (!linea) return;
+  const abogSel = document.getElementById('abogado-select');
+  abogSel.innerHTML = `<option value="${linea.abogado}">${linea.abogado} — Letrado línea ${linea.label}</option>`;
+  state.abogado = linea.abogado;
+  updateResumen();
+}
+
+// ── Toggle para campos tipo checkbox (Ley 25.344, etc.) ──────────────────────
+function toggleCheckbox(inputId, toggleId) {
+  const btn = document.getElementById(toggleId);
+  const dot = document.getElementById(`${toggleId}-dot`);
+  const input = document.getElementById(inputId);
+  const isActive = btn.getAttribute('aria-checked') === 'true';
+
+  if (isActive) {
+    btn.setAttribute('aria-checked', 'false');
+    btn.classList.remove('bg-primary');
+    btn.classList.add('bg-[#bcc0c9]/60');
+    dot.classList.remove('translate-x-4');
+    dot.classList.add('translate-x-0.5');
+    if (input) input.value = 'false';
+  } else {
+    btn.setAttribute('aria-checked', 'true');
+    btn.classList.remove('bg-[#bcc0c9]/60');
+    btn.classList.add('bg-primary');
+    dot.classList.remove('translate-x-0.5');
+    dot.classList.add('translate-x-4');
+    if (input) input.value = 'true';
+  }
+}
+
+function toggleSwitch(inputId, toggleId) {
+  const btn = document.getElementById(toggleId);
+  const dot = document.getElementById(`${toggleId}-dot`);
+  const input = document.getElementById(inputId);
+
+  const isActive = btn.getAttribute('aria-checked') === 'true';
+
+  if (isActive) {
+    // OFF
+    btn.setAttribute('aria-checked', 'false');
+    btn.classList.remove('bg-primary');
+    btn.classList.add('bg-[#bcc0c9]/60');
+
+    dot.classList.remove('translate-x-4');
+    dot.classList.add('translate-x-0.5');
+
+    input.classList.add('hidden');
+  } else {
+    // ON
+    btn.setAttribute('aria-checked', 'true');
+    btn.classList.remove('bg-[#bcc0c9]/60');
+    btn.classList.add('bg-primary');
+
+    dot.classList.remove('translate-x-0.5');
+    dot.classList.add('translate-x-4');
+
+    input.classList.remove('hidden');
+  }
+}
+
+// ── Toggle descripcion solicitud Penal EE ────────────────────────────────────
+function onTipoSolicitudChange(selectEl) {
+  const descEl = document.getElementById('penal-solicitud-desc');
+  if (!descEl) return;
+
+  const wrapper = descEl.closest('div');
+  if (wrapper) {
+    wrapper.classList.toggle('hidden', selectEl.value !== 'DESCRIPCION');
+  }
+}
+
+// formato currency para input Monto
+function formatCurrency(input) {
+  // Guardar posición del cursor
+  const selectionStart = input.selectionStart;
+
+  // Sacar todo lo que no sea número
+  let value = input.value.replace(/\D/g, '');
+
+  if (!value) {
+    input.value = '';
+    return;
+  }
+
+  // Formatear con separador de miles argentino
+  value = Number(value).toLocaleString('es-AR');
+
+  // Setear con $
+  input.value = '$ ' + value;
+
+  // Reposicionar cursor (simple, al final)
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+// ── Detección de N° causa duplicado ─────────────────────────────────────────
+function onNumeroCausaChange(valor) {
+  updateResumen();
+  const trimmed = valor.trim();
+  if (!trimmed || trimmed.toUpperCase() === 'SS SOFSE') { ocultarAlertaDuplicado(); return; }
+  const todos = [
+    ...window.SACO.EXPEDIENTES_ABOGADO,
+    ...window.SACO.QUEUE_MESA,
+  ];
+  const duplicados = todos.filter(e =>
+    e.numero_causa && e.numero_causa.toLowerCase() === trimmed.toLowerCase()
+  );
+  if (duplicados.length > 0) mostrarAlertaDuplicado(duplicados);
+  else ocultarAlertaDuplicado();
+}
+
+function mostrarAlertaDuplicado(duplicados) {
+  const alerta = document.getElementById('alerta-causa-duplicada');
+  const lista  = document.getElementById('lista-duplicados');
+  if (!alerta || !lista) return;
+  lista.innerHTML = duplicados.map(e => `
+    <div class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id || e.ref}</span>
+          ${e.area ? SACO_UI.areaBadge(e.area) : ''}
+        </div>
+        <p class="text-xs text-[#4f6080] mt-0.5 line-clamp-1">${e.caratula}</p>
+      </div>
+      <button onclick="seleccionarParaVincularDesdeAlta('${e.id || e.ref}')"
+        class="text-[11px] font-bold text-[#256386] hover:underline flex-shrink-0 ml-3">
+        Vincular
+      </button>
+    </div>`).join('');
+  alerta.classList.remove('hidden');
+}
+
+function ocultarAlertaDuplicado() {
+  document.getElementById('alerta-causa-duplicada')?.classList.add('hidden');
+  expedienteParaVincular = null;
+}
+
+function seleccionarParaVincularDesdeAlta(id) {
+  expedienteParaVincular = id;
+  const encontrado = window.SACO.getExpedienteById(id);
+  const btn = document.getElementById('btn-vincular-confirmado');
+  if (btn && encontrado) {
+    btn.innerHTML = `<span class="material-symbols-outlined text-[14px]">link</span> Vincular con ${id} al crear`;
+    btn.classList.remove('hidden');
+  }
+  SACO_UI.showToast(`Al crear el expediente se vinculará automáticamente con ${id}.`, 'info');
+}
+
+// ── Resumen live ────────────────────────────────────────────────────────────
+function updateResumen() {
+  document.getElementById('res-canal').textContent = state.canal || '—';
+  const abogEl = document.getElementById('abogado-select');
+  document.getElementById('res-abogado').textContent = abogEl ? abogEl.value || state.abogado || '—' : state.abogado || '—';
+  const caratulaEl = document.getElementById('caratula');
+  document.getElementById('res-caratula').textContent = caratulaEl ? caratulaEl.value || '—' : '—';
+}
+
+// ── Archivos ─────────────────────────────────────────────────────────────────
+let files = [];
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('border-[#256386]/50', 'bg-[#c5e0ea]/20');
+  handleFiles(e.dataTransfer.files);
+}
+function handleFiles(fl) {
+  Array.from(fl).forEach(f => {
+    if (f.size > 25 * 1024 * 1024) { SACO_UI.showToast(`${f.name} excede 25 MB.`, 'warn'); return; }
+    files.push(f);
+  });
+  renderFiles();
+}
+function renderFiles() {
+  document.getElementById('file-list').innerHTML = files.map((f, i) => `
+    <li class="flex items-center gap-3 p-3 bg-[#f0f7f8] rounded-lg">
+      <span class="material-symbols-outlined text-[#cd5055] text-[20px]" style="font-variation-settings:'FILL' 1;">picture_as_pdf</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-semibold text-[#1b3a5c] truncate">${f.name}</p>
+        <p class="text-[10px] text-[#4f6080]">${(f.size / 1024).toFixed(0)} KB</p>
+      </div>
+      <button onclick="files.splice(${i},1);renderFiles()" class="p-1 hover:bg-surface-container rounded transition-colors">
+        <span class="material-symbols-outlined text-[#4f6080] text-[16px]">close</span>
+      </button>
+    </li>`).join('');
+}
+
+// ── Crear expediente ──────────────────────────────────────────────────────────
+function crearExpediente() {
+  const errores = [];
+  if (!state.area) errores.push('Seleccioná el área jurídica');
+  if (!state.tipo) errores.push('Seleccioná el tipo de gestión');
+
+  const caratulaEl = document.getElementById('caratula');
+  if (!caratulaEl || !caratulaEl.value.trim()) errores.push('Ingresá la carátula');
+
+  if (state.area === 'PENAL') {
+    const lineaEl = document.getElementById('linea-ferroviaria');
+    if (!lineaEl || !lineaEl.value) errores.push('Seleccioná la línea ferroviaria');
+  }
+
+  if (errores.length) { SACO_UI.showToast(errores[0], 'warn'); return; }
+
+  const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[state.area];
+  const n = ++state.numerosActivos[state.area];
+  const numInterno = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
+
+  // Si hay un expediente para vincular, agregar relación bidireccional
+  if (expedienteParaVincular) {
+    const expDestino = window.SACO.getExpedienteById(expedienteParaVincular);
+    if (expDestino) {
+      if (!expDestino.vinculos) expDestino.vinculos = [];
+      expDestino.vinculos.push({
+        id: numInterno,
+        area: state.area,
+        tipo: state.tipo,
+        caratula: document.getElementById('caratula')?.value || '',
+        estado: 'EN_TRAMITE',
+        estadoLabel: 'Recepcionado',
+        tipo_relacion: 'MISMA_CAUSA',
+        numero_causa: document.getElementById('num-causa')?.value || '',
+        abogado: document.getElementById('abogado-select')?.value || '',
+      });
+    }
+  }
+
+  SACO_UI.showToast(`Expediente ${numInterno} creado exitosamente.`, 'success');
+  setTimeout(() => { window.location.href = 'bandeja-abogado.html'; }, 1500);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+(function init() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+
+  document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('alta-expediente');
+  document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Nuevo Expediente', 'Nuevo Expediente');
+
+  setCanal('EE_GDE');
+
+  SACO_SYNC.syncListen(({ type, payload }) => {
+    if (type === 'USUARIO_CAMBIADO') {
+      if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+      document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('alta-expediente');
+      if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
+    }
+  });
+})();
+</script>
+</body>
+</html>
