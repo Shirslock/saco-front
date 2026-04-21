@@ -11,14 +11,15 @@
 tailwind.config = {
   theme: { extend: {
     colors: {
-      "primary":"#3a5f94","primary-dim":"#2d5387","primary-container":"#d5e3ff","on-primary":"#f6f7ff","on-primary-container":"#2c5287","on-primary-fixed":"#153f73",
-      "secondary":"#49636f","secondary-container":"#cbe7f5","on-secondary-fixed":"#29434e","secondary-dim":"#3d5762",
-      "tertiary":"#5d5d78","tertiary-container":"#dbdafb","on-tertiary-fixed":"#393953","tertiary-dim":"#51516c",
-      "surface":"#f8f9fb","surface-container-lowest":"#ffffff","surface-container-low":"#f0f4f7","surface-container":"#e8eff3","surface-container-high":"#e1e9ee","surface-container-highest":"#d9e4ea",
-      "background":"#f8f9fb","on-background":"#2a3439","on-surface":"#2a3439","on-surface-variant":"#566166",
-      "outline":"#717c82","outline-variant":"#a9b4b9",
-      "error":"#9f403d","error-container":"#fe8983","on-error-container":"#752121",
-      "inverse-surface":"#0b0f10",
+      "primary":"#256386","primary-dim":"#1d4e6b","primary-container":"#c5e0ea","on-primary":"#ffffff","on-primary-container":"#1b3a5c","on-primary-fixed":"#0f2a42",
+      "secondary":"#3a70a9","secondary-container":"#dbeafe","on-secondary-fixed":"#1e3a5f","secondary-dim":"#2d5987",
+      "tertiary":"#6d8eb0","tertiary-container":"#e0e7ef","on-tertiary-fixed":"#3a4f6a","tertiary-dim":"#5a7a9e",
+      "surface":"#f0f7f8","surface-container-lowest":"#ffffff","surface-container-low":"#f0f7f8","surface-container":"#e2eff5","surface-container-high":"#d4e6ef","surface-container-highest":"#c5dde9",
+      "background":"#f0f7f8","on-background":"#1b3a5c","on-surface":"#1b3a5c","on-surface-variant":"#4f6080",
+      "outline":"#6d8eb0","outline-variant":"#bcc0c9",
+      "error":"#cd5055","error-container":"#fee2e2","on-error-container":"#7f1d1d",
+      "inverse-surface":"#1b3a5c",
+      "header":"#242D4F",
     },
     fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
     borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
@@ -29,31 +30,31 @@ tailwind.config = {
   .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
   body { font-family:'Inter',sans-serif; }
   h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
-  .shadow-card { box-shadow:0 4px 20px rgba(42,52,57,0.06); }
-  .shadow-card-lg { box-shadow:0 12px 40px rgba(42,52,57,0.08); }
-  tr.row-hover:hover td { background:rgb(217 228 234 / 0.4); }
+  .shadow-card { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
+  .shadow-card-lg { box-shadow:0 4px 12px rgba(27,58,92,0.1); }
+  tr.row-hover:hover td { background:#f0f7f8; }
 </style>
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-[#f0f7f8] text-[#1b3a5c]">
 
 <div id="sidebar-mount"></div>
 <div id="topbar-mount"></div>
 
-<main class="ml-64 pt-16 min-h-screen">
+<main class="ml-64 min-h-screen" style="padding-top:64px">
 <div class="p-8 max-w-[1600px] mx-auto space-y-8">
 
   <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-2 uppercase tracking-wide font-medium">
+      <nav class="flex items-center gap-2 text-xs text-[#4f6080] mb-2 uppercase tracking-wide font-medium">
         <span>SACO</span>
         <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-        <span class="text-primary">Mesa SACO</span>
+        <span class="text-[#256386]">Mesa SACO</span>
       </nav>
-      <h1 class="text-2xl font-headline font-bold text-on-surface">Bandeja Mesa SACO</h1>
-      <p class="text-on-surface-variant text-sm mt-0.5">Consulta de expedientes asignados — vista de solo lectura.</p>
+      <h1 class="text-2xl font-headline font-bold text-[#1b3a5c]">Bandeja Mesa SACO</h1>
+      <p class="text-[#4f6080] text-sm mt-0.5">Consulta de expedientes asignados — vista de solo lectura.</p>
     </div>
-    <a href="alta-expediente.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-br from-primary to-primary-dim text-white font-bold text-sm rounded-xl shadow-md hover:brightness-105 active:scale-[0.98] transition-all">
+    <a href="alta-expediente.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#256386] hover:bg-[#1d4e6b] text-white font-bold text-sm rounded-xl shadow-md hover:brightness-105 active:scale-[0.98] transition-all">
       <span class="material-symbols-outlined">create_new_folder</span>
       Nuevo Expediente
     </a>
@@ -62,47 +63,47 @@ tailwind.config = {
   <!-- ── Métricas ──────────────────────────────────────────────────────── -->
   <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col justify-between">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
       <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-primary p-2 bg-primary-container rounded-lg" style="font-variation-settings:'FILL' 1;">folder_open</span>
-        <span class="text-[10px] font-bold text-on-secondary-fixed bg-secondary-container px-2 py-1 rounded-full uppercase tracking-tight">Total</span>
+        <span class="material-symbols-outlined text-[#256386] p-2 bg-primary-container rounded-lg" style="font-variation-settings:'FILL' 1;">folder_open</span>
+        <span class="text-[10px] font-bold text-[#1e3a5f] bg-[#dbeafe] px-2 py-1 rounded-full uppercase tracking-tight">Total</span>
       </div>
       <div class="mt-4">
-        <p class="text-4xl font-black text-on-surface" id="metric-total">—</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Expedientes Asignados</p>
+        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-total">—</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Asignados</p>
       </div>
     </div>
 
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col justify-between">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
       <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-secondary p-2 bg-secondary-container rounded-lg" style="font-variation-settings:'FILL' 1;">gavel</span>
-        <span class="text-[10px] font-bold text-on-secondary-fixed bg-secondary-container px-2 py-1 rounded-full uppercase tracking-tight">Civil</span>
+        <span class="material-symbols-outlined text-[#3a70a9] p-2 bg-[#dbeafe] rounded-lg" style="font-variation-settings:'FILL' 1;">gavel</span>
+        <span class="text-[10px] font-bold text-[#1e3a5f] bg-[#dbeafe] px-2 py-1 rounded-full uppercase tracking-tight">Civil</span>
       </div>
       <div class="mt-4">
-        <p class="text-4xl font-black text-on-surface" id="metric-civil">—</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Expedientes Civiles</p>
+        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-civil">—</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Civiles</p>
       </div>
     </div>
 
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col justify-between">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
       <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-secondary p-2 bg-secondary-container rounded-lg" style="font-variation-settings:'FILL' 1;">work</span>
-        <span class="text-[10px] font-bold text-on-secondary-fixed bg-secondary-container px-2 py-1 rounded-full uppercase tracking-tight">Laboral</span>
+        <span class="material-symbols-outlined text-[#3a70a9] p-2 bg-[#dbeafe] rounded-lg" style="font-variation-settings:'FILL' 1;">work</span>
+        <span class="text-[10px] font-bold text-[#1e3a5f] bg-[#dbeafe] px-2 py-1 rounded-full uppercase tracking-tight">Laboral</span>
       </div>
       <div class="mt-4">
-        <p class="text-4xl font-black text-on-surface" id="metric-laboral">—</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Expedientes Laborales</p>
+        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-laboral">—</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Laborales</p>
       </div>
     </div>
 
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col justify-between">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
       <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-tertiary p-2 bg-tertiary-container rounded-lg" style="font-variation-settings:'FILL' 1;">policy</span>
-        <span class="text-[10px] font-bold text-on-tertiary-fixed bg-tertiary-container px-2 py-1 rounded-full uppercase tracking-tight">Penal</span>
+        <span class="material-symbols-outlined text-[#6d8eb0] p-2 bg-[#e0e7ef] rounded-lg" style="font-variation-settings:'FILL' 1;">policy</span>
+        <span class="text-[10px] font-bold text-[#3a4f6a] bg-[#e0e7ef] px-2 py-1 rounded-full uppercase tracking-tight">Penal</span>
       </div>
       <div class="mt-4">
-        <p class="text-4xl font-black text-on-surface" id="metric-penal">—</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Expedientes Penales</p>
+        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-penal">—</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Penales</p>
       </div>
     </div>
 
@@ -113,31 +114,31 @@ tailwind.config = {
 
     <!-- ── Filtros ──────────────────────────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-3">
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-5 space-y-5 sticky top-20">
+      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5 space-y-5 sticky top-20">
 
         <div class="relative">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-          <input id="f-search" oninput="applyFilters()" class="w-full bg-surface-container-low border-none rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Carátula, N° causa..."/>
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
+          <input id="f-search" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Carátula, N° causa..."/>
         </div>
 
         <!-- Tipo de Gestión -->
         <div>
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Tipo de Gestión</label>
-          <select id="f-tipo" onchange="applyFilters()" class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de Gestión</label>
+          <select id="f-tipo" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
             <option value="">Todos</option>
           </select>
         </div>
 
         <!-- Referencia GDE -->
         <div>
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Referencia GDE</label>
-          <input id="f-gde" oninput="applyFilters()" class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm font-mono focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="EX-2026-..."/>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Referencia GDE</label>
+          <input id="f-gde" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="EX-2026-..."/>
         </div>
 
         <!-- Canal de Ingreso -->
         <div>
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Canal de Ingreso</label>
-          <select id="f-canal" onchange="applyFilters()" class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Canal de Ingreso</label>
+          <select id="f-canal" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
             <option value="">Todos</option>
             <option value="EE_GDE">EE GDE</option>
             <option value="MEMO_GDE">Memo GDE</option>
@@ -147,21 +148,21 @@ tailwind.config = {
 
         <!-- Letrado -->
         <div>
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Letrado</label>
-          <select id="f-abogado" onchange="applyFilters()" class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Letrado</label>
+          <select id="f-abogado" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
             <option value="">Todos</option>
           </select>
         </div>
 
         <!-- Fecha de Recepción -->
         <div>
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Recepción desde</label>
-          <input id="f-fecha-desde" oninput="applyFilters()" type="date" class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none mb-2"/>
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Recepción hasta</label>
-          <input id="f-fecha-hasta" oninput="applyFilters()" type="date" class="w-full bg-surface-container-low border-none rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"/>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Recepción desde</label>
+          <input id="f-fecha-desde" oninput="applyFilters()" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none mb-2"/>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Recepción hasta</label>
+          <input id="f-fecha-hasta" oninput="applyFilters()" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
         </div>
 
-        <button onclick="limpiarFiltros()" class="w-full py-2 border-2 border-dashed border-outline-variant/30 rounded-xl text-xs font-bold text-on-surface-variant hover:border-primary/50 hover:text-primary transition-all">
+        <button onclick="limpiarFiltros()" class="w-full py-2 border-2 border-dashed border-[#bcc0c9] rounded-xl text-xs font-bold text-[#4f6080] hover:border-[#256386]/50 hover:text-[#256386] transition-all">
           Limpiar filtros
         </button>
       </div>
@@ -169,27 +170,27 @@ tailwind.config = {
 
     <!-- ── Tabla ─────────────────────────────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-9">
-      <div class="bg-surface-container-lowest rounded-xl shadow-card overflow-hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
 
-        <div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center">
+        <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
           <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">assignment</span>
-            <h2 class="font-headline font-bold text-on-surface">Expedientes Asignados</h2>
+            <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">assignment</span>
+            <h2 class="font-headline font-bold text-[#1b3a5c]">Expedientes Asignados</h2>
           </div>
-          <span class="text-[10px] font-bold bg-surface-container text-on-surface-variant px-3 py-1 rounded-full border border-outline-variant/20" id="tabla-count">— expedientes</span>
+          <span class="text-[10px] font-bold bg-[#e2eff5] text-[#4f6080] px-3 py-1 rounded-full border border-[#bcc0c9]/80" id="tabla-count">— expedientes</span>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
-            <thead class="bg-surface-container-low/60">
+            <thead class="bg-[#f0f7f8]">
               <tr>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">N° Interno</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Carátula</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Tipo de Gestión</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Referencia GDE</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Canal</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Letrado</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Recepción</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo de Gestión</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Referencia GDE</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Canal</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
+                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
                 <th class="px-6 py-3.5"></th>
               </tr>
             </thead>
@@ -198,10 +199,10 @@ tailwind.config = {
         </div>
 
         <!-- Paginación decorativa -->
-        <div class="px-6 py-4 border-t border-outline-variant/10 flex justify-between items-center">
-          <p class="text-xs text-on-surface-variant">Página 1 de 1</p>
+        <div class="px-6 py-4 border-t border-[#bcc0c9]/40 flex justify-between items-center">
+          <p class="text-xs text-[#4f6080]">Página 1 de 1</p>
           <div class="flex gap-1">
-            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">1</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#256386] text-white font-bold text-xs">1</button>
           </div>
         </div>
 
@@ -229,9 +230,9 @@ document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Mesa 
 const canalLabels = { EE_GDE:'EE GDE', MEMO_GDE:'Memo GDE', MAIL:'Mail' };
 
 const areaColors = {
-  CIVIL:   'bg-primary-container/60 text-on-primary-container',
-  LABORAL: 'bg-secondary-container text-on-secondary-fixed',
-  PENAL:   'bg-tertiary-container text-on-tertiary-fixed',
+  CIVIL:   'bg-primary-container/60 text-[#1b3a5c]',
+  LABORAL: 'bg-[#dbeafe] text-[#1e3a5f]',
+  PENAL:   'bg-[#e0e7ef] text-[#3a4f6a]',
 };
 
 // ── Poblar filtros dinámicamente desde los datos ───────────────────────────
@@ -272,35 +273,35 @@ function renderTabla(datos) {
   document.getElementById('tabla-count').textContent = `${datos.length} expediente${datos.length !== 1 ? 's' : ''}`;
 
   if (!datos.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-on-surface-variant text-sm">No hay expedientes que coincidan con los filtros seleccionados.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros seleccionados.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = datos.map(e => `
     <tr class="row-hover transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
       <td class="px-6 py-4">
-        <span class="font-mono text-xs font-bold text-on-surface">${e.id}</span>
+        <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
         <span class="block text-[10px] px-1.5 py-0.5 rounded font-bold mt-1 w-fit ${areaColors[e.area] || ''}">${e.area}</span>
       </td>
       <td class="px-6 py-4 max-w-[220px]">
-        <p class="text-sm font-semibold text-on-surface line-clamp-2 leading-snug">${e.caratula}</p>
-        <p class="font-mono text-[10px] text-on-surface-variant mt-0.5">${e.numero_causa || ''}</p>
+        <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
+        <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa || ''}</p>
       </td>
-      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.tipo.replace(/_/g, ' ')}</td>
+      <td class="px-6 py-4 text-xs text-[#4f6080]">${e.tipo.replace(/_/g, ' ')}</td>
       <td class="px-6 py-4">
-        <span class="font-mono text-[10px] text-on-surface-variant">${e.ref_gde || e.gde || '—'}</span>
+        <span class="font-mono text-[10px] text-[#4f6080]">${e.ref || e.gde || '—'}</span>
       </td>
       <td class="px-6 py-4">
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">${canalLabels[e.canal_ingreso] || e.canal_ingreso || '—'}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e2eff5] text-[#4f6080]">${canalLabels[e.canal_ingreso || e.canal] || '—'}</span>
       </td>
-      <td class="px-6 py-4 text-xs text-on-surface">${e.abogado}</td>
-      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.fecha_recepcion}</td>
+      <td class="px-6 py-4 text-xs text-[#1b3a5c]">${e.abogado}</td>
+      <td class="px-6 py-4 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
       <td class="px-6 py-4 text-right">
         <button
           onclick="event.stopPropagation(); window.location='detalle-expediente.html'"
           class="p-1.5 hover:bg-surface-container rounded-lg transition-colors"
           title="Visualizar expediente">
-          <span class="material-symbols-outlined text-on-surface-variant hover:text-primary text-[18px] transition-colors">visibility</span>
+          <span class="material-symbols-outlined text-[#4f6080] hover:text-[#256386] text-[18px] transition-colors">visibility</span>
         </button>
       </td>
     </tr>`).join('');

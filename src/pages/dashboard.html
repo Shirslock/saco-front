@@ -11,14 +11,15 @@
 tailwind.config = {
   theme: { extend: {
     colors: {
-      "primary":"#3a5f94","primary-dim":"#2d5387","primary-container":"#d5e3ff","on-primary":"#f6f7ff","on-primary-container":"#2c5287","on-primary-fixed":"#153f73",
-      "secondary":"#49636f","secondary-container":"#cbe7f5","on-secondary-fixed":"#29434e","secondary-dim":"#3d5762",
-      "tertiary":"#5d5d78","tertiary-container":"#dbdafb","on-tertiary-fixed":"#393953","tertiary-dim":"#51516c",
-      "surface":"#f8f9fb","surface-container-lowest":"#ffffff","surface-container-low":"#f0f4f7","surface-container":"#e8eff3","surface-container-high":"#e1e9ee","surface-container-highest":"#d9e4ea",
-      "background":"#f8f9fb","on-background":"#2a3439","on-surface":"#2a3439","on-surface-variant":"#566166",
-      "outline":"#717c82","outline-variant":"#a9b4b9",
-      "error":"#9f403d","error-container":"#fe8983","on-error-container":"#752121",
-      "inverse-surface":"#0b0f10",
+      "primary":"#256386","primary-dim":"#1d4e6b","primary-container":"#c5e0ea","on-primary":"#ffffff","on-primary-container":"#1b3a5c","on-primary-fixed":"#0f2a42",
+      "secondary":"#3a70a9","secondary-container":"#dbeafe","on-secondary-fixed":"#1e3a5f","secondary-dim":"#2d5987",
+      "tertiary":"#6d8eb0","tertiary-container":"#e0e7ef","on-tertiary-fixed":"#3a4f6a","tertiary-dim":"#5a7a9e",
+      "surface":"#f0f7f8","surface-container-lowest":"#ffffff","surface-container-low":"#f0f7f8","surface-container":"#e2eff5","surface-container-high":"#d4e6ef","surface-container-highest":"#c5dde9",
+      "background":"#f0f7f8","on-background":"#1b3a5c","on-surface":"#1b3a5c","on-surface-variant":"#4f6080",
+      "outline":"#6d8eb0","outline-variant":"#bcc0c9",
+      "error":"#cd5055","error-container":"#fee2e2","on-error-container":"#7f1d1d",
+      "inverse-surface":"#1b3a5c",
+      "header":"#242D4F",
     },
     fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
     borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
@@ -29,8 +30,8 @@ tailwind.config = {
   .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
   body { font-family:'Inter',sans-serif; }
   h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
-  .shadow-card    { box-shadow:0 4px 20px rgba(42,52,57,0.06); }
-  .shadow-card-lg { box-shadow:0 12px 40px rgba(42,52,57,0.08); }
+  .shadow-card    { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
+  .shadow-card-lg { box-shadow:0 4px 12px rgba(27,58,92,0.1); }
 
   /* ── Barras animadas ── */
   .bar-fill {
@@ -59,20 +60,20 @@ tailwind.config = {
   .pulse-dot { animation: pulse-dot 2s ease infinite; }
 </style>
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-[#f0f7f8] text-[#1b3a5c]">
 
 <div id="sidebar-mount"></div>
 <div id="topbar-mount"></div>
 
-<main class="ml-64 pt-16 min-h-screen">
+<main class="ml-64 min-h-screen" style="padding-top:64px">
 <div class="p-8 max-w-[1600px] mx-auto space-y-7">
 
   <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
     <div>
-      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Panel de Gestión</p>
-      <h1 class="text-3xl font-headline font-extrabold text-on-surface tracking-tight">Dashboard Ejecutivo</h1>
-      <p class="text-on-surface-variant text-sm mt-1">Vista consolidada de causas activas — <span class="font-semibold text-on-surface" id="fecha-hoy"></span></p>
+      <p class="text-xs font-bold uppercase tracking-widest text-[#4f6080] mb-1.5">Panel de Gestión</p>
+      <h1 class="text-3xl font-headline font-extrabold text-[#1b3a5c] tracking-tight">Dashboard Ejecutivo</h1>
+      <p class="text-[#4f6080] text-sm mt-1">Vista consolidada de causas activas — <span class="font-semibold text-[#1b3a5c]" id="fecha-hoy"></span></p>
     </div>
   </div>
 
@@ -80,64 +81,64 @@ tailwind.config = {
   <section class="grid grid-cols-2 lg:grid-cols-4 gap-5">
 
     <!-- Total activos -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col gap-4">
       <div class="flex justify-between items-start">
         <div class="p-2.5 bg-primary-container rounded-xl">
-          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">folder_open</span>
+          <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">folder_open</span>
         </div>
-        <div class="flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+        <div class="flex items-center gap-1 text-[10px] font-bold text-[#166534] bg-[#dcfce7] px-2 py-0.5 rounded-full">
           <span class="material-symbols-outlined text-[12px]">trending_up</span>+8%
         </div>
       </div>
       <div>
-        <p class="text-4xl font-black text-on-surface kpi-num" id="kpi-total">0</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Causas Activas</p>
-        <p class="text-[11px] text-on-surface-variant mt-0.5">Civil · Laboral · Penal</p>
+        <p class="text-4xl font-black text-[#1b3a5c] kpi-num" id="kpi-total">0</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Causas Activas</p>
+        <p class="text-[11px] text-[#4f6080] mt-0.5">Civil · Laboral · Penal</p>
       </div>
     </div>
 
     <!-- Urgentes -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col gap-4">
       <div class="flex justify-between items-start">
-        <div class="p-2.5 bg-error-container/30 rounded-xl">
-          <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">warning</span>
+        <div class="p-2.5 bg-[#fee2e2]/50 rounded-xl">
+          <span class="material-symbols-outlined text-[#cd5055]" style="font-variation-settings:'FILL' 1;">warning</span>
         </div>
-        <span class="pulse-dot w-2.5 h-2.5 bg-error rounded-full mt-1"></span>
+        <span class="pulse-dot w-2.5 h-2.5 bg-[#cd5055] rounded-full mt-1"></span>
       </div>
       <div>
-        <p class="text-4xl font-black text-error kpi-num" id="kpi-urgentes">0</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Con Alerta Activa</p>
-        <p class="text-[11px] text-on-surface-variant mt-0.5">Requieren atención inmediata</p>
+        <p class="text-4xl font-black text-[#cd5055] kpi-num" id="kpi-urgentes">0</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Con Alerta Activa</p>
+        <p class="text-[11px] text-[#4f6080] mt-0.5">Requieren atención inmediata</p>
       </div>
     </div>
 
     <!-- En prueba / tramitación avanzada -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col gap-4">
       <div class="flex justify-between items-start">
-        <div class="p-2.5 bg-tertiary-container rounded-xl">
-          <span class="material-symbols-outlined text-tertiary" style="font-variation-settings:'FILL' 1;">hourglass_top</span>
+        <div class="p-2.5 bg-[#e0e7ef] rounded-xl">
+          <span class="material-symbols-outlined text-[#6d8eb0]" style="font-variation-settings:'FILL' 1;">hourglass_top</span>
         </div>
-        <span class="text-[10px] font-bold text-on-tertiary-fixed bg-tertiary-container px-2 py-0.5 rounded-full">Etapa avanzada</span>
+        <span class="text-[10px] font-bold text-[#3a4f6a] bg-[#e0e7ef] px-2 py-0.5 rounded-full">Etapa avanzada</span>
       </div>
       <div>
-        <p class="text-4xl font-black text-on-surface kpi-num" id="kpi-en-prueba">0</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">En Prueba / Suspensión</p>
-        <p class="text-[11px] text-on-surface-variant mt-0.5">Instancia procesal avanzada</p>
+        <p class="text-4xl font-black text-[#1b3a5c] kpi-num" id="kpi-en-prueba">0</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">En Prueba / Suspensión</p>
+        <p class="text-[11px] text-[#4f6080] mt-0.5">Instancia procesal avanzada</p>
       </div>
     </div>
 
     <!-- Cumplidos este año -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-card p-6 flex flex-col gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col gap-4">
       <div class="flex justify-between items-start">
-        <div class="p-2.5 bg-green-100 rounded-xl">
-          <span class="material-symbols-outlined text-green-700" style="font-variation-settings:'FILL' 1;">task_alt</span>
+        <div class="p-2.5 bg-[#dcfce7] rounded-xl">
+          <span class="material-symbols-outlined text-[#166534]" style="font-variation-settings:'FILL' 1;">task_alt</span>
         </div>
-        <span class="text-[10px] font-bold text-green-800 bg-green-100 px-2 py-0.5 rounded-full">2026</span>
+        <span class="text-[10px] font-bold text-[#14532d] bg-[#dcfce7] px-2 py-0.5 rounded-full">2026</span>
       </div>
       <div>
-        <p class="text-4xl font-black text-green-700 kpi-num" id="kpi-cumplidos">0</p>
-        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mt-1">Causas Cumplidas</p>
-        <p class="text-[11px] text-on-surface-variant mt-0.5">Cerradas en el año en curso</p>
+        <p class="text-4xl font-black text-[#166534] kpi-num" id="kpi-cumplidos">0</p>
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Causas Cumplidas</p>
+        <p class="text-[11px] text-[#4f6080] mt-0.5">Cerradas en el año en curso</p>
       </div>
     </div>
 
@@ -147,13 +148,13 @@ tailwind.config = {
   <div class="grid grid-cols-12 gap-6">
 
     <!-- Distribución por área -->
-    <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-card p-6">
+    <div class="col-span-12 lg:col-span-4 bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">donut_large</span>
-          <h3 class="font-headline font-bold text-on-surface">Distribución por Área</h3>
+          <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">donut_large</span>
+          <h3 class="font-headline font-bold text-[#1b3a5c]">Distribución por Área</h3>
         </div>
-        <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Total</span>
+        <span class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider">Total</span>
       </div>
 
       <!-- Donut SVG -->
@@ -184,25 +185,25 @@ tailwind.config = {
     </div>
 
     <!-- Carga por letrado -->
-    <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-card p-6">
+    <div class="col-span-12 lg:col-span-4 bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6">
       <div class="flex items-center gap-2 mb-5">
-        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">groups</span>
-        <h3 class="font-headline font-bold text-on-surface">Carga por Letrado</h3>
+        <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">groups</span>
+        <h3 class="font-headline font-bold text-[#1b3a5c]">Carga por Letrado</h3>
       </div>
       <div class="space-y-4" id="letrados-bars"></div>
     </div>
 
     <!-- Alertas y vencimientos -->
-    <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-card p-6">
+    <div class="col-span-12 lg:col-span-4 bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">notifications_active</span>
-          <h3 class="font-headline font-bold text-on-surface">Alertas y Vencimientos</h3>
+          <span class="material-symbols-outlined text-[#cd5055]" style="font-variation-settings:'FILL' 1;">notifications_active</span>
+          <h3 class="font-headline font-bold text-[#1b3a5c]">Alertas y Vencimientos</h3>
         </div>
-        <span class="w-5 h-5 bg-error text-white text-[10px] font-black rounded-full flex items-center justify-center" id="alert-count-badge">0</span>
+        <span class="w-5 h-5 bg-[#cd5055] text-white text-[10px] font-black rounded-full flex items-center justify-center" id="alert-count-badge">0</span>
       </div>
       <div class="space-y-3" id="alertas-list"></div>
-      <a href="bandeja-abogado.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+      <a href="bandeja-abogado.html" class="mt-4 flex items-center gap-1 text-xs font-bold text-[#256386] hover:underline">
         Ver todas en la bandeja
         <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
       </a>
@@ -214,34 +215,34 @@ tailwind.config = {
   <div class="grid grid-cols-12 gap-6">
 
     <!-- Distribución por estado -->
-    <div class="col-span-12 lg:col-span-5 bg-surface-container-lowest rounded-xl shadow-card p-6">
+    <div class="col-span-12 lg:col-span-5 bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6">
       <div class="flex items-center gap-2 mb-5">
-        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">stacked_bar_chart</span>
-        <h3 class="font-headline font-bold text-on-surface">Distribución por Estado</h3>
+        <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">stacked_bar_chart</span>
+        <h3 class="font-headline font-bold text-[#1b3a5c]">Distribución por Estado</h3>
       </div>
       <div class="space-y-3" id="estados-dist"></div>
     </div>
 
     <!-- Expedientes recientes -->
-    <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-card overflow-hidden">
-      <div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center">
+    <div class="col-span-12 lg:col-span-7 bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
+      <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">history</span>
-          <h3 class="font-headline font-bold text-on-surface">Expedientes Recientes</h3>
+          <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">history</span>
+          <h3 class="font-headline font-bold text-[#1b3a5c]">Expedientes Recientes</h3>
         </div>
-        <a href="bandeja-abogado.html" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+        <a href="bandeja-abogado.html" class="text-xs font-bold text-[#256386] hover:underline flex items-center gap-1">
           Ver todos
           <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
         </a>
       </div>
       <table class="w-full text-left border-collapse">
-        <thead class="bg-surface-container-low/60">
+        <thead class="bg-[#f0f7f8]">
           <tr>
-            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">N° Interno</th>
-            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Carátula</th>
-            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Área</th>
-            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Estado</th>
-            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Letrado</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Área</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
+            <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-outline-variant/5" id="recientes-tbody"></tbody>
@@ -252,74 +253,74 @@ tailwind.config = {
 
   <!-- ── Fila 4: Accesos rápidos por área ─────────────────────────────────── -->
   <section>
-    <h2 class="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4">Accesos Rápidos por Área</h2>
+    <h2 class="text-xs font-black uppercase tracking-widest text-[#4f6080] mb-4">Accesos Rápidos por Área</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-      <a href="area-civil.html" class="group bg-surface-container-lowest rounded-xl shadow-card p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
+      <a href="area-civil.html" class="group bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
         <div class="flex items-center gap-4 mb-4">
           <div class="p-3 bg-primary-container rounded-xl group-hover:bg-primary group-hover:text-white transition-all">
-            <span class="material-symbols-outlined text-primary group-hover:text-white" style="font-variation-settings:'FILL' 1;">gavel</span>
+            <span class="material-symbols-outlined text-[#256386] group-hover:text-white" style="font-variation-settings:'FILL' 1;">gavel</span>
           </div>
           <div>
-            <h4 class="font-headline font-bold text-on-surface">Área Civil</h4>
-            <p class="text-[11px] text-on-surface-variant">Coordinación de causas civiles</p>
+            <h4 class="font-headline font-bold text-[#1b3a5c]">Área Civil</h4>
+            <p class="text-[11px] text-[#4f6080]">Coordinación de causas civiles</p>
           </div>
-          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary ml-auto transition-colors">arrow_right_alt</span>
+          <span class="material-symbols-outlined text-[#4f6080] group-hover:text-[#256386] ml-auto transition-colors">arrow_right_alt</span>
         </div>
         <div class="flex gap-3">
-          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
-            <p class="text-lg font-black text-on-surface" id="civil-quick-total">—</p>
-            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Activas</p>
+          <div class="flex-1 p-2.5 bg-[#f0f7f8] rounded-lg text-center">
+            <p class="text-lg font-black text-[#1b3a5c]" id="civil-quick-total">—</p>
+            <p class="text-[10px] text-[#4f6080] font-bold uppercase tracking-tight mt-0.5">Activas</p>
           </div>
-          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
-            <p class="text-lg font-black text-on-surface" id="civil-quick-letrados">4</p>
-            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Letrados</p>
+          <div class="flex-1 p-2.5 bg-[#f0f7f8] rounded-lg text-center">
+            <p class="text-lg font-black text-[#1b3a5c]" id="civil-quick-letrados">4</p>
+            <p class="text-[10px] text-[#4f6080] font-bold uppercase tracking-tight mt-0.5">Letrados</p>
           </div>
         </div>
       </a>
 
-      <a href="area-laboral.html" class="group bg-surface-container-lowest rounded-xl shadow-card p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
+      <a href="area-laboral.html" class="group bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
         <div class="flex items-center gap-4 mb-4">
-          <div class="p-3 bg-secondary-container rounded-xl group-hover:bg-secondary group-hover:text-white transition-all">
-            <span class="material-symbols-outlined text-secondary group-hover:text-white" style="font-variation-settings:'FILL' 1;">work</span>
+          <div class="p-3 bg-[#dbeafe] rounded-xl group-hover:bg-secondary group-hover:text-white transition-all">
+            <span class="material-symbols-outlined text-[#3a70a9] group-hover:text-white" style="font-variation-settings:'FILL' 1;">work</span>
           </div>
           <div>
-            <h4 class="font-headline font-bold text-on-surface">Área Laboral</h4>
-            <p class="text-[11px] text-on-surface-variant">Coordinación de causas laborales</p>
+            <h4 class="font-headline font-bold text-[#1b3a5c]">Área Laboral</h4>
+            <p class="text-[11px] text-[#4f6080]">Coordinación de causas laborales</p>
           </div>
-          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary ml-auto transition-colors">arrow_right_alt</span>
+          <span class="material-symbols-outlined text-[#4f6080] group-hover:text-secondary ml-auto transition-colors">arrow_right_alt</span>
         </div>
         <div class="flex gap-3">
-          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
-            <p class="text-lg font-black text-on-surface" id="laboral-quick-total">—</p>
-            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Activas</p>
+          <div class="flex-1 p-2.5 bg-[#f0f7f8] rounded-lg text-center">
+            <p class="text-lg font-black text-[#1b3a5c]" id="laboral-quick-total">—</p>
+            <p class="text-[10px] text-[#4f6080] font-bold uppercase tracking-tight mt-0.5">Activas</p>
           </div>
-          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
-            <p class="text-lg font-black text-on-surface" id="laboral-quick-letrados">3</p>
-            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Letrados</p>
+          <div class="flex-1 p-2.5 bg-[#f0f7f8] rounded-lg text-center">
+            <p class="text-lg font-black text-[#1b3a5c]" id="laboral-quick-letrados">3</p>
+            <p class="text-[10px] text-[#4f6080] font-bold uppercase tracking-tight mt-0.5">Letrados</p>
           </div>
         </div>
       </a>
 
-      <a href="gestion-penal.html" class="group bg-surface-container-lowest rounded-xl shadow-card p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
+      <a href="gestion-penal.html" class="group bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 hover:shadow-card-lg transition-all hover:-translate-y-0.5">
         <div class="flex items-center gap-4 mb-4">
-          <div class="p-3 bg-tertiary-container rounded-xl group-hover:bg-tertiary group-hover:text-white transition-all">
-            <span class="material-symbols-outlined text-tertiary group-hover:text-white" style="font-variation-settings:'FILL' 1;">policy</span>
+          <div class="p-3 bg-[#e0e7ef] rounded-xl group-hover:bg-tertiary group-hover:text-white transition-all">
+            <span class="material-symbols-outlined text-[#6d8eb0] group-hover:text-white" style="font-variation-settings:'FILL' 1;">policy</span>
           </div>
           <div>
-            <h4 class="font-headline font-bold text-on-surface">Área Penal</h4>
-            <p class="text-[11px] text-on-surface-variant">Coordinación de causas penales</p>
+            <h4 class="font-headline font-bold text-[#1b3a5c]">Área Penal</h4>
+            <p class="text-[11px] text-[#4f6080]">Coordinación de causas penales</p>
           </div>
-          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary ml-auto transition-colors">arrow_right_alt</span>
+          <span class="material-symbols-outlined text-[#4f6080] group-hover:text-tertiary ml-auto transition-colors">arrow_right_alt</span>
         </div>
         <div class="flex gap-3">
-          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
-            <p class="text-lg font-black text-on-surface" id="penal-quick-total">—</p>
-            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Activas</p>
+          <div class="flex-1 p-2.5 bg-[#f0f7f8] rounded-lg text-center">
+            <p class="text-lg font-black text-[#1b3a5c]" id="penal-quick-total">—</p>
+            <p class="text-[10px] text-[#4f6080] font-bold uppercase tracking-tight mt-0.5">Activas</p>
           </div>
-          <div class="flex-1 p-2.5 bg-surface-container-low rounded-lg text-center">
-            <p class="text-lg font-black text-on-surface" id="penal-quick-cartas">—</p>
-            <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tight mt-0.5">Cartas SAE</p>
+          <div class="flex-1 p-2.5 bg-[#f0f7f8] rounded-lg text-center">
+            <p class="text-lg font-black text-[#1b3a5c]" id="penal-quick-cartas">—</p>
+            <p class="text-[10px] text-[#4f6080] font-bold uppercase tracking-tight mt-0.5">Cartas SAE</p>
           </div>
         </div>
       </a>
@@ -415,11 +416,11 @@ function renderDonut() {
     { label:'Penal',   count:penal.length,   color:'bg-tertiary',  pct: Math.round(pPenal*100)   },
   ];
   document.getElementById('area-legend').innerHTML = areaData.map(a => `
-    <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+    <div class="flex items-center gap-3 p-3 bg-[#f0f7f8] rounded-xl">
       <div class="w-3 h-3 rounded-full ${a.color} flex-shrink-0"></div>
-      <span class="text-sm font-semibold text-on-surface flex-1">${a.label}</span>
-      <span class="text-sm font-black text-on-surface">${a.count}</span>
-      <span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded-full">${a.pct}%</span>
+      <span class="text-sm font-semibold text-[#1b3a5c] flex-1">${a.label}</span>
+      <span class="text-sm font-black text-[#1b3a5c]">${a.count}</span>
+      <span class="text-[10px] font-bold text-[#4f6080] bg-[#e2eff5] px-1.5 py-0.5 rounded-full">${a.pct}%</span>
     </div>`).join('');
 }
 
@@ -447,11 +448,11 @@ function renderLetradosBars() {
           <div class="w-6 h-6 rounded-full ${barColor} flex items-center justify-center text-white text-[9px] font-black flex-shrink-0">
             ${nombreCorto.split(' ').map(w=>w[0]).join('').slice(0,2)}
           </div>
-          <span class="text-xs font-semibold text-on-surface truncate">${nombreCorto}</span>
+          <span class="text-xs font-semibold text-[#1b3a5c] truncate">${nombreCorto}</span>
         </div>
-        <span class="text-xs font-black text-on-surface ml-2 flex-shrink-0">${l.count}</span>
+        <span class="text-xs font-black text-[#1b3a5c] ml-2 flex-shrink-0">${l.count}</span>
       </div>
-      <div class="h-2 bg-surface-container rounded-full overflow-hidden">
+      <div class="h-2 bg-[#e2eff5] rounded-full overflow-hidden">
         <div class="bar-fill h-full rounded-full ${barColor}" style="--bar-width:${pct}%;width:${pct}%" data-width="${pct}"></div>
       </div>
     </div>`;
@@ -472,8 +473,8 @@ function renderAlertas() {
     document.getElementById('alertas-list').innerHTML = `
       <div class="text-center py-6">
         <span class="material-symbols-outlined text-4xl text-green-500 mb-2 block" style="font-variation-settings:'FILL' 1;">check_circle</span>
-        <p class="text-sm font-semibold text-on-surface">Sin alertas activas</p>
-        <p class="text-xs text-on-surface-variant mt-0.5">Todos los vencimientos están al día.</p>
+        <p class="text-sm font-semibold text-[#1b3a5c]">Sin alertas activas</p>
+        <p class="text-xs text-[#4f6080] mt-0.5">Todos los vencimientos están al día.</p>
       </div>`;
     return;
   }
@@ -481,11 +482,11 @@ function renderAlertas() {
   const alertaIcons = { CIVIL:'gavel', LABORAL:'work', PENAL:'policy' };
   document.getElementById('alertas-list').innerHTML = alertas.map(e => `
     <div class="flex items-start gap-3 p-3 bg-error-container/10 rounded-xl border border-error-container/20">
-      <span class="material-symbols-outlined text-error text-[18px] mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1;">${alertaIcons[e.area] || 'warning'}</span>
+      <span class="material-symbols-outlined text-[#cd5055] text-[18px] mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1;">${alertaIcons[e.area] || 'warning'}</span>
       <div class="min-w-0">
-        <p class="text-xs font-bold text-on-surface truncate">${e.id} — ${e.area}</p>
-        <p class="text-[11px] text-error font-semibold mt-0.5 leading-snug">${e.alerta_msg}</p>
-        <p class="text-[10px] text-on-surface-variant mt-1 truncate">${e.abogado}</p>
+        <p class="text-xs font-bold text-[#1b3a5c] truncate">${e.id} — ${e.area}</p>
+        <p class="text-[11px] text-[#cd5055] font-semibold mt-0.5 leading-snug">${e.alerta_msg}</p>
+        <p class="text-[10px] text-[#4f6080] mt-1 truncate">${e.abogado}</p>
       </div>
     </div>`).join('');
 }
@@ -504,7 +505,7 @@ function renderEstadosDist() {
     { code:'SUSPENSION_TERMINOS', label:'Suspensión Términos',  color:'bg-tertiary' },
     { code:'GDE_VINCULADO',       label:'GDE Vinculado',        color:'bg-secondary' },
     { code:'PENDIENTE_GDE',       label:'Pendiente GDE',        color:'bg-tertiary' },
-    { code:'CUMPLIDO',            label:'Cumplido',             color:'bg-green-500' },
+    { code:'CUMPLIDO',            label:'Cumplido',             color:'bg-[#166534]' },
     { code:'ARCHIVADO',           label:'Archivado',            color:'bg-outline-variant' },
   ].filter(e => estadoCount[e.code] > 0);
 
@@ -515,11 +516,11 @@ function renderEstadosDist() {
     const pct = (count / maxVal * 100).toFixed(0);
     return `
     <div class="flex items-center gap-3">
-      <span class="text-[11px] text-on-surface-variant w-36 flex-shrink-0 truncate">${e.label}</span>
-      <div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+      <span class="text-[11px] text-[#4f6080] w-36 flex-shrink-0 truncate">${e.label}</span>
+      <div class="flex-1 h-2 bg-[#e2eff5] rounded-full overflow-hidden">
         <div class="bar-fill h-full rounded-full ${e.color}" style="width:${pct}%" data-width="${pct}"></div>
       </div>
-      <span class="text-xs font-bold text-on-surface w-4 text-right flex-shrink-0">${count}</span>
+      <span class="text-xs font-bold text-[#1b3a5c] w-4 text-right flex-shrink-0">${count}</span>
     </div>`;
   }).join('');
 
@@ -531,24 +532,24 @@ function renderEstadosDist() {
 // ── Expedientes recientes ──────────────────────────────────────────────────
 function renderRecientes() {
   const areaColors = {
-    CIVIL:   'bg-primary-container/60 text-on-primary-container',
-    LABORAL: 'bg-secondary-container text-on-secondary-fixed',
-    PENAL:   'bg-tertiary-container text-on-tertiary-fixed',
+    CIVIL:   'bg-primary-container/60 text-[#1b3a5c]',
+    LABORAL: 'bg-[#dbeafe] text-[#1e3a5f]',
+    PENAL:   'bg-[#e0e7ef] text-[#3a4f6a]',
   };
 
   // Ordenar por fecha de recepción (más recientes primero)
   const recientes = [...todos].sort((a,b) => b.fecha_recepcion.localeCompare(a.fecha_recepcion));
 
   document.getElementById('recientes-tbody').innerHTML = recientes.map(e => `
-    <tr class="hover:bg-surface-container-highest transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
+    <tr class="hover:bg-[#f0f7f8] transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
       <td class="px-6 py-3.5">
         <div class="flex items-center gap-1.5">
-          ${e.tiene_alerta ? `<span class="material-symbols-outlined text-error text-[12px]" style="font-variation-settings:'FILL' 1;">warning</span>` : ''}
-          <span class="font-mono text-xs font-bold text-on-surface">${e.id}</span>
+          ${e.tiene_alerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[12px]" style="font-variation-settings:'FILL' 1;">warning</span>` : ''}
+          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
         </div>
       </td>
       <td class="px-6 py-3.5 max-w-[200px]">
-        <p class="text-xs font-semibold text-on-surface line-clamp-1">${e.caratula}</p>
+        <p class="text-xs font-semibold text-[#1b3a5c] line-clamp-1">${e.caratula}</p>
       </td>
       <td class="px-6 py-3.5">
         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${areaColors[e.area]||''}">${e.area}</span>
@@ -556,7 +557,7 @@ function renderRecientes() {
       <td class="px-6 py-3.5">
         ${SACO_UI.estadoBadge(e.estado, e.estado.replace(/_/g,' '))}
       </td>
-      <td class="px-6 py-3.5 text-xs text-on-surface-variant">${e.abogado.replace(/^Dr\. |^Dra\. /, '')}</td>
+      <td class="px-6 py-3.5 text-xs text-[#4f6080]">${e.abogado.replace(/^Dr\. |^Dra\. /, '')}</td>
     </tr>`).join('');
 }
 

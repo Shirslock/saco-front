@@ -181,6 +181,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Dr. Alejandro Rossi', linea: 'LM', prioridad: 'ALTA',
     tiene_alerta: true, alerta_msg: 'Vence período probatorio en 12 días',
     gde: 'EX-2023-08842-APN-SACO#SOFSE',
+    canal_ingreso: 'EE_GDE',
   },
   {
     id: 'P-0089/2026', area: 'PENAL', tipo: 'CARTA_SUCESO',
@@ -192,6 +193,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Dr. Marcos Gallo', linea: 'LM', prioridad: 'NORMAL',
     tiene_alerta: false, alerta_msg: null,
     gde: 'EX-2023-08910-APN-SACO#SOFSE',
+    canal_ingreso: 'EE_GDE',
     vinculos: [
       {
         id: 'C-0023/2026',
@@ -253,6 +255,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Dr. Hernán Blanco', linea: 'LM', prioridad: 'ALTA',
     tiene_alerta: true, alerta_msg: 'Plazo contestación vence 25/04/2026',
     gde: 'EX-2026-00449-APN-SACO#SOFSE',
+    canal_ingreso: 'EE_GDE',
     vinculos: [
       {
         id: 'C-0023/2026',

@@ -11,14 +11,15 @@
 tailwind.config = {
   theme: { extend: {
     colors: {
-      "primary":"#3a5f94","primary-dim":"#2d5387","primary-container":"#d5e3ff","on-primary":"#f6f7ff","on-primary-container":"#2c5287","on-primary-fixed":"#153f73",
-      "secondary":"#49636f","secondary-container":"#cbe7f5","on-secondary-fixed":"#29434e",
-      "tertiary":"#5d5d78","tertiary-container":"#dbdafb","on-tertiary-fixed":"#393953",
-      "surface":"#f8f9fb","surface-container-lowest":"#ffffff","surface-container-low":"#f0f4f7","surface-container":"#e8eff3","surface-container-high":"#e1e9ee","surface-container-highest":"#d9e4ea",
-      "background":"#f8f9fb","on-background":"#2a3439","on-surface":"#2a3439","on-surface-variant":"#566166",
-      "outline":"#717c82","outline-variant":"#a9b4b9",
-      "error":"#9f403d","error-container":"#fe8983","on-error-container":"#752121",
-      "inverse-surface":"#0b0f10",
+      "primary":"#256386","primary-dim":"#1d4e6b","primary-container":"#c5e0ea","on-primary":"#ffffff","on-primary-container":"#1b3a5c","on-primary-fixed":"#0f2a42",
+      "secondary":"#3a70a9","secondary-container":"#dbeafe","on-secondary-fixed":"#1e3a5f","secondary-dim":"#2d5987",
+      "tertiary":"#6d8eb0","tertiary-container":"#e0e7ef","on-tertiary-fixed":"#3a4f6a","tertiary-dim":"#5a7a9e",
+      "surface":"#f0f7f8","surface-container-lowest":"#ffffff","surface-container-low":"#f0f7f8","surface-container":"#e2eff5","surface-container-high":"#d4e6ef","surface-container-highest":"#c5dde9",
+      "background":"#f0f7f8","on-background":"#1b3a5c","on-surface":"#1b3a5c","on-surface-variant":"#4f6080",
+      "outline":"#6d8eb0","outline-variant":"#bcc0c9",
+      "error":"#cd5055","error-container":"#fee2e2","on-error-container":"#7f1d1d",
+      "inverse-surface":"#1b3a5c",
+      "header":"#242D4F",
     },
     fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
     borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
@@ -29,31 +30,31 @@ tailwind.config = {
   .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
   body { font-family:'Inter',sans-serif; }
   h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
-  .shadow-card { box-shadow:0 4px 20px rgba(42,52,57,0.06); }
+  .shadow-card { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
   .exp-row { transition: background 0.12s; }
-  .exp-row:hover { background: rgb(217 228 234 / 0.35); }
+  .exp-row:hover { background: #f0f7f8; }
 </style>
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-[#f0f7f8] text-[#1b3a5c]">
 
 <div id="sidebar-mount"></div>
 <div id="topbar-mount"></div>
 
-<main class="ml-64 pt-16 min-h-screen">
+<main class="ml-64 min-h-screen" style="padding-top:64px">
 <div class="p-8">
 
   <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
     <div>
-      <h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-1">Mi Bandeja</h2>
-      <p class="text-on-surface-variant text-sm" id="subtitle">Gestionando <strong id="total-count">5</strong> expedientes activos.</p>
+      <h2 class="font-headline text-3xl font-extrabold tracking-tight text-[#1b3a5c] mb-1">Mi Bandeja</h2>
+      <p class="text-[#4f6080] text-sm" id="subtitle">Gestionando <strong id="total-count">5</strong> expedientes activos.</p>
     </div>
-    <div class="flex bg-surface-container-low p-1 rounded-xl shadow-inner gap-1">
-      <button onclick="setTab('activos')"   id="tab-activos"   class="tab-btn px-5 py-2 bg-surface-container-lowest text-primary font-bold rounded-lg shadow-sm text-sm">Activos</button>
-      <button onclick="setTab('cumplidos')" id="tab-cumplidos" class="tab-btn px-5 py-2 text-on-surface-variant hover:text-on-surface font-medium text-sm transition-colors">Cumplidos</button>
-      <button onclick="setTab('urgentes')"  id="tab-urgentes"  class="tab-btn px-5 py-2 text-on-surface-variant hover:text-on-surface font-medium text-sm transition-colors flex items-center gap-1">
+    <div class="flex bg-[#f0f7f8] p-1 rounded-xl shadow-inner gap-1">
+      <button onclick="setTab('activos')"   id="tab-activos"   class="tab-btn px-5 py-2 bg-surface-container-lowest text-[#256386] font-bold rounded-lg shadow-sm text-sm">Activos</button>
+      <button onclick="setTab('cumplidos')" id="tab-cumplidos" class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors">Cumplidos</button>
+      <button onclick="setTab('urgentes')"  id="tab-urgentes"  class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors flex items-center gap-1">
         Urgentes
-        <span class="w-4 h-4 bg-error text-white text-[9px] font-black rounded-full flex items-center justify-center">2</span>
+        <span class="w-4 h-4 bg-[#cd5055] text-white text-[9px] font-black rounded-full flex items-center justify-center">2</span>
       </button>
     </div>
   </div>
@@ -63,21 +64,21 @@ tailwind.config = {
     <!-- ── Filtros ──────────────────────────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-3 space-y-5">
 
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-5">
+      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
         <div class="relative mb-4">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-          <input id="search-input" oninput="applyFilters()" class="w-full bg-surface-container-low border-none rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Carátula, N° causa..."/>
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
+          <input id="search-input" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-[#256386]/20" placeholder="Carátula, N° causa..."/>
         </div>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Área</h3>
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Área</h3>
         <div id="area-filter-list" class="space-y-1 mb-5"></div>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Urgencia</h3>
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Urgencia</h3>
         <div class="space-y-1">
           <label class="flex items-center gap-3 p-2 hover:bg-surface-container-low rounded-lg cursor-pointer">
-            <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-error focus:ring-error"/>
-            <span class="text-sm text-on-surface-variant flex items-center gap-2">
-              <span class="material-symbols-outlined text-error text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
+            <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-[#cd5055] focus:ring-error"/>
+            <span class="text-sm text-[#4f6080] flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
               Con alerta activa
             </span>
           </label>
@@ -85,8 +86,8 @@ tailwind.config = {
       </div>
 
       <!-- Docs rápidos -->
-      <div class="bg-surface-container-lowest rounded-xl shadow-card p-5">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Documentos GDE recientes</h3>
+      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Documentos GDE recientes</h3>
         <div id="docs-gde-list" class="space-y-2"></div>
       </div>
 
@@ -95,15 +96,15 @@ tailwind.config = {
     <!-- ── Tabla de expedientes ──────────────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-9">
 
-      <div class="bg-surface-container-lowest rounded-xl shadow-card overflow-hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
         <!-- Tabla header -->
-        <div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center">
-          <p class="text-xs text-on-surface-variant"><span id="showing-count">5</span> expedientes</p>
+        <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
+          <p class="text-xs text-[#4f6080]"><span id="showing-count">5</span> expedientes</p>
           <div class="flex gap-2">
-            <button onclick="sortBy('fecha_recepcion')" class="text-[10px] font-bold text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
+            <button onclick="sortBy('fecha_recepcion')" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
               <span class="material-symbols-outlined text-[14px]">sort</span>Fecha
             </button>
-            <button onclick="sortBy('area')" class="text-[10px] font-bold text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
+            <button onclick="sortBy('area')" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
               Área
             </button>
           </div>
@@ -111,12 +112,12 @@ tailwind.config = {
 
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-surface-container-low/60">
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">N° Interno</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Carátula</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Tipo</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Estado</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Recepción</th>
+            <tr class="bg-[#f0f7f8]">
+              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
+              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
+              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
+              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
               <th class="px-6 py-3.5"></th>
             </tr>
           </thead>
@@ -124,13 +125,13 @@ tailwind.config = {
         </table>
 
         <!-- Paginación -->
-        <div class="px-6 py-4 border-t border-outline-variant/10 flex justify-between items-center">
-          <p class="text-xs text-on-surface-variant">Página 1 de 2</p>
+        <div class="px-6 py-4 border-t border-[#bcc0c9]/40 flex justify-between items-center">
+          <p class="text-xs text-[#4f6080]">Página 1 de 2</p>
           <div class="flex gap-1">
             <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container disabled:opacity-30 transition-colors" disabled>
               <span class="material-symbols-outlined text-[16px]">chevron_left</span>
             </button>
-            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">1</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#256386] text-white font-bold text-xs">1</button>
             <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container font-medium text-xs transition-colors">2</button>
             <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
               <span class="material-symbols-outlined text-[16px]">chevron_right</span>
@@ -183,7 +184,7 @@ function setTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => {
     const active = b.id === `tab-${tab}`;
-    b.className = `tab-btn px-5 py-2 rounded-lg text-sm transition-colors font-${active?'bold':'medium'} ${active ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`;
+    b.className = `tab-btn px-5 py-2 rounded-lg text-sm transition-colors font-${active?'bold':'medium'} ${active ? 'bg-surface-container-lowest text-[#256386] shadow-sm' : 'text-[#4f6080] hover:text-on-surface'}`;
   });
   applyFilters();
 }
@@ -213,36 +214,36 @@ function sortBy(field) {
 }
 
 const areaColors = {
-  CIVIL:   'bg-primary-container/60 text-on-primary-container',
-  LABORAL: 'bg-secondary-container text-on-secondary-fixed',
-  PENAL:   'bg-tertiary-container text-on-tertiary-fixed',
+  CIVIL:   'bg-primary-container/60 text-[#1b3a5c]',
+  LABORAL: 'bg-[#dbeafe] text-[#1e3a5f]',
+  PENAL:   'bg-[#e0e7ef] text-[#3a4f6a]',
 };
 
 function renderTabla(rows) {
   const tbody = document.getElementById('exp-tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-on-surface-variant text-sm">No hay expedientes que coincidan con los filtros.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(e => `
     <tr class="exp-row cursor-pointer" onclick="verDetalle('${e.id}')">
       <td class="px-6 py-4">
         <div class="flex items-center gap-2">
-          ${e.tiene_alerta ? `<span class="material-symbols-outlined text-error text-[14px]" style="font-variation-settings:'FILL' 1;" title="${e.alerta_msg}">warning</span>` : ''}
-          <span class="font-mono text-xs font-bold text-on-surface">${e.id}</span>
+          ${e.tiene_alerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[14px]" style="font-variation-settings:'FILL' 1;" title="${e.alerta_msg}">warning</span>` : ''}
+          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
         </div>
         <span class="text-[10px] px-1.5 py-0.5 rounded font-bold mt-1 inline-block ${areaColors[e.area]||''}">${e.area}</span>
       </td>
       <td class="px-6 py-4 max-w-xs">
-        <p class="text-sm font-semibold text-on-surface line-clamp-2 leading-snug">${e.caratula}</p>
-        <p class="font-mono text-[10px] text-on-surface-variant mt-0.5">${e.numero_causa||''}</p>
-        ${e.tiene_alerta ? `<p class="text-[10px] text-error font-semibold mt-1">${e.alerta_msg}</p>` : ''}
+        <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
+        <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa||''}</p>
+        ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-1">${e.alerta_msg}</p>` : ''}
       </td>
-      <td class="px-6 py-4 text-xs text-on-surface-variant font-medium">${e.tipo.replace(/_/g,' ')}</td>
+      <td class="px-6 py-4 text-xs text-[#4f6080] font-medium">${e.tipo.replace(/_/g,' ')}</td>
       <td class="px-6 py-4">${SACO_UI.estadoBadge(e.estado, e.estado.replace(/_/g,' '))}</td>
-      <td class="px-6 py-4 text-xs text-on-surface-variant">${e.fecha_recepcion}</td>
+      <td class="px-6 py-4 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
       <td class="px-6 py-4">
-        <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-primary hover:text-primary-dim font-bold text-xs uppercase tracking-tight transition-colors">
+        <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-[#256386] hover:text-[#256386]-dim font-bold text-xs uppercase tracking-tight transition-colors">
           Abrir
         </button>
       </td>
@@ -258,11 +259,11 @@ function renderAreaFilter() {
     ['TODAS','Todos','12'],['CIVIL','Civil','12'],['LABORAL','Laboral','8'],['PENAL','Penal','4']
   ].map(([v,l,n]) => `
   <label class="flex items-center gap-3 p-2 hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer group">
-    <div id="ck-${v}" class="w-4 h-4 rounded border-2 ${v==='TODAS'?'border-primary bg-primary flex items-center justify-center':'border-outline-variant group-hover:border-primary transition-colors'}">
+    <div id="ck-${v}" class="w-4 h-4 rounded border-2 ${v==='TODAS'?'border-primary bg-[#256386] flex items-center justify-center':'border-outline-variant group-hover:border-primary transition-colors'}">
       ${v==='TODAS'?'<span class="material-symbols-outlined text-[10px] text-white" style="font-variation-settings:\'FILL\' 1;">check</span>':''}
     </div>
-    <span class="text-sm font-${v==='TODAS'?'semibold':'medium'} text-${v==='TODAS'?'on-surface':'on-surface-variant'} group-hover:text-on-surface">${l}</span>
-    <span class="ml-auto text-[10px] px-1.5 py-0.5 bg-surface-container text-on-surface-variant rounded-md">${n}</span>
+    <span class="text-sm font-${v==='TODAS'?'semibold':'medium'} text-${v==='TODAS'?'on-surface':'on-surface-variant'} group-hover:text-[#1b3a5c]">${l}</span>
+    <span class="ml-auto text-[10px] px-1.5 py-0.5 bg-[#e2eff5] text-[#4f6080] rounded-md">${n}</span>
   </label>`).join('');
 }
 
@@ -272,9 +273,9 @@ function renderDocsGDE() {
     ['ME-2026-00441','Recupero - SGSySL'],
     ['EX-2026-00449','García - Laboral'],
   ].map(([ref,desc]) => `
-  <div class="p-2.5 bg-surface-container-low rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
-    <p class="font-mono text-[10px] text-primary font-bold">${ref}</p>
-    <p class="text-[11px] text-on-surface-variant mt-0.5">${desc}</p>
+  <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
+    <p class="font-mono text-[10px] text-[#256386] font-bold">${ref}</p>
+    <p class="text-[11px] text-[#4f6080] mt-0.5">${desc}</p>
   </div>`).join('');
 }
 
