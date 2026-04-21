@@ -321,13 +321,13 @@ window.SACO = {
   ESTADOS_POR_TIPO,       // { DEMANDA: [...], QUERELLA: [...], OFICIO: [...], ... } — catálogo completo
   QUEUE_MESA,             // expedientes pendientes en Mesa SACO
   EXPEDIENTES_ABOGADO,    // expedientes asignados al letrado
-  EXPEDIENTE_DETALLE,     // objeto único del expediente abierto (incluye vinculos:[], estadoExpediente en cada mov., estadoLabel para estado custom) (incluye vinculos:[] y estadoExpediente en cada movimiento del timeline)
+  EXPEDIENTE_DETALLE,     // objeto único del expediente abierto (incluye vinculos:[], intervinientes:[], estadoExpediente en cada mov., estadoLabel para estado custom)
   CARTA_SUCESO_QUEUE,     // cartas SAE pendientes (penal)
   CAUSAS_PENALES,         // causas activas del área penal
   JUZGADOS,               // [{ code, label }]
   getEstadosPorTipo,      // helper: getEstadosPorTipo(tipoGestion) → string[] — fallback genérico si tipo no existe
   buscarPorNumeroCausa,   // helper: buscarPorNumeroCausa(str) → expediente[] — busca en EXPEDIENTES_ABOGADO + QUEUE_MESA
-  getExpedienteById,      // helper: getExpedienteById(id) → expediente|null
+  getExpedienteById,      // helper: getExpedienteById(id) → expediente|null (busca en EXPEDIENTE_DETALLE y EXPEDIENTES_ABOGADO)
   abrirExpediente,        // helper: abrirExpediente(id) → navega a detalle-expediente.html?id=X
 }
 ```
@@ -335,7 +335,7 @@ window.SACO = {
 ### Reglas de los datos
 - Los tipos de gestión están en `TIPOS_GESTION` separados por área (CIVIL tiene 14, LABORAL 8, PENAL 8)
 - `ESTADOS_POR_TIPO` define los estados válidos para cada `tipo_gestion`; usar siempre `getEstadosPorTipo(tipo)` para obtenerlos
-- `EXPEDIENTE_DETALLE` contiene el array `timeline[]` y `documentos[]` que se modifican en runtime
+- `EXPEDIENTE_DETALLE` contiene los arrays `timeline[]`, `documentos[]`, `vinculos[]` e `intervinientes[]` que se modifican en runtime
 - `exp.estadoLabel` guarda el estado como texto libre del catálogo (e.g. "Etapa de instrucción"); `exp.estado` conserva el código legacy para compatibilidad
 - El estado se pierde al recargar la página — es intencional para el prototipo
 
@@ -555,9 +555,12 @@ Para expedientes del área PENAL:
 - **Previsión:** cards de monto original/actualizado/pronóstico + tabla histórica por año
 - Subir documento agrega al array `documentos[]` en runtime
 
+- **Tab "Intervinientes":** tabla de participantes de la causa (Actor, Demandado, Imputado, Perito, etc.) con roles procesales, documentos y contactos. Permite agregar/eliminar intervinientes. `renderIntervinientes()` + `abrirModalAgregarInterviniente()` + `guardarInterviniente()` + `eliminarInterviniente(i)`.
+- **Navegación bidireccional:** `window.SACO.abrirExpediente(id)` navega a `detalle-expediente.html?id=X`; al cargar, `cargarExpedienteActivo()` lee el query param y actualiza `SACO.EXPEDIENTE_DETALLE` antes de que `const exp` lo tome.
+- **Vínculos:** cada card de vínculo muestra badge "Mismo siniestro" si `tipo_relacion === 'MISMO_SINIESTRO'`; el onclick navega al expediente vinculado.
 - **N° Causa editable inline:** el campo N° Causa NO está en `metaFields`; se muestra en `#causa-editable-wrap` debajo de `dl#metadata-list`. Botón "editar" → `activarEdicionCausa()` → input + alerta duplicado con `onCausaDetalleChange()` → `guardarNumeroCausa()` actualiza `exp.numero_causa` y aplica vinculación bidireccional si `causaVincularId` está seteado.
 
-**Estado que modifica:** `SACO.EXPEDIENTE_DETALLE.timeline`, `.documentos`, `.vinculos`, `.numero_causa`
+**Estado que modifica:** `SACO.EXPEDIENTE_DETALLE.timeline`, `.documentos`, `.vinculos`, `.intervinientes`, `.numero_causa`
 
 **Nota:** El campo `observaciones` (textarea) persiste en sub-panel Información (sub-tab del panel derecho).
 
@@ -789,7 +792,7 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 | v1.1 | Abr 2026 | detalle-expediente: panel izquierdo convertido a 3 tabs (Datos/Vínculos/Estados), sistema de vínculos entre expedientes, timeline agrupado por estado procesal (estadoExpediente), eliminación del box de Observaciones |
 | v1.2 | Abr 2026 | detalle-expediente: layout fullwidth v2 — 4 tabs principales (Datos/Timeline/Docs/Previsión), sub-tabs Información/Vínculos, filtro de estado integrado en Timeline, uid string para movimientos |
 | v1.3 | Abr 2026 | mock.js: ESTADOS_POR_TIPO (catálogo completo por tipo de gestión) + getEstadosPorTipo(); shared.js: estadoBadgeCustom(); detalle: modal cambio de estado filtrado por tipo; alta: campo estado inicial dinámico; labels TIPOS_GESTION actualizados |
-| v1.4 | Abr 2026 | N° causa opcional + detección de duplicado con vinculación bidireccional: mock.js (buscarPorNumeroCausa, getExpedienteById, abrirExpediente); alta: alerta duplicado con selección de vínculo; detalle: N° causa editable inline (#causa-editable-wrap) con alerta de duplicado y vinculación bidireccional |
+| v1.4 | Abr 2026 | N° causa opcional + detección de duplicado con vinculación bidireccional: mock.js (buscarPorNumeroCausa, getExpedienteById, abrirExpediente, intervinientes[] y vinculos[] bidireccionales en los 3 expedientes demo); alta: alerta duplicado con selección de vínculo + vinculación automática al crear; detalle: N° causa editable inline (#causa-editable-wrap) con alerta de duplicado y vinculación bidireccional; tab Intervinientes con CRUD + badge "Mismo siniestro" + navegación entre expedientes vinculados |
 
 ---
 
