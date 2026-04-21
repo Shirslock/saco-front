@@ -99,6 +99,39 @@ tailwind.config = {
         <div class="bg-surface-container-lowest rounded-xl shadow-card p-6">
           <h3 class="text-xs font-headline font-black uppercase tracking-widest text-on-surface-variant mb-5">Datos del Expediente</h3>
           <dl id="metadata-list" class="space-y-3"></dl>
+
+          <!-- N° Causa — editable inline -->
+          <div id="causa-editable-wrap" class="mt-3 py-2 border-t border-outline-variant/8">
+            <div class="flex justify-between items-start gap-2">
+              <dt class="text-[11px] text-on-surface-variant flex-shrink-0 pt-0.5">N° Causa</dt>
+              <div class="flex-1 text-right">
+                <div id="causa-display" class="flex items-center justify-end gap-1">
+                  <span id="causa-valor" class="text-[11px] font-semibold text-on-surface font-mono"></span>
+                  <button onclick="activarEdicionCausa()" id="causa-edit-btn"
+                    class="text-primary hover:underline text-[10px] font-bold ml-1">editar</button>
+                </div>
+                <div id="causa-edit-mode" class="hidden space-y-2 mt-1">
+                  <input id="causa-input" oninput="onCausaDetalleChange(this.value)"
+                    class="w-full bg-surface-container-low border-none rounded-lg py-2 px-3 text-xs font-mono focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                    placeholder="FSM-XXXXX/2026 o SS SOFSE"/>
+                  <div id="causa-duplicado-inline" class="hidden p-3 bg-amber-50 rounded-lg border border-amber-200 space-y-2">
+                    <p class="text-[10px] font-bold text-amber-800">N° de causa existente — podés vincularlo:</p>
+                    <div id="causa-duplicado-lista" class="space-y-1.5"></div>
+                  </div>
+                  <div class="flex gap-2 justify-end">
+                    <button onclick="cancelarEdicionCausa()"
+                      class="text-[11px] font-semibold text-on-surface-variant hover:text-on-surface px-3 py-1.5 rounded-lg hover:bg-surface-container transition-colors">
+                      Cancelar
+                    </button>
+                    <button onclick="guardarNumeroCausa()"
+                      class="text-[11px] font-bold text-white bg-gradient-to-br from-primary to-primary-dim px-3 py-1.5 rounded-lg hover:brightness-105 transition-all">
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -279,7 +312,6 @@ function setTabDatos(tab) {
 const metaFields = [
   ['Tipo de Gestión',       exp.tipo],
   ['Área',                  exp.area],
-  ['N° Causa',              exp.numero_causa],
   ['Juzgado / Dependencia', exp.juzgado],
   ['Estado SIGEJ',          exp.estado_sigej],
   ['N° SIGEJ',              exp.numero_sigej],
@@ -300,12 +332,112 @@ document.getElementById('metadata-list').innerHTML = metaFields.map(([k,v]) => `
 
 document.getElementById('obs-area').value = exp.observaciones || '';
 
+inicializarCausaEditable();
+
 // ─────────────────────────────────────────────────────────────────────────────
 // OBSERVACIONES
 // ─────────────────────────────────────────────────────────────────────────────
 function guardarObs() {
   exp.observaciones = document.getElementById('obs-area').value;
   SACO_UI.showToast('Observaciones guardadas.', 'success');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// N° CAUSA — EDICIÓN INLINE
+// ─────────────────────────────────────────────────────────────────────────────
+let causaVincularId = null;
+
+function inicializarCausaEditable() {
+  const valorEl = document.getElementById('causa-valor');
+  if (valorEl) valorEl.textContent = exp.numero_causa || '—';
+}
+
+function activarEdicionCausa() {
+  document.getElementById('causa-display').classList.add('hidden');
+  document.getElementById('causa-edit-mode').classList.remove('hidden');
+  const input = document.getElementById('causa-input');
+  if (input) {
+    input.value = exp.numero_causa || '';
+    input.focus();
+  }
+  causaVincularId = null;
+}
+
+function cancelarEdicionCausa() {
+  document.getElementById('causa-display').classList.remove('hidden');
+  document.getElementById('causa-edit-mode').classList.add('hidden');
+  document.getElementById('causa-duplicado-inline').classList.add('hidden');
+  causaVincularId = null;
+}
+
+function onCausaDetalleChange(valor) {
+  if (!valor || valor.trim() === '' || valor.trim().toUpperCase() === 'SS SOFSE') {
+    document.getElementById('causa-duplicado-inline').classList.add('hidden');
+    causaVincularId = null;
+    return;
+  }
+  const duplicados = window.SACO.buscarPorNumeroCausa(valor.trim()).filter(e => e.id !== exp.id);
+  if (duplicados.length) {
+    const lista = document.getElementById('causa-duplicado-lista');
+    lista.innerHTML = duplicados.map(e => `
+      <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-amber-100">
+        <div>
+          <span class="text-[11px] font-bold text-on-surface">${e.numero_interno || e.id}</span>
+          <span class="mx-1 text-outline-variant">·</span>
+          <span class="text-[10px] text-on-surface-variant">${e.caratula || '—'}</span>
+        </div>
+        <button onclick="seleccionarCausaVinculo('${e.id || e.numero_interno}')"
+          class="text-[10px] font-bold text-primary-dim border border-primary/30 rounded-lg px-2 py-1 hover:bg-primary-container transition-colors">
+          Vincular
+        </button>
+      </div>`).join('');
+    document.getElementById('causa-duplicado-inline').classList.remove('hidden');
+  } else {
+    document.getElementById('causa-duplicado-inline').classList.add('hidden');
+    causaVincularId = null;
+  }
+}
+
+function seleccionarCausaVinculo(id) {
+  causaVincularId = id;
+  document.getElementById('causa-duplicado-inline').innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-green-600 text-base">check_circle</span>
+      <p class="text-[10px] font-bold text-green-800">Se vinculará con <span class="font-mono">${id}</span> al guardar.</p>
+      <button onclick="causaVincularId=null;document.getElementById('causa-duplicado-inline').classList.add('hidden')"
+        class="ml-auto text-[10px] text-on-surface-variant hover:text-on-surface">Cancelar</button>
+    </div>`;
+}
+
+function guardarNumeroCausa() {
+  const valor = (document.getElementById('causa-input').value || '').trim();
+  exp.numero_causa = valor || null;
+  document.getElementById('causa-valor').textContent = valor || '—';
+
+  // Vinculación bidireccional si el abogado seleccionó un expediente relacionado
+  if (causaVincularId) {
+    const relacionado = window.SACO.getExpedienteById(causaVincularId);
+    if (relacionado) {
+      if (!relacionado.vinculos) relacionado.vinculos = [];
+      const yaVinculado = relacionado.vinculos.some(v => v.id === exp.id);
+      if (!yaVinculado) {
+        relacionado.vinculos.push({ id: exp.id, numero_interno: exp.numero_interno, caratula: exp.caratula, tipo_relacion: 'MISMA_CAUSA' });
+      }
+    }
+    if (!exp.vinculos) exp.vinculos = [];
+    const yaVinculadoInverso = exp.vinculos.some(v => v.id === causaVincularId);
+    if (!yaVinculadoInverso) {
+      const rel = window.SACO.getExpedienteById(causaVincularId);
+      exp.vinculos.push({ id: causaVincularId, numero_interno: rel ? (rel.numero_interno || causaVincularId) : causaVincularId, caratula: rel ? rel.caratula : '', tipo_relacion: 'MISMA_CAUSA' });
+    }
+    renderVinculos();
+    SACO_UI.showToast(`N° causa guardado y vinculado con ${causaVincularId}.`, 'success');
+  } else {
+    SACO_UI.showToast('N° de causa actualizado.', 'success');
+  }
+
+  cancelarEdicionCausa();
+  causaVincularId = null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -399,10 +399,12 @@ const FIELD_DEFINITIONS = {
   // ── Campos universales ─────────────────────────────────────────────────
   num_causa: {
     label: 'N° de Causa Judicial',
+    labelSuffix: '(opcional — puede cargarse luego desde el expediente)',
     type: 'text',
     mono: true,
     placeholder: 'FSM-XXXXX/2026 / IPP-XXXX / SS SOFSE',
-    hint: 'SS = Sin Siniestro cuando no hay N° de causa',
+    hint: 'Podés dejarlo vacío si aún no tenés el número. El abogado podrá cargarlo desde el detalle. SS = Sin Siniestro.',
+    onInput: 'onNumeroCausaChange(this.value)',
   },
   caratula: {
     label: 'Carátula / Título del Caso',
@@ -976,6 +978,26 @@ function getEstadosPorTipo(tipoGestion) {
   ];
 }
 
+// ── Búsqueda por N° de causa (para alerta de reincidencia) ──────────────────
+function buscarPorNumeroCausa(numeroCausa) {
+  if (!numeroCausa || numeroCausa.trim() === '') return [];
+  const q = numeroCausa.trim().toLowerCase();
+  const todos = [
+    ...(EXPEDIENTES_ABOGADO || []),
+    ...(QUEUE_MESA || []),
+  ].filter(e => e.numero_causa && e.numero_causa.toLowerCase() === q);
+  return todos;
+}
+
+function getExpedienteById(id) {
+  if (EXPEDIENTE_DETALLE && EXPEDIENTE_DETALLE.id === id) return EXPEDIENTE_DETALLE;
+  return (EXPEDIENTES_ABOGADO || []).find(e => e.id === id) || null;
+}
+
+function abrirExpediente(id) {
+  window.location.href = 'detalle-expediente.html?id=' + id;
+}
+
 window.SACO = {
   TIPOS_GESTION,
   LINEAS_FERROVIARIAS,
@@ -995,4 +1017,7 @@ window.SACO = {
   getEstadosPorTipo,
   FIELD_DEFINITIONS,
   FORM_CONFIG,
+  buscarPorNumeroCausa,
+  getExpedienteById,
+  abrirExpediente,
 };
