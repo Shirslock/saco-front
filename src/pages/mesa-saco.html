@@ -40,7 +40,7 @@ tailwind.config = {
 <div id="sidebar-mount"></div>
 <div id="topbar-mount"></div>
 
-<main class="ml-64 min-h-screen" style="padding-top:64px">
+<main id="main-content" class="min-h-screen transition-all duration-200" style="padding-top:64px;margin-left:256px">
 <div class="p-8 max-w-[1600px] mx-auto space-y-8">
 
   <!-- Header -->
@@ -360,6 +360,18 @@ SACO_SYNC.syncListen(({ type, payload }) => {
     if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
   }
 });
+
+// Aplicar offset correcto del sidebar al cargar
+(function applyInitialSidebarOffset() {
+  try {
+    var collapsed = localStorage.getItem('saco_sidebar_collapsed') === '1';
+    var ml = collapsed ? '52px' : '256px';
+    var main   = document.getElementById('main-content');
+    var topbar = document.getElementById('topbar-content');
+    if (main)   main.style.marginLeft = ml;
+    if (topbar) topbar.style.left     = ml;
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
