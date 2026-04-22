@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"dir \\\\\"C:\\\\Users\\\\cristian.gil\\\\.claude\\\\projects\\\\C--modelos-saco-frontend\\\\memory\\\\\"\" 2>&1)",
+      "Bash(cmd /c \"dir \"\"C:\\\\Users\\\\cristian.gil\\\\.claude\\\\projects\"\"\")",
+      "Bash(powershell -Command \"Test-Path 'C:\\\\Users\\\\cristian.gil\\\\.claude\\\\projects\\\\C--modelos-saco-frontend\\\\memory'\")",
+      "Bash(powershell -Command \"New-Item -ItemType Directory -Force -Path 'C:\\\\Users\\\\cristian.gil\\\\.claude\\\\projects\\\\C--modelos-saco-frontend\\\\memory'\")",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}

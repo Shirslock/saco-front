@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Detalle Expediente | SOFSE SACO</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "primary":"#256386","primary-dim":"#1d4e6b","primary-container":"#c5e0ea","on-primary":"#ffffff","on-primary-container":"#1b3a5c","on-primary-fixed":"#0f2a42",
+      "secondary":"#3a70a9","secondary-container":"#dbeafe","on-secondary-fixed":"#1e3a5f","secondary-dim":"#2d5987",
+      "tertiary":"#6d8eb0","tertiary-container":"#e0e7ef","on-tertiary-fixed":"#3a4f6a","tertiary-dim":"#5a7a9e",
+      "surface":"#f0f7f8","surface-container-lowest":"#ffffff","surface-container-low":"#f0f7f8","surface-container":"#e2eff5","surface-container-high":"#d4e6ef","surface-container-highest":"#c5dde9",
+      "background":"#f0f7f8","on-background":"#1b3a5c","on-surface":"#1b3a5c","on-surface-variant":"#4f6080",
+      "outline":"#6d8eb0","outline-variant":"#bcc0c9",
+      "error":"#cd5055","error-container":"#fee2e2","on-error-container":"#7f1d1d",
+      "inverse-surface":"#1b3a5c",
+      "header":"#242D4F",
+    },
+    fontFamily: { "headline":["Public Sans","sans-serif"], "body":["Inter","sans-serif"] },
+    borderRadius: { DEFAULT:"0.125rem","sm":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px" },
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; }
+  body { font-family:'Inter',sans-serif; }
+  h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
+  .shadow-card { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
+  .tab-active   { border-bottom:2px solid #256386; color:#256386; font-weight:700; }
+  .tab-inactive { color:#4f6080; border-bottom:2px solid transparent; }
+  .obs-area:focus { outline:none; box-shadow:0 0 0 3px rgba(37,99,134,0.12); border-radius:0.5rem; }
+  .rotate-90 { transform:rotate(90deg); }
+</style>
+</head>
+<body class="bg-[#f0f7f8] text-[#1b3a5c]">
+
+<div id="sidebar-mount"></div>
+<div id="topbar-mount"></div>
+
+<main class="ml-64 min-h-screen" style="padding-top:64px">
+<div class="px-8 py-7 max-w-[1500px] mx-auto">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
+    <div class="flex-1">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <a href="bandeja-abogado.html" class="text-xs text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">arrow_back</span> Mi Bandeja
+        </a>
+        <span class="text-[#4f6080] text-xs">/</span>
+        <span class="text-xs font-mono font-bold bg-[#f0f7f8] px-2 py-0.5 rounded text-[#4f6080]" id="h-num">C-0023/2026</span>
+        <span id="h-estado-badge"></span>
+        <span id="h-area-badge"></span>
+      </div>
+      <h1 class="text-2xl font-headline font-bold text-[#1b3a5c] tracking-tight leading-snug mb-2" id="h-caratula">Cargando...</h1>
+      <p class="text-[#4f6080] text-sm" id="h-juzgado">—</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2 flex-shrink-0">
+      <button onclick="modalMovimiento()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-[#1b3a5c] text-sm font-semibold rounded-xl shadow-sm border border-[#bcc0c9]/60 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[16px]">add_comment</span> Nueva Actividad
+      </button>
+      <button onclick="document.getElementById('file-input-det').click()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-[#1b3a5c] text-sm font-semibold rounded-xl shadow-sm border border-[#bcc0c9]/60 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[16px]">upload_file</span> Subir Documento
+        <input type="file" id="file-input-det" class="hidden" accept=".pdf,.docx" onchange="subirDoc(this)"/>
+      </button>
+      <button onclick="abrirModalVincular()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-[#1b3a5c] text-sm font-semibold rounded-xl shadow-sm border border-[#bcc0c9]/60 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[16px]">link</span> Vincular
+      </button>
+      <button onclick="abrirModalCambioEstado()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-[#1b3a5c] text-sm font-semibold rounded-xl shadow-sm border border-[#bcc0c9]/60 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[16px]">swap_horiz</span> Cambiar Estado
+      </button>
+      <button id="btn-reasignar" onclick="SACO_UI.showToast('Reasignación iniciada.','info')" class="inline-flex items-center gap-2 px-5 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-xl shadow-md hover:brightness-105 transition-all">
+        <span class="material-symbols-outlined text-[16px]">forward</span> Reasignar
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Tabs principales ─────────────────────────────────────────────────── -->
+  <div class="flex border-b border-[#bcc0c9]/60 gap-6 mb-6">
+    <button onclick="setTabMain('datos')"          id="mt-datos"          class="tab-active pb-3 text-sm transition-colors">Datos</button>
+    <button onclick="setTabMain('intervinientes')" id="mt-intervinientes" class="tab-inactive pb-3 text-sm transition-colors">Intervinientes</button>
+    <button onclick="setTabMain('timeline')"       id="mt-timeline"       class="tab-inactive pb-3 text-sm transition-colors">Timeline del Caso</button>
+    <button onclick="setTabMain('docs')"      id="mt-docs"      class="tab-inactive pb-3 text-sm transition-colors">Documentos</button>
+    <button onclick="setTabMain('prevision')" id="mt-prevision" class="tab-inactive pb-3 text-sm transition-colors">Previsión Económica</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PANEL: DATOS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="panel-datos">
+    <div class="grid grid-cols-12 gap-6">
+
+      <!-- Metadata -->
+      <div class="col-span-12 lg:col-span-4">
+        <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6">
+          <h3 class="text-xs font-headline font-black uppercase tracking-widest text-[#4f6080] mb-5">Datos del Expediente</h3>
+          <dl id="metadata-list" class="space-y-3"></dl>
+
+          <!-- N° Causa — editable inline -->
+          <div id="causa-editable-wrap" class="mt-3 py-2 border-t border-outline-variant/8">
+            <div class="flex justify-between items-start gap-2">
+              <dt class="text-[11px] text-[#4f6080] flex-shrink-0 pt-0.5">N° Causa</dt>
+              <div class="flex-1 text-right">
+                <div id="causa-display" class="flex items-center justify-end gap-1">
+                  <span id="causa-valor" class="text-[11px] font-semibold text-[#1b3a5c] font-mono"></span>
+                  <button onclick="activarEdicionCausa()" id="causa-edit-btn"
+                    class="text-[#256386] hover:underline text-[10px] font-bold ml-1">editar</button>
+                </div>
+                <div id="causa-edit-mode" class="hidden space-y-2 mt-1">
+                  <input id="causa-input" oninput="onCausaDetalleChange(this.value)"
+                    class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+                    placeholder="FSM-XXXXX/2026 o SS SOFSE"/>
+                  <div id="causa-duplicado-inline" class="hidden p-3 bg-amber-50 rounded-lg border border-amber-200 space-y-2">
+                    <p class="text-[10px] font-bold text-amber-800">N° de causa existente — podés vincularlo:</p>
+                    <div id="causa-duplicado-lista" class="space-y-1.5"></div>
+                  </div>
+                  <div class="flex gap-2 justify-end">
+                    <button onclick="cancelarEdicionCausa()"
+                      class="text-[11px] font-semibold text-[#4f6080] hover:text-on-surface px-3 py-1.5 rounded-lg hover:bg-surface-container transition-colors">
+                      Cancelar
+                    </button>
+                    <button onclick="guardarNumeroCausa()"
+                      class="text-[11px] font-bold text-white bg-[#256386] hover:bg-[#1d4e6b] px-3 py-1.5 rounded-lg hover:brightness-105 transition-all">
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs Info / Vínculos -->
+      <div class="col-span-12 lg:col-span-8">
+        <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb]">
+          <div class="flex border-b border-[#bcc0c9]/60 px-6 pt-4 gap-6">
+            <button onclick="setTabDatos('info')"     id="dt-info"     class="tab-active pb-3 text-sm transition-colors">Información</button>
+            <button onclick="setTabDatos('vinculos')" id="dt-vinculos" class="tab-inactive pb-3 text-sm transition-colors">Vínculos</button>
+          </div>
+
+          <!-- Sub-panel: Información -->
+          <div id="subpanel-info" class="p-6">
+            <div class="mb-5">
+              <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Observaciones</label>
+              <textarea id="obs-area" rows="5"
+                class="obs-area w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm resize-none"
+                placeholder="Sin observaciones..."></textarea>
+              <button onclick="guardarObs()" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-[#256386] hover:underline">
+                <span class="material-symbols-outlined text-[14px]">save</span> Guardar
+              </button>
+            </div>
+            <div id="vinculos-preview"></div>
+          </div>
+
+          <!-- Sub-panel: Vínculos -->
+          <div id="subpanel-vinculos" class="hidden p-6">
+            <button onclick="abrirModalVincular()"
+              class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5
+              bg-[#f0f7f8] text-[#1b3a5c] text-sm font-semibold rounded-xl
+              border border-[#bcc0c9]/60 hover:bg-surface-container transition-colors mb-4">
+              <span class="material-symbols-outlined text-[16px]">link</span>
+              Vincular Expediente
+            </button>
+            <div id="vinculos-list"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PANEL: TIMELINE
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="panel-timeline" class="hidden bg-[#f0f7f8] rounded-xl p-7 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-28 h-28 bg-primary/5 rounded-bl-full pointer-events-none"></div>
+    <div class="flex items-center justify-between mb-7">
+      <h3 class="font-headline font-bold text-[#1b3a5c]">Ciclo de Vida — Actividades</h3>
+      <div class="flex items-center gap-3">
+        <select id="filtro-estado-timeline"
+          onchange="renderTimeline(this.value || null)"
+          class="bg-surface-container-lowest border-none rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-[#256386]/20">
+          <option value="">Todos los estados</option>
+        </select>
+        <button onclick="modalMovimiento()" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#256386] hover:underline">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span> Nueva Actividad
+        </button>
+      </div>
+    </div>
+    <div id="timeline-list"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PANEL: DOCUMENTOS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="panel-docs" class="hidden bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-7">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="font-headline font-bold text-[#1b3a5c]">Repositorio GDE</h3>
+      <button onclick="document.getElementById('file-input-det').click()" class="flex items-center gap-1.5 text-xs font-bold text-[#256386] hover:underline">
+        <span class="material-symbols-outlined text-[16px]">upload_file</span> Subir
+      </button>
+    </div>
+    <table class="w-full text-left border-separate border-spacing-y-1.5">
+      <thead>
+        <tr class="bg-[#f0f7f8]">
+          <th class="px-4 py-3 rounded-l-lg text-[10px] font-bold text-[#4f6080] uppercase tracking-wider">Archivo</th>
+          <th class="px-4 py-3 text-[10px] font-bold text-[#4f6080] uppercase tracking-wider">Tipo GDE</th>
+          <th class="px-4 py-3 text-[10px] font-bold text-[#4f6080] uppercase tracking-wider">Fecha</th>
+          <th class="px-4 py-3 text-right text-[10px] font-bold text-[#4f6080] uppercase tracking-wider">Tamaño</th>
+          <th class="px-4 py-3 rounded-r-lg"></th>
+        </tr>
+      </thead>
+      <tbody id="docs-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PANEL: PREVISIÓN ECONÓMICA
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="panel-prevision" class="hidden bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-7">
+    <h3 class="font-headline font-bold text-[#1b3a5c] mb-5">Previsión Económica</h3>
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-surface-container-low rounded-xl p-4">
+        <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">Monto Demanda</p>
+        <p class="text-xl font-black text-[#1b3a5c]">$4.200.000</p>
+        <p class="text-[10px] text-[#4f6080] mt-1">Monto original (inmutable)</p>
+      </div>
+      <div class="bg-surface-container-low rounded-xl p-4">
+        <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">Monto Actualizado</p>
+        <p class="text-xl font-black text-[#256386]">$5.800.000</p>
+        <p class="text-[10px] text-[#4f6080] mt-1">Diciembre 2025</p>
+      </div>
+      <div class="bg-surface-container-low rounded-xl p-4">
+        <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">Pronóstico</p>
+        <p class="text-xl font-black text-[#6d8eb0]">Desfavorable</p>
+        <p class="text-[10px] text-[#4f6080] mt-1">Estado: En Prueba</p>
+      </div>
+    </div>
+    <table class="w-full text-left text-xs border-separate border-spacing-y-1">
+      <thead>
+        <tr class="bg-[#f0f7f8]">
+          <th class="px-4 py-3 rounded-l-lg font-bold text-[#4f6080] uppercase tracking-wider">Año</th>
+          <th class="px-4 py-3 font-bold text-[#4f6080] uppercase tracking-wider">Estado Procesal</th>
+          <th class="px-4 py-3 font-bold text-[#4f6080] uppercase tracking-wider">Pronóstico</th>
+          <th class="px-4 py-3 font-bold text-[#4f6080] uppercase tracking-wider rounded-r-lg">Monto dic.</th>
+        </tr>
+      </thead>
+      <tbody id="prevision-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PANEL: INTERVINIENTES
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="panel-intervinientes" class="hidden bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h3 class="font-headline font-bold text-[#1b3a5c]">Intervinientes de la Causa</h3>
+        <p class="text-xs text-[#4f6080] mt-1">Todos los participantes vinculados a este expediente</p>
+      </div>
+      <button onclick="abrirModalAgregarInterviniente()"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-xl hover:brightness-105 active:scale-[0.98] transition-all">
+        <span class="material-symbols-outlined text-[16px]">person_add</span>
+        Agregar Interviniente
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-[#f0f7f8]">
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Nombre / Razón Social</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Rol Procesal</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Documento</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Representado por</th>
+            <th class="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Contacto</th>
+            <th class="px-5 py-3.5"></th>
+          </tr>
+        </thead>
+        <tbody id="intervinientes-tbody" class="divide-y divide-outline-variant/5"></tbody>
+      </table>
+    </div>
+    <div id="intervinientes-empty" class="hidden text-center py-12">
+      <span class="material-symbols-outlined text-4xl text-outline-variant">group</span>
+      <p class="text-sm text-[#4f6080] mt-2">No hay intervinientes registrados en este expediente</p>
+      <button onclick="abrirModalAgregarInterviniente()" class="mt-4 text-sm font-bold text-[#256386] hover:underline">Agregar el primero</button>
+    </div>
+  </div>
+
+</div><!-- /main inner -->
+</main>
+
+<script src="../data/mock.js"></script>
+<script src="../components/sync.js"></script>
+<script src="../components/shared.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+(function initUser() {
+  const u = SACO_SYNC.getCurrentUser();
+  if (u) window.SACO.CURRENT_USER = u;
+})();
+
+// ── Soporte para navegación entre expedientes vinculados ──────────────────────
+(function cargarExpedienteActivo() {
+  const idEnUrl = new URLSearchParams(location.search).get('id');
+  if (idEnUrl) {
+    const encontrado = window.SACO.getExpedienteById(idEnUrl);
+    if (encontrado) {
+      window.SACO.EXPEDIENTE_DETALLE = Object.assign({
+        timeline: [],
+        documentos: [],
+        vinculos: [],
+        intervinientes: [],
+      }, encontrado);
+    }
+  }
+})();
+
+const exp = window.SACO.EXPEDIENTE_DETALLE;
+
+document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('detalle-expediente');
+document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar(exp.id, exp.id);
+document.getElementById('h-caratula').textContent  = exp.caratula;
+document.getElementById('h-juzgado').textContent   = exp.juzgado;
+document.getElementById('h-num').textContent       = exp.id;
+document.getElementById('h-estado-badge').innerHTML = SACO_UI.estadoBadge(exp.estado, exp.estado.replace(/_/g,' '));
+document.getElementById('h-area-badge').innerHTML  = SACO_UI.areaBadge(exp.area);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TABS PRINCIPALES
+// ─────────────────────────────────────────────────────────────────────────────
+function setTabMain(tab) {
+  ['datos','intervinientes','timeline','docs','prevision'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('hidden', t !== tab);
+    document.getElementById(`mt-${t}`).className =
+      t === tab ? 'tab-active pb-3 text-sm transition-colors'
+                : 'tab-inactive pb-3 text-sm transition-colors';
+  });
+  if (tab === 'docs')           renderDocs();
+  if (tab === 'prevision')      renderPrevision();
+  if (tab === 'intervinientes') renderIntervinientes();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUB-TABS PANEL DATOS
+// ─────────────────────────────────────────────────────────────────────────────
+function setTabDatos(tab) {
+  ['info','vinculos'].forEach(t => {
+    document.getElementById(`subpanel-${t}`).classList.toggle('hidden', t !== tab);
+    document.getElementById(`dt-${t}`).className =
+      t === tab ? 'tab-active pb-3 text-sm transition-colors'
+                : 'tab-inactive pb-3 text-sm transition-colors';
+  });
+  if (tab === 'vinculos') renderVinculos();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// METADATA
+// ─────────────────────────────────────────────────────────────────────────────
+const metaFields = [
+  ['Tipo de Gestión',       exp.tipo],
+  ['Área',                  exp.area],
+  ['Juzgado / Dependencia', exp.juzgado],
+  ['Estado SIGEJ',          exp.estado_sigej],
+  ['N° SIGEJ',              exp.numero_sigej],
+  ['Letrado Asignado',      exp.abogado],
+  ['Línea Ferroviaria',     exp.linea],
+  ['Lugar del Hecho',       exp.lugar_hecho],
+  ['Fecha del Hecho',       exp.fecha_hecho],
+  ['Fecha Recepción',       exp.fecha_recepcion],
+  ['Variante Ingreso',      exp.variante],
+  ['Monto Demanda',         exp.monto_demanda],
+  ['GDE Vinculado',         exp.gde],
+];
+document.getElementById('metadata-list').innerHTML = metaFields.map(([k,v]) => `
+  <div class="flex justify-between items-start gap-3 py-2 border-b border-outline-variant/8">
+    <dt class="text-[11px] text-[#4f6080] flex-shrink-0">${k}</dt>
+    <dd class="text-[11px] font-semibold text-[#1b3a5c] text-right leading-snug max-w-[180px]">${v||'—'}</dd>
+  </div>`).join('');
+
+document.getElementById('obs-area').value = exp.observaciones || '';
+
+inicializarCausaEditable();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OBSERVACIONES
+// ─────────────────────────────────────────────────────────────────────────────
+function guardarObs() {
+  exp.observaciones = document.getElementById('obs-area').value;
+  SACO_UI.showToast('Observaciones guardadas.', 'success');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// N° CAUSA — EDICIÓN INLINE
+// ─────────────────────────────────────────────────────────────────────────────
+let causaVincularId = null;
+
+function inicializarCausaEditable() {
+  const valorEl = document.getElementById('causa-valor');
+  if (valorEl) valorEl.textContent = exp.numero_causa || '—';
+}
+
+function activarEdicionCausa() {
+  document.getElementById('causa-display').classList.add('hidden');
+  document.getElementById('causa-edit-mode').classList.remove('hidden');
+  const input = document.getElementById('causa-input');
+  if (input) {
+    input.value = exp.numero_causa || '';
+    input.focus();
+  }
+  causaVincularId = null;
+}
+
+function cancelarEdicionCausa() {
+  document.getElementById('causa-display').classList.remove('hidden');
+  document.getElementById('causa-edit-mode').classList.add('hidden');
+  document.getElementById('causa-duplicado-inline').classList.add('hidden');
+  causaVincularId = null;
+}
+
+function onCausaDetalleChange(valor) {
+  if (!valor || valor.trim() === '' || valor.trim().toUpperCase() === 'SS SOFSE') {
+    document.getElementById('causa-duplicado-inline').classList.add('hidden');
+    causaVincularId = null;
+    return;
+  }
+  const duplicados = window.SACO.buscarPorNumeroCausa(valor.trim()).filter(e => e.id !== exp.id);
+  if (duplicados.length) {
+    const lista = document.getElementById('causa-duplicado-lista');
+    lista.innerHTML = duplicados.map(e => `
+      <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-amber-100">
+        <div>
+          <span class="text-[11px] font-bold text-[#1b3a5c]">${e.numero_interno || e.id}</span>
+          <span class="mx-1 text-outline-variant">·</span>
+          <span class="text-[10px] text-[#4f6080]">${e.caratula || '—'}</span>
+        </div>
+        <button onclick="seleccionarCausaVinculo('${e.id || e.numero_interno}')"
+          class="text-[10px] font-bold text-primary-dim border border-[#256386]/30 rounded-lg px-2 py-1 hover:bg-[#c5e0ea] transition-colors">
+          Vincular
+        </button>
+      </div>`).join('');
+    document.getElementById('causa-duplicado-inline').classList.remove('hidden');
+  } else {
+    document.getElementById('causa-duplicado-inline').classList.add('hidden');
+    causaVincularId = null;
+  }
+}
+
+function seleccionarCausaVinculo(id) {
+  causaVincularId = id;
+  document.getElementById('causa-duplicado-inline').innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-green-600 text-base">check_circle</span>
+      <p class="text-[10px] font-bold text-[#14532d]">Se vinculará con <span class="font-mono">${id}</span> al guardar.</p>
+      <button onclick="causaVincularId=null;document.getElementById('causa-duplicado-inline').classList.add('hidden')"
+        class="ml-auto text-[10px] text-[#4f6080] hover:text-[#1b3a5c]">Cancelar</button>
+    </div>`;
+}
+
+function guardarNumeroCausa() {
+  const valor = (document.getElementById('causa-input').value || '').trim();
+  exp.numero_causa = valor || null;
+  document.getElementById('causa-valor').textContent = valor || '—';
+
+  // Vinculación bidireccional si el abogado seleccionó un expediente relacionado
+  if (causaVincularId) {
+    const relacionado = window.SACO.getExpedienteById(causaVincularId);
+    if (relacionado) {
+      if (!relacionado.vinculos) relacionado.vinculos = [];
+      const yaVinculado = relacionado.vinculos.some(v => v.id === exp.id);
+      if (!yaVinculado) {
+        relacionado.vinculos.push({ id: exp.id, numero_interno: exp.numero_interno, caratula: exp.caratula, tipo_relacion: 'MISMA_CAUSA' });
+      }
+    }
+    if (!exp.vinculos) exp.vinculos = [];
+    const yaVinculadoInverso = exp.vinculos.some(v => v.id === causaVincularId);
+    if (!yaVinculadoInverso) {
+      const rel = window.SACO.getExpedienteById(causaVincularId);
+      exp.vinculos.push({ id: causaVincularId, numero_interno: rel ? (rel.numero_interno || causaVincularId) : causaVincularId, caratula: rel ? rel.caratula : '', tipo_relacion: 'MISMA_CAUSA' });
+    }
+    renderVinculos();
+    SACO_UI.showToast(`N° causa guardado y vinculado con ${causaVincularId}.`, 'success');
+  } else {
+    SACO_UI.showToast('N° de causa actualizado.', 'success');
+  }
+
+  cancelarEdicionCausa();
+  causaVincularId = null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TIMELINE
+// ─────────────────────────────────────────────────────────────────────────────
+const tiposMov = ['DERIVACION','MEMO_ENVIADO','NOTA_RESPUESTA','PRORROGA','RECEPCION','CIERRE','OTRO'];
+const tipoIcons = { RECEPCION:'inbox', NOTA_RESPUESTA:'mail', MOVIMIENTO:'edit_note', DERIVACION:'forward', CIERRE:'task_alt' };
+let movFileSelected = null;
+let subFilesSelected = {};
+let estadoActual = exp.estado;
+const timelineItemMap = {};
+
+function renderMovimiento(t, uid, esActivo) {
+  timelineItemMap[uid] = t;
+  const expandido = esActivo;
+  const tieneContenido = t.desc || t.doc || (t.subMovimientos && t.subMovimientos.length > 0);
+
+  const subMov = (t.subMovimientos || []).map(s => `
+    <div class="mt-3 pl-4 border-l-2 border-[#bcc0c9]/80 space-y-2">
+      <div class="flex items-start gap-2">
+        <span class="material-symbols-outlined text-[13px] text-[#4f6080] mt-0.5">subdirectory_arrow_right</span>
+        <div>
+          <p class="text-[11px] font-bold text-[#1b3a5c]">${s.titulo}</p>
+          <p class="text-[10px] text-[#4f6080]">${s.fecha}</p>
+          <p class="text-xs text-[#4f6080] leading-relaxed mt-0.5">${s.desc}</p>
+          ${s.doc ? `<div class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-[#e2eff5] rounded-lg w-fit">
+            <span class="material-symbols-outlined text-[12px] text-[#4f6080]">attachment</span>
+            <span class="text-[10px] font-medium text-[#4f6080] font-mono">${s.doc}</span>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="relative">
+      <div class="absolute -left-[32px] top-1 w-4 h-4 rounded-full ${esActivo ? 'bg-primary' : 'bg-outline-variant'} border-4 border-surface-container-low z-10"></div>
+      <div class="flex flex-col md:flex-row md:items-start gap-3">
+        <span class="text-xs font-bold ${esActivo?'text-primary':'text-[#4f6080]'} whitespace-nowrap pt-0.5">${t.fecha}</span>
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm flex-1 ${esActivo?'border-l-4 border-primary':''}">
+          <button onclick="toggleMovimiento('${uid}')" class="w-full flex items-center gap-2 p-5 text-left">
+            <span class="material-symbols-outlined text-[16px] ${esActivo?'text-primary':'text-[#4f6080]'}">${tipoIcons[t.tipo]||'circle'}</span>
+            <h4 class="text-sm font-bold text-[#1b3a5c] flex-1">${t.titulo}</h4>
+            ${tieneContenido ? `<span id="chevron-${uid}" class="material-symbols-outlined text-[18px] text-[#4f6080] transition-transform duration-200 ${expandido ? 'rotate-90' : ''}">chevron_right</span>` : ''}
+          </button>
+          ${tieneContenido ? `<div id="mov-body-${uid}" class="${expandido ? '' : 'hidden'} px-5 pb-5">
+            <p class="text-xs text-[#4f6080] leading-relaxed">${t.desc||''}</p>
+            ${t.doc ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-[#e2eff5] rounded-lg w-fit">
+              <span class="material-symbols-outlined text-[14px] text-[#4f6080]">attachment</span>
+              <span class="text-[11px] font-medium text-[#4f6080] font-mono">${t.doc}</span>
+            </div>` : ''}
+            <div id="submov-list-${uid}">${subMov}</div>
+            <div class="mt-3 pt-3 border-t border-[#bcc0c9]/40">
+              <button id="reply-btn-${uid}" onclick="mostrarReply('${uid}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#256386] hover:underline">
+                <span class="material-symbols-outlined text-[15px]">reply</span> Responder
+              </button>
+              <div id="reply-form-${uid}" class="hidden mt-3 space-y-2">
+                <select id="sub-tipo-${uid}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-[#256386]/20">
+                  ${tiposMov.map(tp=>`<option value="${tp}">${tp.replace(/_/g,' ')}</option>`).join('')}
+                </select>
+                <textarea id="sub-desc-${uid}" rows="2" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs resize-none focus:ring-2 focus:ring-[#256386]/20" placeholder="Descripción..."></textarea>
+                <input id="sub-gde-${uid}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs font-mono focus:ring-2 focus:ring-[#256386]/20" placeholder="N° GDE (opcional)"/>
+                <div id="sub-dropzone-${uid}"
+                  class="border-2 border-dashed border-[#bcc0c9] rounded-lg p-3 text-center hover:border-primary/40 hover:bg-surface-container-low/50 transition-all cursor-pointer text-xs"
+                  onclick="document.getElementById('sub-file-${uid}').click()">
+                  <span class="material-symbols-outlined text-lg text-outline-variant">upload_file</span>
+                  <p class="text-[#4f6080] mt-0.5">Adjuntar archivo (opcional)</p>
+                  <p id="sub-file-name-${uid}" class="font-bold text-[#256386] mt-0.5 hidden"></p>
+                </div>
+                <input type="file" id="sub-file-${uid}" class="hidden" accept=".pdf,.docx" onchange="onSubFileSelected(this, '${uid}')"/>
+                <div class="flex gap-2">
+                  <button onclick="guardarSubMovimiento('${uid}')" class="px-3 py-1.5 bg-[#256386] hover:bg-[#1d4e6b] text-white text-xs font-bold rounded-lg hover:brightness-105 transition-all">Guardar</button>
+                  <button onclick="cancelarReply('${uid}')" class="px-3 py-1.5 text-xs font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderTimeline(filtroEstado = null) {
+  const grupos = {};
+  const ordenGrupos = [];
+  exp.timeline.forEach(t => {
+    const key = t.estadoExpediente || 'EN_TRAMITE';
+    if (!grupos[key]) { grupos[key] = []; ordenGrupos.push(key); }
+    grupos[key].push(t);
+  });
+
+  const container = document.getElementById('timeline-list');
+  container.innerHTML = ordenGrupos
+    .filter(estado => !filtroEstado || estado === filtroEstado)
+    .map((estado, gi) => {
+      const movs = grupos[estado];
+      const esActual = gi === 0;
+      return `
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full ${esActual ? 'bg-primary text-white' : 'bg-surface-container text-[#4f6080]'}">
+              <span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">${esActual ? 'radio_button_checked' : 'radio_button_unchecked'}</span>
+              <span class="text-[10px] font-black uppercase tracking-widest">${estado.replace(/_/g,' ')}</span>
+            </div>
+            <div class="flex-1 h-[1px] bg-[#bcc0c9]/30"></div>
+          </div>
+          <div class="relative pl-8 space-y-8 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[2px] before:bg-primary-container">
+            ${movs.map((t, i) => renderMovimiento(t, `${estado}-${i}`, esActual && i === 0)).join('')}
+          </div>
+        </div>`;
+    }).join('');
+}
+
+function poblarFiltroEstados() {
+  const estados = [...new Set(exp.timeline.map(t => t.estadoExpediente || 'EN_TRAMITE'))];
+  const sel = document.getElementById('filtro-estado-timeline');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Todos los estados</option>' +
+    estados.map(e => `<option value="${e}">${e.replace(/_/g,' ')}</option>`).join('');
+}
+
+function toggleMovimiento(uid) {
+  const body    = document.getElementById(`mov-body-${uid}`);
+  const chevron = document.getElementById(`chevron-${uid}`);
+  if (!body) return;
+  const oculto = body.classList.toggle('hidden');
+  if (chevron) chevron.classList.toggle('rotate-90', !oculto);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODAL NUEVO MOVIMIENTO
+// ─────────────────────────────────────────────────────────────────────────────
+function modalMovimiento() {
+  SACO_UI.showModal('Registrar Nueva Actividad', `
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de Movimiento</label>
+        <select id="mov-tipo" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20">
+          ${tiposMov.map(t=>`<option value="${t}">${t.replace(/_/g,' ')}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Fecha del Movimiento</label>
+        <input type="date" id="mov-fecha" value="${new Date().toISOString().split('T')[0]}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20"/>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Descripción</label>
+        <textarea id="mov-desc" rows="3" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-[#256386]/20" placeholder="Descripción del movimiento..."></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">N° Documento GDE (opcional)</label>
+        <input id="mov-gde" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20" placeholder="IF-2026-XXXXXXX-APN-SACO#SOFSE"/>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Archivo adjunto (opcional)</label>
+        <div id="mov-dropzone"
+          class="border-2 border-dashed border-[#bcc0c9] rounded-lg p-4 text-center hover:border-primary/40 hover:bg-surface-container-low/50 transition-all cursor-pointer"
+          onclick="document.getElementById('mov-file-input').click()">
+          <span class="material-symbols-outlined text-2xl text-outline-variant mb-1 block">upload_file</span>
+          <p class="text-xs text-[#4f6080]">Click para seleccionar — PDF o DOCX hasta 25 MB</p>
+          <p id="mov-file-name" class="text-xs font-bold text-[#256386] mt-1 hidden"></p>
+        </div>
+        <input type="file" id="mov-file-input" class="hidden" accept=".pdf,.docx" onchange="onMovFileSelected(this)"/>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="guardarMovimiento()" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Guardar Movimiento</button>`
+  );
+}
+
+function guardarMovimiento() {
+  const tipo  = document.getElementById('mov-tipo').value;
+  const desc  = document.getElementById('mov-desc').value.trim();
+  const gde   = document.getElementById('mov-gde').value.trim();
+  if (!desc) { SACO_UI.showToast('Ingresá una descripción para el movimiento.','warn'); return; }
+
+  let docLabel = gde || null;
+  if (movFileSelected) {
+    const sizeStr = movFileSelected.size >= 1024*1024
+      ? (movFileSelected.size/(1024*1024)).toFixed(1)+' MB'
+      : Math.round(movFileSelected.size/1024)+' KB';
+    exp.documentos.unshift({ nombre: movFileSelected.name, tipo:'Adjunto', fecha: new Date().toLocaleDateString('es-AR'), size: sizeStr, icon:'picture_as_pdf', color:'error' });
+    docLabel = gde ? gde+' · '+movFileSelected.name : movFileSelected.name;
+    movFileSelected = null;
+  }
+
+  exp.timeline.forEach(m => { m.activo = false; });
+  exp.timeline.unshift({ fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: docLabel, activo: true, subMovimientos: [], estadoExpediente: estadoActual });
+  SACO_UI.closeModal();
+  setTabMain('timeline');
+  renderTimeline();
+  poblarFiltroEstados();
+  SACO_UI.showToast('Movimiento registrado correctamente.', 'success');
+}
+
+function onMovFileSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 25*1024*1024) { SACO_UI.showToast('El archivo supera los 25 MB.', 'error'); input.value=''; return; }
+  movFileSelected = file;
+  const nameEl = document.getElementById('mov-file-name');
+  nameEl.textContent = file.name;
+  nameEl.classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUB-MOVIMIENTOS
+// ─────────────────────────────────────────────────────────────────────────────
+function mostrarReply(uid) {
+  document.getElementById(`reply-btn-${uid}`).classList.add('hidden');
+  document.getElementById(`reply-form-${uid}`).classList.remove('hidden');
+}
+
+function cancelarReply(uid) {
+  document.getElementById(`reply-form-${uid}`).classList.add('hidden');
+  document.getElementById(`reply-btn-${uid}`).classList.remove('hidden');
+}
+
+function guardarSubMovimiento(uid) {
+  const t = timelineItemMap[uid];
+  if (!t) return;
+  const desc = document.getElementById(`sub-desc-${uid}`).value.trim();
+  const gde  = document.getElementById(`sub-gde-${uid}`).value.trim();
+  const tipo = document.getElementById(`sub-tipo-${uid}`).value;
+  if (!desc) { SACO_UI.showToast('Ingresá una descripción.', 'warn'); return; }
+
+  let docLabel = gde || null;
+  if (subFilesSelected[uid]) {
+    const file = subFilesSelected[uid];
+    const sizeStr = file.size >= 1024*1024 ? (file.size/(1024*1024)).toFixed(1)+' MB' : Math.round(file.size/1024)+' KB';
+    exp.documentos.unshift({ nombre: file.name, tipo:'Adjunto', fecha: new Date().toLocaleDateString('es-AR'), size: sizeStr, icon:'picture_as_pdf', color:'error' });
+    docLabel = gde ? `${gde} · ${file.name}` : file.name;
+    subFilesSelected[uid] = null;
+  }
+
+  const subMov = { fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`, tipo, titulo: tipo.replace(/_/g,' '), desc, doc: docLabel };
+  if (!t.subMovimientos) t.subMovimientos = [];
+  t.subMovimientos.push(subMov);
+
+  const container = document.getElementById(`submov-list-${uid}`);
+  if (container) {
+    container.innerHTML = (t.subMovimientos || []).map(s => `
+      <div class="mt-3 pl-4 border-l-2 border-[#bcc0c9]/80 space-y-2">
+        <div class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-[13px] text-[#4f6080] mt-0.5">subdirectory_arrow_right</span>
+          <div>
+            <p class="text-[11px] font-bold text-[#1b3a5c]">${s.titulo}</p>
+            <p class="text-[10px] text-[#4f6080]">${s.fecha}</p>
+            <p class="text-xs text-[#4f6080] leading-relaxed mt-0.5">${s.desc}</p>
+            ${s.doc ? `<div class="mt-1.5 flex items-center gap-1.5 px-2 py-1 bg-[#e2eff5] rounded-lg w-fit">
+              <span class="material-symbols-outlined text-[12px] text-[#4f6080]">attachment</span>
+              <span class="text-[10px] font-medium text-[#4f6080] font-mono">${s.doc}</span>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  cancelarReply(uid);
+  document.getElementById(`sub-desc-${uid}`).value = '';
+  document.getElementById(`sub-gde-${uid}`).value  = '';
+  SACO_SYNC.syncEmit('MOVIMIENTO_AGREGADO', { expedienteId: exp.id, movimiento: subMov });
+  SACO_UI.showToast('Sub-movimiento registrado.', 'success');
+}
+
+function onSubFileSelected(input, uid) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 25*1024*1024) { SACO_UI.showToast('El archivo supera los 25 MB.', 'error'); input.value=''; return; }
+  subFilesSelected[uid] = file;
+  const nameEl = document.getElementById(`sub-file-name-${uid}`);
+  nameEl.textContent = file.name;
+  nameEl.classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CAMBIO DE ESTADO
+// ─────────────────────────────────────────────────────────────────────────────
+function abrirModalCambioEstado() {
+  const estados = window.SACO.getEstadosPorTipo(exp.tipo);
+  const estadoActualLabel = exp.estadoLabel || exp.estado.replace(/_/g,' ');
+  SACO_UI.showModal('Cambiar Estado del Expediente', `
+    <div class="space-y-4">
+      <div class="p-3 bg-[#f0f7f8] rounded-xl flex items-center justify-between">
+        <span class="text-xs text-[#4f6080] font-medium">Estado actual</span>
+        ${exp.estadoLabel ? SACO_UI.estadoBadgeCustom(exp.estadoLabel) : SACO_UI.estadoBadge(exp.estado, estadoActualLabel)}
+      </div>
+      <div class="p-3 bg-[#f0f7f8] rounded-xl flex items-center justify-between">
+        <span class="text-xs text-[#4f6080] font-medium">Tipo de gestión</span>
+        <span class="text-xs font-bold text-[#1b3a5c]">${exp.tipo.replace(/_/g,' ')}</span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Nuevo estado</label>
+        <select id="nuevo-estado" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20">
+          <option value="">— Seleccioná el nuevo estado —</option>
+          ${estados.map(e=>`<option value="${e}">${e}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Motivo del cambio <span class="text-[#cd5055]">*</span></label>
+        <textarea id="motivo-estado" rows="3" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-[#256386]/20" placeholder="Describí el motivo del cambio de estado..."></textarea>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="confirmarCambioEstado()" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Confirmar Cambio</button>`
+  );
+}
+
+function confirmarCambioEstado() {
+  const nuevoEstado = document.getElementById('nuevo-estado').value;
+  const motivo      = document.getElementById('motivo-estado').value.trim();
+  if (!nuevoEstado) { SACO_UI.showToast('Seleccioná el nuevo estado.', 'warn'); return; }
+  if (!motivo)      { SACO_UI.showToast('Ingresá un motivo para el cambio de estado.', 'warn'); return; }
+
+  const estadoPrevio = exp.estadoLabel || exp.estado;
+  exp.estadoLabel = nuevoEstado;
+  estadoActual = nuevoEstado;
+  document.getElementById('h-estado-badge').innerHTML = SACO_UI.estadoBadgeCustom(nuevoEstado);
+
+  exp.timeline.forEach(m => { m.activo = false; });
+  exp.timeline.unshift({
+    fecha: `Hoy · ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`,
+    tipo: 'MOVIMIENTO', titulo: 'Cambio de Estado', desc: motivo, doc: null, activo: true,
+    subMovimientos: [], estadoExpediente: estadoActual,
+  });
+
+  SACO_UI.closeModal();
+  setTabMain('timeline');
+  renderTimeline();
+  poblarFiltroEstados();
+  SACO_SYNC.syncEmit('ESTADO_CAMBIADO', { id: exp.id, estadoAnterior: estadoPrevio, estadoNuevo: nuevoEstado });
+  SACO_UI.showToast('Estado actualizado correctamente.', 'success');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENTOS
+// ─────────────────────────────────────────────────────────────────────────────
+function renderDocs() {
+  const docColors = { error:'text-[#cd5055]', secondary:'text-secondary', primary:'text-primary' };
+  document.getElementById('docs-tbody').innerHTML = exp.documentos.map(d => `
+    <tr class="group hover:bg-[#f0f7f8] transition-colors">
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined ${docColors[d.color]||'text-[#4f6080]'}" style="font-variation-settings:'FILL' 1;">${d.icon}</span>
+          <span class="text-xs font-bold text-[#1b3a5c]">${d.nombre}</span>
+        </div>
+      </td>
+      <td class="px-4 py-3.5 text-[10px] font-bold text-[#4f6080] uppercase">${d.tipo}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${d.fecha}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080] text-right">${d.size}</td>
+      <td class="px-4 py-3.5 text-right">
+        <button onclick="SACO_UI.showToast('Descargando ${d.nombre}...','info')" class="text-[#4f6080] hover:text-[#256386] transition-colors">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function subirDoc(input) {
+  const f = input.files[0];
+  if (!f) return;
+  exp.documentos.unshift({ nombre: f.name, tipo:'Adjunto', fecha: new Date().toLocaleDateString('es-AR'), size: `${(f.size/1024).toFixed(0)} KB`, icon:'picture_as_pdf', color:'error' });
+  if (!document.getElementById('panel-docs').classList.contains('hidden')) renderDocs();
+  SACO_UI.showToast(`${f.name} subido correctamente.`, 'success');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PREVISIÓN ECONÓMICA
+// ─────────────────────────────────────────────────────────────────────────────
+function renderPrevision() {
+  document.getElementById('prevision-tbody').innerHTML = [
+    ['2023','En Plazo Contestar','Favorable','$4.200.000'],
+    ['2024','En Prueba','Desfavorable','$5.100.000'],
+    ['2025','En Prueba','Desfavorable','$5.800.000'],
+  ].map(r => `
+  <tr class="hover:bg-[#f0f7f8] transition-colors">
+    <td class="px-4 py-3 font-bold text-[#1b3a5c]">${r[0]}</td>
+    <td class="px-4 py-3 text-[#4f6080]">${r[1]}</td>
+    <td class="px-4 py-3"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${r[2]==='Favorable'?'bg-[#dbeafe] text-[#1e3a5f]':'bg-[#e0e7ef] text-[#3a4f6a]'}">${r[2]}</span></td>
+    <td class="px-4 py-3 font-mono font-semibold text-[#1b3a5c]">${r[3]}</td>
+  </tr>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VÍNCULOS
+// ─────────────────────────────────────────────────────────────────────────────
+let vincSeleccionado = null;
+
+function renderVinculos() {
+  const container = document.getElementById('vinculos-list');
+  if (!exp.vinculos || exp.vinculos.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8">
+        <span class="material-symbols-outlined text-3xl text-outline-variant">link_off</span>
+        <p class="text-xs text-[#4f6080] mt-2">Sin expedientes vinculados</p>
+      </div>`;
+    return;
+  }
+  const tipoLabels = { MISMA_CAUSA:'Misma Causa', MISMO_SINIESTRO:'Mismo Siniestro', DERIVACION:'Derivación', CONEXO:'Conexo' };
+  container.innerHTML = exp.vinculos.map(v => `
+    <div onclick="window.SACO.abrirExpediente('${v.id}')"
+      class="p-4 bg-[#f0f7f8] rounded-xl hover:bg-surface-container cursor-pointer transition-colors border-l-4 border-[#256386]/30 hover:border-primary group mb-3">
+      <div class="flex items-start justify-between mb-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${v.id}</span>
+          ${SACO_UI.areaBadge(v.area)}
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-[#e2eff5] text-[#4f6080] rounded-full">${tipoLabels[v.tipo_relacion]||v.tipo_relacion}</span>
+          ${v.tipo_relacion === 'MISMO_SINIESTRO' ? `<span class="text-[9px] font-black px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded uppercase tracking-tight inline-flex items-center gap-0.5"><span class="material-symbols-outlined" style="font-size:10px">link</span> Mismo siniestro</span>` : ''}
+        </div>
+        <span class="material-symbols-outlined text-outline-variant group-hover:text-[#256386] transition-colors text-[16px]">open_in_new</span>
+      </div>
+      <p class="text-xs text-[#4f6080] line-clamp-2 leading-snug">${v.caratula}</p>
+      <div class="mt-2">${v.estadoLabel ? SACO_UI.estadoBadgeCustom(v.estadoLabel) : SACO_UI.estadoBadge(v.estado, v.estado.replace(/_/g,' '))}</div>
+    </div>`).join('');
+}
+
+function renderVinculosPreview() {
+  const container = document.getElementById('vinculos-preview');
+  if (!container || !exp.vinculos || exp.vinculos.length === 0) { if(container) container.innerHTML=''; return; }
+  container.innerHTML = `
+    <div class="mt-4 pt-4 border-t border-[#bcc0c9]/40">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider">Vínculos (${exp.vinculos.length})</p>
+        <button onclick="setTabDatos('vinculos')" class="text-xs text-[#256386] font-bold hover:underline">Ver todos</button>
+      </div>
+      ${exp.vinculos.slice(0,2).map(v => `
+        <div class="p-3 bg-[#f0f7f8] rounded-lg mb-2 flex items-center justify-between">
+          <div>
+            <span class="font-mono text-xs font-bold text-[#1b3a5c]">${v.id}</span>
+            <p class="text-[10px] text-[#4f6080] line-clamp-1">${v.caratula}</p>
+          </div>
+          ${SACO_UI.areaBadge(v.area)}
+        </div>`).join('')}
+    </div>`;
+}
+
+function abrirModalVincular() {
+  vincSeleccionado = null;
+  SACO_UI.showModal('Vincular Expediente', `
+    <div class="space-y-4">
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
+        <input id="vinc-search" oninput="buscarParaVincular(this.value)"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#256386]/20"
+          placeholder="Buscar por N° interno, carátula o N° causa..."/>
+      </div>
+      <div id="vinc-resultados" class="space-y-2 max-h-48 overflow-y-auto"></div>
+      <div id="vinc-seleccionado" class="hidden p-3 bg-[#c5e0ea]/40 rounded-lg">
+        <p class="text-xs font-bold text-[#1b3a5c] mb-1">Expediente seleccionado</p>
+        <p id="vinc-sel-texto" class="text-sm font-semibold text-[#1b3a5c]"></p>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de relación</label>
+        <select id="vinc-tipo" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20">
+          <option value="MISMA_CAUSA">Misma Causa — mismo número de causa judicial</option>
+          <option value="MISMO_SINIESTRO">Mismo Siniestro — mismo hecho</option>
+          <option value="DERIVACION">Derivación — uno derivó en el otro</option>
+          <option value="CONEXO">Conexo — relación indirecta</option>
+        </select>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="confirmarVinculo()" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Vincular</button>`
+  );
+  setTimeout(() => buscarParaVincular(''), 50);
+}
+
+function buscarParaVincular(query) {
+  const q = query.toLowerCase();
+  const resultados = window.SACO.EXPEDIENTES_ABOGADO.filter(e => {
+    if (e.id === exp.id) return false;
+    if (!q) return true;
+    return e.id.toLowerCase().includes(q) || e.caratula.toLowerCase().includes(q) || (e.numero_causa||'').toLowerCase().includes(q);
+  });
+  const container = document.getElementById('vinc-resultados');
+  if (!container) return;
+  if (!resultados.length) { container.innerHTML = `<p class="text-xs text-[#4f6080] text-center py-4">Sin resultados</p>`; return; }
+  container.innerHTML = resultados.map(e => `
+    <div onclick="seleccionarParaVincular('${e.id}')" id="vinc-item-${e.id}"
+      class="p-3 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer flex items-center justify-between group">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
+          ${SACO_UI.areaBadge(e.area)}
+        </div>
+        <p class="text-xs text-[#4f6080] mt-0.5 line-clamp-1">${e.caratula}</p>
+      </div>
+      <span class="material-symbols-outlined text-outline-variant group-hover:text-[#256386] transition-colors text-[18px]">arrow_forward_ios</span>
+    </div>`).join('');
+}
+
+function seleccionarParaVincular(id) {
+  const e = window.SACO.EXPEDIENTES_ABOGADO.find(x => x.id === id);
+  if (!e) return;
+  vincSeleccionado = e;
+  document.getElementById('vinc-sel-texto').textContent = `${e.id} — ${e.caratula}`;
+  document.getElementById('vinc-seleccionado').classList.remove('hidden');
+  document.querySelectorAll('[id^="vinc-item-"]').forEach(el => el.classList.remove('bg-primary-container/20','border','border-[#256386]/30'));
+  const item = document.getElementById(`vinc-item-${id}`);
+  if (item) item.classList.add('bg-primary-container/20','border','border-[#256386]/30');
+}
+
+function confirmarVinculo() {
+  if (!vincSeleccionado) { SACO_UI.showToast('Seleccioná un expediente', 'warn'); return; }
+  if (!exp.vinculos) exp.vinculos = [];
+  exp.vinculos.push({
+    id: vincSeleccionado.id, area: vincSeleccionado.area,
+    caratula: vincSeleccionado.caratula, estado: vincSeleccionado.estado,
+    tipo_relacion: document.getElementById('vinc-tipo').value,
+  });
+  SACO_UI.closeModal();
+  renderVinculos();
+  renderVinculosPreview();
+  setTabDatos('vinculos');
+  SACO_UI.showToast('Expediente vinculado correctamente', 'success');
+  vincSeleccionado = null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERVINIENTES
+// ─────────────────────────────────────────────────────────────────────────────
+const ROL_COLORS = {
+  'Actor':          'bg-primary-container/60 text-[#1b3a5c]',
+  'Demandado':      'bg-[#fee2e2]/50 text-on-error-container',
+  'Imputado':       'bg-[#fee2e2]/50 text-on-error-container',
+  'Denunciante':    'bg-[#dbeafe] text-[#1e3a5f]',
+  'Perito':         'bg-[#e0e7ef] text-[#3a4f6a]',
+  'Tercero citado': 'bg-surface-container-high text-[#4f6080]',
+  'Querellante':    'bg-primary-container/60 text-[#1b3a5c]',
+  'Testigo':        'bg-surface-container text-[#4f6080]',
+};
+
+const ROLES_PROCESALES = [
+  'Actor','Demandado','Imputado','Denunciante',
+  'Perito','Tercero citado','Querellante','Testigo','Otro',
+];
+
+function renderIntervinientes() {
+  const lista = exp.intervinientes || [];
+  const tbody = document.getElementById('intervinientes-tbody');
+  const empty = document.getElementById('intervinientes-empty');
+  if (!tbody) return;
+
+  if (!lista.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = lista.map((inv, i) => {
+    const rolCls = ROL_COLORS[inv.rol_procesal] || 'bg-surface-container text-[#4f6080]';
+    const contacto = [inv.contacto_email, inv.contacto_telefono].filter(Boolean).join(' · ') || '—';
+    return `
+      <tr class="hover:bg-[#f0f7f8] transition-colors group">
+        <td class="px-5 py-4">
+          <p class="text-sm font-semibold text-[#1b3a5c]">${inv.nombre}</p>
+          ${inv.observaciones ? `<p class="text-[10px] text-[#4f6080] mt-0.5 line-clamp-1 italic">${inv.observaciones}</p>` : ''}
+        </td>
+        <td class="px-5 py-4">
+          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${rolCls}">${inv.rol_procesal}</span>
+        </td>
+        <td class="px-5 py-4 text-xs text-[#4f6080] font-mono">${inv.tipo_documento} ${inv.numero_documento}</td>
+        <td class="px-5 py-4 text-xs text-[#4f6080]">${inv.representado_por || '—'}</td>
+        <td class="px-5 py-4 text-xs text-[#4f6080]">${contacto}</td>
+        <td class="px-5 py-4 text-right">
+          <button onclick="eliminarInterviniente(${i})"
+            class="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-error-container/20 rounded text-[#cd5055]">
+            <span class="material-symbols-outlined text-[16px]">delete</span>
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function abrirModalAgregarInterviniente() {
+  SACO_UI.showModal('Agregar Interviniente', `
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Nombre / Razón Social *</label>
+          <input id="inv-nombre" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Ej: Juan Carlos Martínez"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Rol Procesal *</label>
+          <select id="inv-rol" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">— Seleccioná —</option>
+            ${ROLES_PROCESALES.map(r => `<option value="${r}">${r}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de Documento</label>
+          <select id="inv-tipo-doc" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option>DNI</option><option>CUIT</option><option>CUIL</option><option>Pasaporte</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Número de Documento</label>
+          <input id="inv-num-doc" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="XX.XXX.XXX"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Email</label>
+          <input id="inv-email" type="email" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="correo@ejemplo.com"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Teléfono</label>
+          <input id="inv-tel" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="011-XXXX-XXXX"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Domicilio</label>
+          <input id="inv-domicilio" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Calle, número, piso, ciudad"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Representado por</label>
+          <input id="inv-representado" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Letrado o institución que lo representa"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Observaciones</label>
+          <textarea id="inv-obs" rows="2" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Notas adicionales..."></textarea>
+        </div>
+      </div>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
+     <button onclick="guardarInterviniente()" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Guardar</button>`
+  );
+}
+
+function guardarInterviniente() {
+  const nombre = document.getElementById('inv-nombre').value.trim();
+  const rol    = document.getElementById('inv-rol').value;
+  if (!nombre || !rol) { SACO_UI.showToast('Nombre y rol procesal son obligatorios.', 'warn'); return; }
+  const nuevo = {
+    id: 'INT-' + String(Date.now()).slice(-4),
+    nombre,
+    rol_procesal:       rol,
+    tipo_documento:     document.getElementById('inv-tipo-doc').value,
+    numero_documento:   document.getElementById('inv-num-doc').value,
+    contacto_email:     document.getElementById('inv-email').value,
+    contacto_telefono:  document.getElementById('inv-tel').value,
+    contacto_domicilio: document.getElementById('inv-domicilio').value,
+    representado_por:   document.getElementById('inv-representado').value,
+    observaciones:      document.getElementById('inv-obs').value,
+  };
+  if (!exp.intervinientes) exp.intervinientes = [];
+  exp.intervinientes.push(nuevo);
+  SACO_UI.closeModal();
+  renderIntervinientes();
+  SACO_UI.showToast(`${nombre} agregado como ${rol}.`, 'success');
+}
+
+function eliminarInterviniente(index) {
+  const nombre = exp.intervinientes[index]?.nombre;
+  exp.intervinientes.splice(index, 1);
+  renderIntervinientes();
+  SACO_UI.showToast(`${nombre} eliminado.`, 'info');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BOTÓN REASIGNAR — visibilidad según rol
+// ─────────────────────────────────────────────────────────────────────────────
+function updateReasignarBtn() {
+  const btn = document.getElementById('btn-reasignar');
+  if (btn) btn.classList.toggle('hidden', !SACO_UI.puedeReasignar());
+}
+updateReasignarBtn();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SYNC
+// ─────────────────────────────────────────────────────────────────────────────
+SACO_SYNC.syncListen(({ type, payload }) => {
+  if (type === 'USUARIO_CAMBIADO') {
+    if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
+    document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('detalle-expediente');
+    if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
+    updateReasignarBtn();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER INICIAL
+// ─────────────────────────────────────────────────────────────────────────────
+renderTimeline();
+poblarFiltroEstados();
+renderVinculosPreview();
+renderIntervinientes();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Cambiar registrar nuevo movimiento a la parte superior (cambiar por nueva actividad)
