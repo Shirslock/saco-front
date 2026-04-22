@@ -134,6 +134,23 @@ tailwind.config = {
               </div>
             </div>
           </div>
+
+          <!-- Campos pendientes del abogado -->
+          <div id="campos-abogado-section" class="mt-5 pt-4 border-t border-outline-variant/8">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-[10px] font-headline font-black uppercase tracking-widest text-[#4f6080]">Campos a completar</h4>
+              <span id="campos-completados-badge" class="text-[10px] font-bold px-2 py-0.5 bg-[#f0f7f8] rounded-full text-[#4f6080]"></span>
+            </div>
+            <div id="campos-abogado-form" class="space-y-3"></div>
+            <div id="campos-abogado-empty" class="hidden py-4 text-center">
+              <span class="material-symbols-outlined text-[#256386] text-2xl" style="font-variation-settings:'FILL' 1;">check_circle</span>
+              <p class="text-xs text-[#4f6080] mt-1">Todos los campos completos</p>
+            </div>
+            <button id="btn-guardar-campos" onclick="guardarCamposAbogado()"
+              class="hidden mt-4 w-full py-2.5 text-xs font-bold text-white bg-[#256386] hover:bg-[#1d4e6b] rounded-xl transition-colors">
+              Guardar campos
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1151,6 +1168,127 @@ function eliminarInterviniente(index) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CAMPOS ABOGADO — sección "Campos a completar" del panel izquierdo
+// ─────────────────────────────────────────────────────────────────────────────
+function renderCamposAbogado() {
+  if (!window.SACO || !window.SACO.getCamposFormulario) return;
+  const campos = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area);
+  const guardados = exp.campos_abogado || {};
+
+  const form   = document.getElementById('campos-abogado-form');
+  const empty  = document.getElementById('campos-abogado-empty');
+  const badge  = document.getElementById('campos-completados-badge');
+  const btnG   = document.getElementById('btn-guardar-campos');
+  const section= document.getElementById('campos-abogado-section');
+
+  if (!form || !section) return;
+
+  if (!campos || campos.length === 0) {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+
+  const completados = campos.filter(f => guardados[f.id] && guardados[f.id] !== '').length;
+  badge.textContent = `${completados}/${campos.length}`;
+  badge.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${
+    completados === campos.length
+      ? 'bg-green-100 text-green-800'
+      : 'bg-[#f0f7f8] text-[#4f6080]'
+  }`;
+
+  if (completados === campos.length) {
+    form.classList.add('hidden');
+    empty.classList.remove('hidden');
+    btnG.classList.add('hidden');
+    return;
+  }
+  form.classList.remove('hidden');
+  empty.classList.add('hidden');
+  btnG.classList.remove('hidden');
+
+  form.innerHTML = campos.map(f => {
+    const val = guardados[f.id] || '';
+    const colClass = f.full ? '' : '';
+    switch (f.type) {
+      case 'text':
+      case 'causa':
+        return `<div>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">${f.label}</label>
+          <input id="abg_inp_${f.id}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-[#256386]/20 focus:outline-none${f.mono ? ' font-mono' : ''}"
+            placeholder="${f.placeholder || ''}" value="${val}"/>
+        </div>`;
+      case 'date':
+        return `<div>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">${f.label}</label>
+          <input id="abg_inp_${f.id}" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" value="${val}"/>
+        </div>`;
+      case 'money':
+        return `<div>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">${f.label}</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#4f6080]">$</span>
+            <input id="abg_inp_${f.id}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-7 pr-3 text-xs focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="0" value="${val}"/>
+          </div>
+        </div>`;
+      case 'textarea':
+        return `<div>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">${f.label}</label>
+          <textarea id="abg_inp_${f.id}" rows="3"
+            class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs resize-none focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+            placeholder="${f.placeholder || ''}">${val}</textarea>
+        </div>`;
+      case 'linea': {
+        const opts = (window.SACO.LINEAS_FERROVIARIAS || []).map(l =>
+          `<option value="${l.code}" ${val === l.code ? 'selected' : ''}>${l.label}</option>`
+        ).join('');
+        return `<div>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">${f.label}</label>
+          <select id="abg_inp_${f.id}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">— Sin línea —</option>${opts}
+          </select>
+        </div>`;
+      }
+      case 'juzgado': {
+        const opts = (window.SACO.JUZGADOS || []).map(j =>
+          `<option value="${j.code}" ${val === j.code ? 'selected' : ''}>${j.label}</option>`
+        ).join('');
+        return `<div>
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">${f.label}</label>
+          <select id="abg_inp_${f.id}" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-xs focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">— Seleccioná juzgado —</option>${opts}
+          </select>
+        </div>`;
+      }
+      default:
+        return '';
+    }
+  }).join('');
+}
+
+function guardarCamposAbogado() {
+  const campos = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area);
+  if (!exp.campos_abogado) exp.campos_abogado = {};
+  campos.forEach(f => {
+    const el = document.getElementById(`abg_inp_${f.id}`);
+    if (el) exp.campos_abogado[f.id] = el.value || '';
+  });
+  // Registrar en el timeline
+  exp.timeline.unshift({
+    uid: Date.now().toString(36),
+    fecha: new Date().toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+    tipo: 'OTRO',
+    titulo: 'Campos del abogado actualizados',
+    estadoExpediente: estadoActual,
+    desc: 'Se completaron los campos de la etapa abogado.',
+    doc: null, activo: false, subMovimientos: [],
+  });
+  renderCamposAbogado();
+  renderTimeline();
+  SACO_UI.showToast('Campos guardados correctamente.', 'success');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // BOTÓN REASIGNAR — visibilidad según rol
 // ─────────────────────────────────────────────────────────────────────────────
 function updateReasignarBtn() {
@@ -1178,6 +1316,7 @@ renderTimeline();
 poblarFiltroEstados();
 renderVinculosPreview();
 renderIntervinientes();
+renderCamposAbogado();
 </script>
 </body>
 </html>
