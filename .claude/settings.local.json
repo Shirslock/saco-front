@@ -8,7 +8,13 @@
       "Bash(git checkout *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git branch *)",
+      "Bash(head -n 564 src/data/mock.js)",
+      "Bash(tail -n +947 src/data/mock.js)",
+      "Read(//tmp/**)",
+      "Bash(head -n 432 src/pages/alta-expediente.html)",
+      "Bash(tail -n +649 src/pages/alta-expediente.html)"
     ]
   }
 }
