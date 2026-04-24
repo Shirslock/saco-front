@@ -31,8 +31,51 @@ tailwind.config = {
   body { font-family:'Inter',sans-serif; }
   h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
   .shadow-card { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
-  .exp-row { transition: background 0.12s; }
-  .exp-row:hover { background: #f0f7f8; }
+
+  /* Causa row */
+  .causa-row { cursor:pointer; }
+  .causa-row:hover td { background:#e2eff5; }
+
+  /* Expediente row */
+  .exp-row { transition: background 0.1s; }
+  .exp-row:hover td { background:#f0f7f8; }
+
+  /* Child row (dentro de causa) */
+  .child-row td { background:#fafcfd; }
+  .child-row:hover td { background:#f0f7f8; }
+
+  /* Animación apertura */
+  @keyframes slideDown {
+    from { opacity:0; transform:translateY(-4px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .child-row { animation: slideDown 0.15s ease-out both; }
+
+  /* Conector visual hijo */
+  .child-connector {
+    position: relative;
+  }
+  .child-connector::before {
+    content:'';
+    position:absolute;
+    left:28px;
+    top:0;
+    bottom:50%;
+    width:2px;
+    background:#bcc0c9;
+  }
+  .child-connector::after {
+    content:'';
+    position:absolute;
+    left:28px;
+    top:50%;
+    width:14px;
+    height:2px;
+    background:#bcc0c9;
+  }
+  .child-connector-last::before {
+    bottom:50%;
+  }
 </style>
 </head>
 <body class="bg-[#f0f7f8] text-[#1b3a5c]">
@@ -47,14 +90,16 @@ tailwind.config = {
   <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
     <div>
       <h2 class="font-headline text-3xl font-extrabold tracking-tight text-[#1b3a5c] mb-1">Mi Bandeja</h2>
-      <p class="text-[#4f6080] text-sm" id="subtitle">Gestionando <strong id="total-count">5</strong> expedientes activos.</p>
+      <div class="flex items-center gap-3 mt-1.5">
+        <p class="text-[#4f6080] text-sm" id="subtitle">Gestionando <strong id="total-count">0</strong> expedientes activos.</p>
+      </div>
     </div>
     <div class="flex bg-[#f0f7f8] p-1 rounded-xl shadow-inner gap-1">
       <button onclick="setTab('activos')"   id="tab-activos"   class="tab-btn px-5 py-2 bg-surface-container-lowest text-[#256386] font-bold rounded-lg shadow-sm text-sm">Activos</button>
       <button onclick="setTab('cumplidos')" id="tab-cumplidos" class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors">Cumplidos</button>
       <button onclick="setTab('urgentes')"  id="tab-urgentes"  class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors flex items-center gap-1">
         Urgentes
-        <span class="w-4 h-4 bg-[#cd5055] text-white text-[9px] font-black rounded-full flex items-center justify-center">2</span>
+        <span id="urgentes-badge" class="w-4 h-4 bg-[#cd5055] text-white text-[9px] font-black rounded-full flex items-center justify-center">0</span>
       </button>
     </div>
   </div>
@@ -64,75 +109,113 @@ tailwind.config = {
     <!-- ── Filtros ──────────────────────────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-3 space-y-5">
 
-      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
-        <div class="relative mb-4">
+      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5 space-y-4">
+
+        <!-- Búsqueda -->
+        <div class="relative">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
-          <input id="search-input" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-[#256386]/20" placeholder="Carátula, N° causa..."/>
+          <input id="search-input" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Carátula, N° causa..."/>
         </div>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Área</h3>
-        <div id="area-filter-list" class="space-y-1 mb-5"></div>
+        <!-- Tipo de gestión -->
+        <div>
+          <label class="block text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-2">Tipo de gestión</label>
+          <select id="f-tipo" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">Todos</option>
+          </select>
+        </div>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Urgencia</h3>
-        <div class="space-y-1">
-          <label class="flex items-center gap-3 p-2 hover:bg-surface-container-low rounded-lg cursor-pointer">
-            <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-[#cd5055] focus:ring-error"/>
-            <span class="text-sm text-[#4f6080] flex items-center gap-2">
-              <span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
-              Con alerta activa
-            </span>
-          </label>
+        <!-- Estado -->
+        <div>
+          <label class="block text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-2">Estado</label>
+          <select id="f-estado" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <!-- Alerta -->
+        <label class="flex items-center gap-3 p-2.5 bg-[#f0f7f8] hover:bg-[#fee2e2]/30 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-[#cd5055]/20">
+          <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-[#cd5055] focus:ring-error"/>
+          <span class="text-sm text-[#4f6080] flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
+            Solo con alerta activa
+          </span>
+        </label>
+
+        <!-- Limpiar -->
+        <button onclick="limpiarFiltrosBandeja()" class="w-full py-2 text-[10px] font-bold text-[#4f6080] hover:text-[#256386] border border-dashed border-[#bcc0c9] rounded-lg hover:border-[#256386]/40 transition-all">
+          Limpiar filtros
+        </button>
+
+        <!-- Filtro Letrado: oculto en bandeja propia, visible en bandejas globales -->
+        <div id="filter-letrado-wrap" class="hidden">
+          <label class="block text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-2">Letrado</label>
+          <select id="f-letrado" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">Todos</option>
+          </select>
         </div>
       </div>
 
       <!-- Docs rápidos -->
       <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Documentos GDE recientes</h3>
-        <div id="docs-gde-list" class="space-y-2"></div>
+        <div class="space-y-2">
+          <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
+            <p class="font-mono text-[10px] text-[#256386] font-bold">EX-2023-08842</p>
+            <p class="text-[11px] text-[#4f6080]">Martínez - Pericial</p>
+          </div>
+          <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
+            <p class="font-mono text-[10px] text-[#256386] font-bold">ME-2026-00441</p>
+            <p class="text-[11px] text-[#4f6080]">Recupero - SGSySL</p>
+          </div>
+          <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
+            <p class="font-mono text-[10px] text-[#256386] font-bold">EX-2026-00449</p>
+            <p class="text-[11px] text-[#4f6080]">García - Laboral</p>
+          </div>
+        </div>
       </div>
-
     </div>
 
-    <!-- ── Tabla de expedientes ──────────────────────────────────────────── -->
+    <!-- ── Tabla ──────────────────────────────────────────────────────────── -->
     <div class="col-span-12 lg:col-span-9">
 
       <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
-        <!-- Tabla header -->
         <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
-          <p class="text-xs text-[#4f6080]"><span id="showing-count">5</span> expedientes</p>
-          <div class="flex gap-2">
-            <button onclick="sortBy('fecha_recepcion')" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
-              <span class="material-symbols-outlined text-[14px]">sort</span>Fecha
+          <p class="text-xs text-[#4f6080]"><span id="showing-count">0</span> elementos</p>
+          <div class="flex gap-3">
+            <button onclick="expandAll()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">unfold_more</span>Expandir todo
             </button>
-            <button onclick="sortBy('area')" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
-              Área
+            <button onclick="collapseAll()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">unfold_less</span>Colapsar
             </button>
           </div>
         </div>
 
         <table class="w-full text-left border-collapse">
-          <thead>
+          <thead class="border-b-2 border-[#dde6ec]">
             <tr class="bg-[#f0f7f8]">
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
-              <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
-              <th class="px-6 py-3.5"></th>
+              <th class="px-4 py-3.5 w-10"></th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa / Exp</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
+              <th id="th-letrado" class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
+              <th class="px-4 py-3.5"></th>
             </tr>
           </thead>
-          <tbody id="exp-tbody" class="divide-y divide-outline-variant/5"></tbody>
+          <tbody id="exp-tbody" class="divide-y divide-[#bcc0c9]/20"></tbody>
         </table>
 
         <!-- Paginación -->
         <div class="px-6 py-4 border-t border-[#bcc0c9]/40 flex justify-between items-center">
-          <p class="text-xs text-[#4f6080]">Página 1 de 2</p>
+          <p class="text-xs text-[#4f6080]">Página 1 de 1</p>
           <div class="flex gap-1">
             <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container disabled:opacity-30 transition-colors" disabled>
               <span class="material-symbols-outlined text-[16px]">chevron_left</span>
             </button>
             <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#256386] text-white font-bold text-xs">1</button>
-            <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container font-medium text-xs transition-colors">2</button>
             <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
               <span class="material-symbols-outlined text-[16px]">chevron_right</span>
             </button>
@@ -149,6 +232,9 @@ tailwind.config = {
 <script src="../components/sync.js"></script>
 <script src="../components/shared.js"></script>
 <script>
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT USER
+// ─────────────────────────────────────────────────────────────────────────────
 (function initUser() {
   const u = SACO_SYNC.getCurrentUser();
   if (u) window.SACO.CURRENT_USER = u;
@@ -157,7 +243,12 @@ tailwind.config = {
 document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('bandeja-abogado');
 document.getElementById('topbar-mount').innerHTML  = SACO_UI.renderTopbar('Mi Bandeja', 'Mi Bandeja');
 
-function getExpedientesFiltrados() {
+// ─────────────────────────────────────────────────────────────────────────────
+// MODELO DE DATOS: agrupar expedientes en causas
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Expedientes del usuario actual
+function getExpedientesDelUsuario() {
   const u = window.SACO.CURRENT_USER;
   if (!u) return [...window.SACO.EXPEDIENTES_ABOGADO];
   const accesos = window.SACO.getAccesos(u);
@@ -165,21 +256,55 @@ function getExpedientesFiltrados() {
   return window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.abogado === u.nombre);
 }
 
-function updateSubtitle() {
-  const u = window.SACO.CURRENT_USER;
-  const subtitleEl = document.getElementById('subtitle');
-  if (!subtitleEl) return;
-  const total = getExpedientesFiltrados().length;
-  if (u && window.SACO.getAccesos(u).verTodaBandeja) {
-    subtitleEl.innerHTML = `Visualizando <strong id="total-count">${total}</strong> expedientes activos de todo el equipo.`;
-  } else {
-    subtitleEl.innerHTML = `Gestionando <strong id="total-count">${total}</strong> expedientes activos.`;
-  }
+// Construir ítems de bandeja:
+// Cada ítem es: { kind:'causa', numeroCausa, expedientes:[] } | { kind:'suelto', exp }
+function construirItemsBandeja(expedientes) {
+  const causaMap = {}; // numeroCausa -> [expedientes]
+  const sueltos  = [];
+
+  expedientes.forEach(e => {
+    const nc = (e.numero_causa || '').trim();
+    if (nc && nc.toUpperCase() !== 'SS SOFSE') {
+      if (!causaMap[nc]) causaMap[nc] = [];
+      causaMap[nc].push(e);
+    } else {
+      sueltos.push(e);
+    }
+  });
+
+  const items = [];
+
+  // Causas con > 1 expediente → agrupador
+  // Causas con 1 solo expediente → también agrupador (puede crecer)
+  Object.entries(causaMap).forEach(([nc, exps]) => {
+    items.push({ kind: 'causa', numeroCausa: nc, expedientes: exps });
+  });
+
+  // Sueltos
+  sueltos.forEach(e => items.push({ kind: 'suelto', exp: e }));
+
+  return items;
 }
 
-let data = getExpedientesFiltrados();
-let currentTab = 'activos';
+// ─────────────────────────────────────────────────────────────────────────────
+// ESTADO
+// ─────────────────────────────────────────────────────────────────────────────
+let currentTab   = 'activos';
+let expandedCausas = new Set(); // set de numeroCausa expandidas
+let allItems     = [];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COLORES
+// ─────────────────────────────────────────────────────────────────────────────
+const areaColors = {
+  CIVIL:   'bg-primary-container/60 text-[#1b3a5c]',
+  LABORAL: 'bg-[#dbeafe] text-[#1e3a5f]',
+  PENAL:   'bg-[#e0e7ef] text-[#3a4f6a]',
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────────────────────────────────────
 function setTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => {
@@ -189,105 +314,336 @@ function setTab(tab) {
   applyFilters();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FILTROS Y RENDER
+// ─────────────────────────────────────────────────────────────────────────────
 function applyFilters() {
-  const search = document.getElementById('search-input').value.toLowerCase();
+  const search  = document.getElementById('search-input').value.toLowerCase();
+  const tipo    = document.getElementById('f-tipo')?.value || '';
+  const estado  = document.getElementById('f-estado')?.value || '';
   const urgente = document.getElementById('f-urgente').checked;
+  const letrado = document.getElementById('f-letrado')?.value || '';
+  const exps    = getExpedientesDelUsuario();
 
-  let filtered = getExpedientesFiltrados().filter(e => {
-    if (currentTab === 'cumplidos' && e.estado !== 'CUMPLIDO') return false;
-    if (currentTab === 'urgentes' && e.prioridad !== 'ALTA') return false;
-    if (currentTab === 'activos' && e.estado === 'CUMPLIDO') return false;
-    if (search && !e.caratula.toLowerCase().includes(search) && !e.id.toLowerCase().includes(search) && !(e.numero_causa||'').toLowerCase().includes(search)) return false;
-    if (urgente && !e.tiene_alerta) return false;
+  // Filtrar expedientes individuales
+  const filtrados = exps.filter(e => {
+    if (currentTab === 'cumplidos' && e.estado !== 'CUMPLIDO')           return false;
+    if (currentTab === 'urgentes'  && e.prioridad !== 'ALTA')            return false;
+    if (currentTab === 'activos'   && e.estado === 'CUMPLIDO')           return false;
+    if (tipo   && e.tipo !== tipo)                                        return false;
+    if (estado && e.estado !== estado)                                    return false;
+    if (urgente && !e.tiene_alerta)                                       return false;
+    if (letrado && e.abogado !== letrado)                                 return false;
+    if (search && !e.caratula.toLowerCase().includes(search) &&
+        !e.id.toLowerCase().includes(search) &&
+        !(e.numero_causa||'').toLowerCase().includes(search))             return false;
     return true;
   });
 
-  data = filtered;
-  renderTabla(data);
-  document.getElementById('showing-count').textContent = data.length;
-  document.getElementById('total-count').textContent = filtered.length;
+  allItems = construirItemsBandeja(filtrados);
+
+  // Contar urgentes para badge
+  const urgentes = exps.filter(e => e.tiene_alerta && e.estado !== 'CUMPLIDO');
+  document.getElementById('urgentes-badge').textContent = urgentes.length;
+
+  renderTabla(allItems);
+  updateSubtitle(filtrados);
 }
 
-function sortBy(field) {
-  data.sort((a,b) => (a[field]||'').localeCompare(b[field]||''));
-  renderTabla(data);
+function updateSubtitle(filtrados) {
+  const u       = window.SACO.CURRENT_USER;
+  const accesos = u ? window.SACO.getAccesos(u) : null;
+  const total   = filtrados.length;
+  document.getElementById('total-count').textContent = total;
+  if (accesos && accesos.verTodaBandeja) {
+    document.getElementById('subtitle').innerHTML = `Visualizando <strong>${total}</strong> expedientes activos de todo el equipo.`;
+  }
+  // Actualizar pill de identidad
+  renderUserIdentityPill(u);
 }
 
-const areaColors = {
-  CIVIL:   'bg-primary-container/60 text-[#1b3a5c]',
-  LABORAL: 'bg-[#dbeafe] text-[#1e3a5f]',
-  PENAL:   'bg-[#e0e7ef] text-[#3a4f6a]',
-};
+function renderUserIdentityPill(u) {
+  const pill   = document.getElementById('user-identity-pill');
+  const avatar = document.getElementById('uid-avatar');
+  const nombre = document.getElementById('uid-nombre');
+  const badge  = document.getElementById('uid-area-badge');
+  if (!pill || !u) return;
+  const areaColors = { CIVIL:'bg-[#c5e0ea] text-[#1b3a5c]', LABORAL:'bg-[#dbeafe] text-[#1e3a5f]', PENAL:'bg-[#e0e7ef] text-[#3a4f6a]' };
+  pill.classList.remove('hidden');
+  pill.classList.add('flex');
+  avatar.textContent = u.iniciales;
+  nombre.textContent = u.nombre.replace(/^Dr\. |^Dra\. /, '');
+  if (u.area) {
+    badge.textContent = u.area;
+    badge.className = `text-[9px] font-black px-1.5 py-0.5 rounded ${areaColors[u.area] || 'bg-[#e2eff5] text-[#4f6080]'}`;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
 
-function renderTabla(rows) {
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER TABLA
+// ─────────────────────────────────────────────────────────────────────────────
+// showAbogado: false en bandeja propia, true en bandejas globales (área)
+const SHOW_ABOGADO = false; // ← cambiar a true en area-civil/laboral/penal
+
+function renderTabla(items) {
   const tbody = document.getElementById('exp-tbody');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros.</td></tr>`;
+  document.getElementById('showing-count').textContent = items.length;
+
+  if (!items.length) {
+    const colspan = SHOW_ABOGADO ? 8 : 7;
+    tbody.innerHTML = `<tr><td colspan="${colspan}" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros.</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map(e => `
-    <tr class="exp-row cursor-pointer" onclick="verDetalle('${e.id}')">
-      <td class="px-6 py-4">
-        <div class="flex items-center gap-2">
-          ${e.tiene_alerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[14px]" style="font-variation-settings:'FILL' 1;" title="${e.alerta_msg}">warning</span>` : ''}
-          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
+
+  let html = '';
+  items.forEach(item => {
+    if (item.kind === 'causa') {
+      html += renderCausaRow(item, SHOW_ABOGADO);
+    } else {
+      html += renderExpedienteRow(item.exp, false, false, SHOW_ABOGADO);
+    }
+  });
+
+  tbody.innerHTML = html;
+}
+
+// ── Fila de causa agrupadora ──────────────────────────────────────────────
+function renderCausaRow(item, showAbogado = false) {
+  const nc        = item.numeroCausa;
+  const exps      = item.expedientes;
+  const expanded  = expandedCausas.has(nc);
+  const hasAlerta = exps.some(e => e.tiene_alerta);
+  const areas     = [...new Set(exps.map(e => e.area))];
+  // En bandeja global podría haber distintos abogados en la misma causa
+  const abogados  = [...new Set(exps.map(e => e.abogado))];
+
+  let html = `
+    <tr class="causa-row bg-[#e8f0f5] border-l-4 border-[#256386]/30 hover:border-[#256386]/60 transition-all" onclick="toggleCausa('${nc.replace(/'/g, "\\'")}')">
+      <td class="px-4 py-3.5">
+        <div class="w-7 h-7 flex items-center justify-center rounded-lg ${expanded ? 'bg-[#256386] text-white' : 'bg-[#c5e0ea] text-[#256386]'} transition-colors">
+          <span class="material-symbols-outlined text-[16px] transition-transform duration-200" style="${expanded ? 'transform:rotate(90deg)' : ''}">chevron_right</span>
         </div>
-        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold mt-1 inline-block ${areaColors[e.area]||''}">${e.area}</span>
       </td>
-      <td class="px-6 py-4 max-w-xs">
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-2">
+          ${hasAlerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[14px] flex-shrink-0" style="font-variation-settings:'FILL' 1;">warning</span>` : ''}
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#256386] text-[16px]" style="font-variation-settings:'FILL' 1;">folder</span>
+              <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
+            </div>
+            <p class="text-[10px] text-[#4f6080] mt-0.5">${exps.length} expediente${exps.length !== 1 ? 's' : ''} vinculado${exps.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3.5">
+        <div class="flex flex-wrap gap-1.5">
+          ${areas.map(a => `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${areaColors[a]||''}">${a}</span>`).join('')}
+        </div>
+        ${hasAlerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-1">${exps.find(e=>e.tiene_alerta)?.alerta_msg || ''}</p>` : ''}
+      </td>
+      <td class="px-4 py-3.5">
+        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#256386]/10 text-[#256386]">
+          <span class="material-symbols-outlined text-[11px]">link</span>
+          Causa judicial
+        </span>
+      </td>
+      ${showAbogado ? `
+      <td class="px-4 py-3.5">
+        ${abogados.length === 1
+          ? `<span class="text-xs text-[#1b3a5c]">${abogados[0].replace(/^Dr\. |^Dra\. /,'')}</span>`
+          : abogados.map(a => `<p class="text-[10px] text-[#4f6080]">${a.replace(/^Dr\. |^Dra\. /,'')}</p>`).join('')
+        }
+      </td>` : ''}
+      <td class="px-4 py-3.5"></td>
+      <td class="px-4 py-3.5"></td>
+      <td class="px-4 py-3.5 text-right">
+        <button onclick="event.stopPropagation()" class="text-[11px] font-bold text-[#256386] hover:underline">Ver todo</button>
+      </td>
+    </tr>`;
+
+  if (expanded) {
+    exps.forEach((exp, i) => {
+      html += renderExpedienteRow(exp, true, i === exps.length - 1, showAbogado);
+    });
+  }
+
+  return html;
+}
+
+// ── Fila de expediente (suelto o hijo de causa) ────────────────────────────
+function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = false) {
+  const sinCausa = !e.numero_causa || e.numero_causa.trim() === '' || e.numero_causa.trim().toUpperCase() === 'SS SOFSE';
+  const nombreCorto = (e.abogado || '').replace(/^Dr\. |^Dra\. /, '');
+
+  return `
+    <tr class="${isChild ? 'child-row' : 'exp-row'} cursor-pointer ${isChild ? 'border-l-4 border-[#256386]/10' : ''}" onclick="verDetalle('${e.id}')">
+      <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}">
+        ${isChild ? `
+          <div class="absolute left-4 top-0 bottom-0 w-px bg-[#bcc0c9]" ${isLast ? 'style="bottom:50%"' : ''}></div>
+          <div class="absolute left-4 top-1/2 w-3.5 h-px bg-[#bcc0c9]"></div>
+          <div class="w-6 h-6 flex items-center justify-center relative ml-3">
+            ${e.tiene_alerta
+              ? `<span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>`
+              : `<span class="material-symbols-outlined text-[#4f6080] text-[16px]">description</span>`
+            }
+          </div>` : `
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg ${e.tiene_alerta ? 'bg-[#fee2e2]' : 'bg-[#f0f7f8]'}">
+            ${e.tiene_alerta
+              ? `<span class="material-symbols-outlined text-[#cd5055] text-[18px]" style="font-variation-settings:'FILL' 1;">warning</span>`
+              : `<span class="material-symbols-outlined text-[#4f6080] text-[18px]">description</span>`
+            }
+          </div>`}
+      </td>
+      <td class="px-4 py-3.5">
+        <div class="flex flex-col gap-0.5">
+          <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded font-bold w-fit ${areaColors[e.area]||''}">${e.area}</span>
+          ${sinCausa ? `
+            <button onclick="event.stopPropagation();abrirModalVincularCausa('${e.id}')"
+              class="mt-0.5 text-[9px] font-bold text-[#3a70a9] flex items-center gap-0.5 hover:underline">
+              <span class="material-symbols-outlined text-[11px]">link_off</span>Sin causa · Vincular
+            </button>` : ''}
+        </div>
+      </td>
+      <td class="px-4 py-3.5 max-w-xs">
         <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
         <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa||''}</p>
         ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-1">${e.alerta_msg}</p>` : ''}
       </td>
-      <td class="px-6 py-4 text-xs text-[#4f6080] font-medium">${e.tipo.replace(/_/g,' ')}</td>
-      <td class="px-6 py-4">${SACO_UI.estadoBadge(e.estado, e.estado.replace(/_/g,' '))}</td>
-      <td class="px-6 py-4 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
-      <td class="px-6 py-4">
-        <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-[#256386] hover:text-[#256386]-dim font-bold text-xs uppercase tracking-tight transition-colors">
+      <td class="px-4 py-3.5 text-xs text-[#4f6080] font-medium">${(e.tipo||'').replace(/_/g,' ')}</td>
+      ${showAbogado ? `
+      <td class="px-4 py-3.5">
+        <span class="text-xs text-[#1b3a5c]">${nombreCorto}</span>
+      </td>` : ''}
+      <td class="px-4 py-3.5">${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
+      <td class="px-4 py-3.5">
+        <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-[#256386] hover:text-primary-dim font-bold text-xs uppercase tracking-tight transition-colors">
           Abrir
         </button>
       </td>
-    </tr>`).join('');
+    </tr>`;
 }
 
 function verDetalle(id) {
   window.location.href = `detalle-expediente.html?id=${id}`;
 }
 
-function renderAreaFilter() {
-  document.getElementById('area-filter-list').innerHTML = [
-    ['TODAS','Todos','12'],['CIVIL','Civil','12'],['LABORAL','Laboral','8'],['PENAL','Penal','4']
-  ].map(([v,l,n]) => `
-  <label class="flex items-center gap-3 p-2 hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer group">
-    <div id="ck-${v}" class="w-4 h-4 rounded border-2 ${v==='TODAS'?'border-primary bg-[#256386] flex items-center justify-center':'border-outline-variant group-hover:border-primary transition-colors'}">
-      ${v==='TODAS'?'<span class="material-symbols-outlined text-[10px] text-white" style="font-variation-settings:\'FILL\' 1;">check</span>':''}
-    </div>
-    <span class="text-sm font-${v==='TODAS'?'semibold':'medium'} text-${v==='TODAS'?'on-surface':'on-surface-variant'} group-hover:text-[#1b3a5c]">${l}</span>
-    <span class="ml-auto text-[10px] px-1.5 py-0.5 bg-[#e2eff5] text-[#4f6080] rounded-md">${n}</span>
-  </label>`).join('');
+// ─────────────────────────────────────────────────────────────────────────────
+// TOGGLE CAUSA
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleCausa(nc) {
+  if (expandedCausas.has(nc)) expandedCausas.delete(nc);
+  else expandedCausas.add(nc);
+  renderTabla(allItems);
 }
 
-function renderDocsGDE() {
-  document.getElementById('docs-gde-list').innerHTML = [
-    ['EX-2023-08842','Martínez - Pericial'],
-    ['ME-2026-00441','Recupero - SGSySL'],
-    ['EX-2026-00449','García - Laboral'],
-  ].map(([ref,desc]) => `
-  <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
-    <p class="font-mono text-[10px] text-[#256386] font-bold">${ref}</p>
-    <p class="text-[11px] text-[#4f6080] mt-0.5">${desc}</p>
-  </div>`).join('');
+function expandAll() {
+  allItems.forEach(item => {
+    if (item.kind === 'causa') expandedCausas.add(item.numeroCausa);
+  });
+  renderTabla(allItems);
 }
 
-// Init
-renderAreaFilter();
-renderDocsGDE();
-renderTabla(data);
-updateSubtitle();
+function collapseAll() {
+  expandedCausas.clear();
+  renderTabla(allItems);
+}
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MODAL: VINCULAR CAUSA (expediente suelto → asignar número de causa)
+// ─────────────────────────────────────────────────────────────────────────────
+function abrirModalVincularCausa(expId) {
+  const exp = window.SACO.getExpedienteById(expId);
+  if (!exp) return;
+
+  // Causas existentes en la bandeja del usuario
+  const exps       = getExpedientesDelUsuario();
+  const causasExistentes = [...new Set(
+    exps.filter(e => e.numero_causa && e.numero_causa.trim() && e.numero_causa.toUpperCase() !== 'SS SOFSE')
+        .map(e => e.numero_causa.trim())
+  )];
+
+  SACO_UI.showModal('Asignar N° de Causa', `
+    <div class="space-y-4">
+      <div class="p-3 bg-[#f0f7f8] rounded-xl">
+        <p class="text-xs font-bold text-[#1b3a5c]">${exp.id}</p>
+        <p class="text-xs text-[#4f6080] mt-0.5 line-clamp-2">${exp.caratula}</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">N° de Causa Judicial</label>
+        <input id="modal-causa-input" oninput="onModalCausaInput(this.value)"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          placeholder="FSM-XXXXX/2026"/>
+        <p class="text-[10px] text-[#4f6080] mt-1">Ingresá el número tal como figura en el expediente judicial.</p>
+      </div>
+
+      ${causasExistentes.length ? `
+        <div>
+          <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">O seleccioná una causa existente en tu bandeja</p>
+          <div class="space-y-1.5 max-h-36 overflow-y-auto">
+            ${causasExistentes.map(nc => `
+              <button onclick="document.getElementById('modal-causa-input').value='${nc}';onModalCausaInput('${nc}')"
+                class="w-full text-left p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#256386] text-[14px]">folder</span>
+                <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
+              </button>`).join('')}
+          </div>
+        </div>` : ''}
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg">Cancelar</button>
+     <button onclick="confirmarVincularCausa('${expId}')" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Asignar Causa</button>`
+  );
+}
+
+function onModalCausaInput(valor) {
+  // noop — podría usarse para preview en tiempo real
+}
+
+function confirmarVincularCausa(expId) {
+  const nc  = (document.getElementById('modal-causa-input').value || '').trim();
+  if (!nc) { SACO_UI.showToast('Ingresá un número de causa.', 'warn'); return; }
+
+  const exp = window.SACO.getExpedienteById(expId);
+  if (!exp) return;
+
+  // Chequear si ya existe esa causa con otro abogado → asignar el mismo abogado
+  const exps = window.SACO.EXPEDIENTES_ABOGADO;
+  const conMismaCausa = exps.filter(e => e.id !== expId && (e.numero_causa||'').trim() === nc);
+  if (conMismaCausa.length) {
+    // En un sistema real se asignaría automáticamente al mismo letrado
+    SACO_UI.showToast(`Causa ${nc} ya existe. El expediente quedará bajo el mismo agrupador.`, 'info');
+  }
+
+  exp.numero_causa = nc;
+  SACO_UI.closeModal();
+  applyFilters();
+  SACO_UI.showToast(`N° de causa ${nc} asignado a ${expId}.`, 'success');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIMPIAR FILTROS
+// ─────────────────────────────────────────────────────────────────────────────
+function limpiarFiltrosBandeja() {
+  document.getElementById('search-input').value = '';
+  const tipo = document.getElementById('f-tipo');
+  const estado = document.getElementById('f-estado');
+  if (tipo)   tipo.value   = '';
+  if (estado) estado.value = '';
+  document.getElementById('f-urgente').checked = false;
+  applyFilters();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SYNC
+// ─────────────────────────────────────────────────────────────────────────────
 SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'EXPEDIENTE_ASIGNADO' || type === 'ESTADO_CAMBIADO') {
-    data = getExpedientesFiltrados();
     applyFilters();
     SACO_UI.showToast('Bandeja actualizada desde otra pestaña.', 'info');
   }
@@ -295,19 +651,74 @@ SACO_SYNC.syncListen(({ type, payload }) => {
     if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
     document.getElementById('sidebar-mount').innerHTML = SACO_UI.renderSidebar('bandeja-abogado');
     if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
-    data = getExpedientesFiltrados();
     applyFilters();
-    updateSubtitle();
   }
 });
 
-// Aplicar offset correcto del sidebar al cargar
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Poblar selects de filtro con valores reales de los datos del usuario
+(function initFiltrosDinamicos() {
+  const exps = getExpedientesDelUsuario();
+
+  const tipoSel  = document.getElementById('f-tipo');
+  const estadoSel = document.getElementById('f-estado');
+
+  // Tipos únicos
+  const tipos = [...new Set(exps.map(e => e.tipo).filter(Boolean))].sort();
+  tipos.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t.replace(/_/g, ' ');
+    tipoSel.appendChild(opt);
+  });
+
+  // Estados únicos
+  const estados = [...new Set(exps.map(e => e.estado).filter(Boolean))].sort();
+  estados.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s.replace(/_/g, ' ');
+    estadoSel.appendChild(opt);
+  });
+})();
+
+// Configurar columna y filtro de letrado según modo
+(function initLetradoMode() {
+  const thLetrado     = document.getElementById('th-letrado');
+  const filterWrap    = document.getElementById('filter-letrado-wrap');
+  const letradoSelect = document.getElementById('f-letrado');
+
+  if (SHOW_ABOGADO) {
+    // Bandejas globales: mostrar columna + filtro poblado
+    if (thLetrado)  thLetrado.classList.remove('hidden');
+    if (filterWrap) filterWrap.classList.remove('hidden');
+    // Poblar select con los abogados presentes en los datos
+    const abogados = [...new Set(window.SACO.EXPEDIENTES_ABOGADO.map(e => e.abogado))].sort();
+    abogados.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      letradoSelect.appendChild(opt);
+    });
+  } else {
+    // Bandeja propia: ocultar columna y filtro
+    if (thLetrado)  thLetrado.classList.add('hidden');
+    if (filterWrap) filterWrap.classList.add('hidden');
+  }
+})();
+
+applyFilters();
+
+// Aplicar offset sidebar
 (function applyInitialSidebarOffset() {
   try {
-    var collapsed = localStorage.getItem('saco_sidebar_collapsed') === '1';
-    var ml = collapsed ? '52px' : '256px';
-    var main   = document.getElementById('main-content');
-    var topbar = document.getElementById('topbar-content');
+    const collapsed = localStorage.getItem('saco_sidebar_collapsed') === '1';
+    const ml = collapsed ? '52px' : '256px';
+    const main   = document.getElementById('main-content');
+    const topbar = document.getElementById('topbar-content');
     if (main)   main.style.marginLeft = ml;
     if (topbar) topbar.style.left     = ml;
   } catch(e) {}
