@@ -103,21 +103,23 @@ tailwind.config = {
             </button>
           </div>
         </div>
-        <table class="w-full text-left border-collapse">
-          <thead class="bg-[#f0f7f8] border-b-2 border-[#dde6ec]">
-            <tr>
-              <th class="px-4 py-3.5 w-10"></th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa / Exp</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
-              <th class="px-4 py-3.5"></th>
-            </tr>
-          </thead>
-          <tbody id="penal-tbody" class="divide-y divide-[#bcc0c9]/20"></tbody>
-        </table>
+        <div class="overflow-x-auto w-full">
+          <table class="w-full text-left border-collapse min-w-[850px]"> 
+            <thead class="bg-[#f0f7f8] border-b-2 border-[#dde6ec]">
+              <tr>
+                <th class="px-4 py-3.5 w-10"></th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa / Exp</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
+                <th class="px-4 py-3.5"></th>
+              </tr>
+            </thead>
+            <tbody id="penal-tbody" class="divide-y divide-[#bcc0c9]/20"></tbody>
+          </table>
+        </div>
       </div>
 
     </div>
