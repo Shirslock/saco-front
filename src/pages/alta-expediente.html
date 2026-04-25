@@ -50,7 +50,7 @@ tailwind.config = {
 <div id="sidebar-mount"></div>
 <div id="topbar-mount"></div>
 
-<main id="main-content" class="min-h-screen transition-all duration-200" style="padding-top:64px;margin-left:256px">
+<main class="ml-64 min-h-screen" style="padding-top:64px">
 <div class="px-10 py-8 max-w-[1400px] mx-auto">
 
   <!-- Header -->
@@ -127,13 +127,13 @@ tailwind.config = {
         </div>
       </div>
 
-      <!-- ── Sección 2: Campos Mesa SACO (dinámicos por tipo) ──────────────── -->
+      <!-- ── Sección 2: Campos dinámicos ────────────────────────────────── -->
       <div id="dynamic-section" class="hidden saco-card">
         <div class="flex items-center gap-3 mb-6">
           <div class="step-badge bg-[#c5e0ea] text-[#256386]">2</div>
-          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Datos del Ingreso</h3>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Detalles del Caso</h3>
         </div>
-        <div id="campos-mesa" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+        <div id="dynamic-form" class="space-y-5"></div>
       </div>
 
       <!-- ── Sección 3: Asignación ───────────────────────────────────────── -->
@@ -282,154 +282,228 @@ tailwind.config = {
 
 <script>
 
-// ── Renderizado de campos por tipo de campo (objeto, no clave) ────────────────
-function renderCampoField(f) {
-  const colClass = f.full ? 'col-span-2' : '';
+/**
+ * Renderiza un campo individual dado su fieldKey (string).
+ * Devuelve un string de HTML.
+ *
+ * @param {string} fieldKey  - clave en FIELD_DEFINITIONS
+ * @param {boolean} fullWidth - true si debe ocupar col-span-2
+ * @returns {string} HTML
+ */
+function renderField(fieldKey, fullWidth = false) {
+  const def = window.SACO.FIELD_DEFINITIONS[fieldKey];
+  if (!def) { console.warn('[SACO] Campo no definido:', fieldKey); return ''; }
 
-  switch (f.type) {
-    case 'text':
-    case 'causa': {
-      const oninput = f.type === 'causa' ? ' oninput="onNumeroCausaChange(this.value)"' : '';
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <input id="${f.id}" class="field-input${f.mono ? ' font-mono' : ''}" placeholder="${f.placeholder || ''}"${oninput}/>
-        ${f.hint ? `<p class="field-hint">${f.hint}</p>` : ''}
-      </div>`;
+  const colClass = fullWidth ? 'col-span-2' : '';
+  const hiddenClass = (def.hiddenByDefault || def.hidden) ? ' hidden' : '';
+  const id = def.id || fieldKey.replace(/_/g, '-');
+  const mono = def.mono ? ' font-mono' : '';
+
+  const labelSuffix = def.labelSuffix
+    ? `<span class="field-label-suffix">${def.labelSuffix}</span>`
+    : '';
+  const labelHTML = `<label class="field-label" for="${id}">${def.label}${labelSuffix}</label>`;
+
+  let inputHTML = '';
+
+  switch (def.type) {
+    case 'text': {
+      const oninput = def.onInput ? ` oninput="${def.onInput}"` : '';
+      inputHTML = `<input id="${id}" class="field-input${mono}" placeholder="${def.placeholder || ''}"${oninput}/>`;
+      if (def.hint) inputHTML += `<p class="field-hint">${def.hint}</p>`;
+      break;
     }
     case 'date': {
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <input id="${f.id}" type="date" class="field-input"/>
-      </div>`;
-    }
-    case 'money': {
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium">$</span>
-          <input id="${f.id}" class="field-input pl-7" placeholder="${f.placeholder || '0'}" oninput="formatCurrency(this)"/>
-        </div>
-      </div>`;
-    }
-    case 'textarea': {
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <textarea id="${f.id}" class="field-input resize-none" rows="3" placeholder="${f.placeholder || ''}"></textarea>
-      </div>`;
-    }
-    case 'boolean': {
-      const tid = `toggle-${f.id}`;
-      return `<div class="${colClass}">
-        <div class="flex items-center justify-between p-3 bg-[#f0f7f8] rounded-lg">
-          <label for="${tid}" class="text-xs font-medium text-[#1b3a5c] cursor-pointer flex-1">${f.label}</label>
-          <button type="button" id="${tid}" role="switch" aria-checked="false"
-            onclick="toggleCheckbox('${f.id}','${tid}')"
-            class="relative inline-flex h-5 w-9 items-center rounded-full bg-[#bcc0c9]/60 transition-colors flex-shrink-0">
-            <span class="sr-only">${f.label}</span>
-            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-0.5" id="${tid}-dot"></span>
-          </button>
-          <input type="hidden" id="${f.id}" value="false"/>
-        </div>
-      </div>`;
-    }
-    case 'linea': {
-      const opts = (window.SACO.LINEAS_FERROVIARIAS || []).map(l =>
-        `<option value="${l.code}">${l.label}</option>`
-      ).join('');
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <select id="${f.id}" class="field-input" onchange="onLineaChange()">
-          <option value="">— Sin línea asociada —</option>
-          ${opts}
-        </select>
-      </div>`;
-    }
-    case 'juzgado': {
-      const opts = (window.SACO.JUZGADOS || []).map(j =>
-        `<option value="${j.code}">${j.label}</option>`
-      ).join('');
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <select id="${f.id}" class="field-input">
-          <option value="">— Seleccioná juzgado —</option>
-          ${opts}
-        </select>
-      </div>`;
+      const today = def.defaultToday ? new Date().toISOString().split('T')[0] : '';
+      inputHTML = `<input id="${id}" class="field-input" type="date" value="${today}"/>`;
+      break;
     }
     case 'select': {
-      const opts = (f.options || []).map(o =>
-        `<option value="${o.value}">${o.label}</option>`
-      ).join('');
-      return `<div class="${colClass}">
-        <label class="field-label" for="${f.id}">${f.label}</label>
-        <select id="${f.id}" class="field-input">${opts}</select>
+      const onchange = def.onChange ? ` onchange="${def.onChange}"` : '';
+      const opts = (def.options || []).map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+      inputHTML = `<select id="${id}" class="field-input"${onchange}>${opts}</select>`;
+      break;
+    }
+    case 'select-dynamic': {
+      const onchange = def.onChange ? ` onchange="${def.onChange}"` : '';
+      const placeholder = def.placeholder ? `<option value="">${def.placeholder}</option>` : '';
+      const opts = (def.optionsFn ? def.optionsFn() : []).map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+      inputHTML = `<select id="${id}" class="field-input"${onchange}>${placeholder}${opts}</select>`;
+      break;
+    }
+    case 'textarea': {
+      const rows = def.rows || 3;
+      inputHTML = `<textarea id="${id}" class="field-input resize-none" rows="${rows}" placeholder="${def.placeholder || ''}"></textarea>`;
+      break;
+    }
+    case 'toggle-input': {
+      const toggleId = `toggle-${id}`;
+      inputHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <label for="${toggleId}" class="text-xs text-[#4f6080] font-medium cursor-pointer">
+            ${def.toggleLabel}
+          </label>
+
+          <button type="button"
+            id="${toggleId}"
+            role="switch"
+            aria-checked="false"
+            onclick="toggleSwitch('${id}', '${toggleId}')"
+            class="relative inline-flex h-5 w-9 items-center rounded-full bg-[#bcc0c9]/60 transition-colors">
+
+            <span class="sr-only">${def.toggleLabel}</span>
+
+            <span
+              class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-0.5"
+              id="${toggleId}-dot">
+            </span>
+          </button>
+        </div>
+
+        <input id="${id}" class="field-input${mono} hidden" placeholder="${def.placeholder || ''}"/>
+      `;
+      break;
+    }
+    case 'currency': {
+      inputHTML = `
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium">$</span>
+          <input id="${id}"
+            class="field-input pl-7"
+            placeholder="${def.placeholder || '0'}"
+            oninput="formatCurrency(this)"/>
+        </div>
+      `;
+      break;
+    }
+    case 'checkbox': {
+      // Render como toggle visual sin campo de texto asociado
+      const toggleId = `toggle-${id}`;
+      // Para checkbox simple no necesitamos labelHTML arriba — lo reemplazamos inline
+      return `<div class="${colClass}${hiddenClass}">
+        <div class="flex items-center justify-between p-3 bg-[#f0f7f8] rounded-lg">
+          <label for="${toggleId}" class="text-xs font-medium text-[#1b3a5c] cursor-pointer flex-1">${def.label}</label>
+          <button type="button"
+            id="${toggleId}"
+            role="switch"
+            aria-checked="false"
+            onclick="toggleCheckbox('${id}', '${toggleId}')"
+            class="relative inline-flex h-5 w-9 items-center rounded-full bg-[#bcc0c9]/60 transition-colors flex-shrink-0">
+            <span class="sr-only">${def.label}</span>
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-0.5" id="${toggleId}-dot"></span>
+          </button>
+          <input type="hidden" id="${id}" value="false"/>
+        </div>
       </div>`;
     }
     default:
+      console.warn('[SACO] Tipo de campo desconocido:', def.type);
       return '';
   }
+
+  return `<div class="${colClass}${hiddenClass}">${labelHTML}${inputHTML}</div>`;
 }
 
-// ── Renderiza los campos mesa[] del tipo activo ───────────────────────────────
-function renderCamposMesa(tipo, area) {
-  const campos = window.SACO.getCamposFormulario(tipo, 'mesa', area);
-  const container = document.getElementById('campos-mesa');
+/**
+ * Renderiza un bloque agrupado.
+ * @param {Object} group - { group, icon, color, fields, visibleWhenTipo? }
+ * @returns {string} HTML
+ */
+function renderGroup(group) {
+  // Si el grupo tiene visibilidad condicional por tipo, evaluar ahora
+  const isVisible = !group.visibleWhenTipo || state.tipo === group.visibleWhenTipo
+    || (group.visibleWhenTipo === 'DEMANDA' && ['DEMANDA_CIVIL','DEMANDA_LABORAL'].includes(state.tipo));
+  const hidden = isVisible ? '' : ' hidden';
+  const dataAttr = group.visibleWhenTipo ? ` data-visible-when-tipo="${group.visibleWhenTipo}"` : '';
 
-  if (!campos || campos.length === 0) {
-    container.innerHTML = `
-      <div class="col-span-2 p-4 bg-[#f0f7f8] rounded-xl flex items-center gap-3">
-        <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
-        <p class="text-sm text-[#1b3a5c]">La carátula se generará automáticamente con el tipo de gestión seleccionado.</p>
-      </div>`;
+  const fieldsHTML = group.fields.map(entry => {
+    const [fKey, modifier] = typeof entry === 'string' ? entry.split(':') : [null, null];
+    const isFull = modifier === 'full';
+    return renderField(fKey, isFull);
+  }).join('');
+
+  return `
+  <div class="col-span-2${hidden} field-group border-l-4 ${group.color}"${dataAttr}>
+    <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wide flex items-center gap-2 mb-4">
+      <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">${group.icon}</span>
+      ${group.group}
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${fieldsHTML}</div>
+  </div>`;
+}
+
+/**
+ * Renderiza el formulario dinámico completo según área y canal activos.
+ * Inserta el resultado en #dynamic-form.
+ */
+function renderDynamicForm() {
+  if (!state.area) return;
+
+  // Obtener la config correcta
+  let entries = [];
+  if (state.area === 'PENAL') {
+    entries = window.SACO.FORM_CONFIG.PENAL[state.canal] || [];
   } else {
-    container.innerHTML = campos.map(f => renderCampoField(f)).join('');
-    // Set hoy en campos date con defaultToday
-    campos.forEach(f => {
-      if (f.type === 'date' && f.defaultToday) {
-        const el = document.getElementById(f.id);
-        if (el && !el.value) el.value = new Date().toISOString().split('T')[0];
-      }
-    });
-    // Alerta duplicado junto al campo causa
-    const causaField = campos.find(f => f.type === 'causa');
-    if (causaField && !document.getElementById('alerta-causa-duplicada')) {
-      const el = document.getElementById(causaField.id);
-      if (el) {
-        el.parentElement.insertAdjacentHTML('afterend', `
-          <div id="alerta-causa-duplicada" class="hidden col-span-2 p-4 bg-amber-50 rounded-xl border border-amber-200">
-            <div class="flex items-start gap-3 mb-3">
-              <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
-              <div>
-                <p class="text-sm font-bold text-amber-800">N° de causa ya registrado en el sistema</p>
-                <p class="text-xs text-amber-700 mt-0.5">Existe al menos un expediente con ese número. Podés vincularlos al crear el nuevo.</p>
-              </div>
-            </div>
-            <div id="lista-duplicados" class="space-y-2 mb-3"></div>
-            <button id="btn-vincular-confirmado" class="hidden text-[11px] font-bold text-[#256386] flex items-center gap-1 hover:underline">
-              <span class="material-symbols-outlined text-[14px]">link</span> Vincular al crear
-            </button>
-          </div>`);
-      }
-    }
+    entries = window.SACO.FORM_CONFIG[state.area].common;
   }
 
+  // Renderizar
+  const html = entries.map(entry => {
+    if (typeof entry === 'object' && entry.group) {
+      return renderGroup(entry);
+    }
+    const [fieldKey, modifier] = entry.split(':');
+    const isFull = modifier === 'full';
+    return renderField(fieldKey, isFull);
+  }).join('');
+
+  document.getElementById('dynamic-form').innerHTML =
+    `<div class="grid grid-cols-1 md:grid-cols-2 gap-5">${html}</div>`;
+
+  // Restaurar fecha de recepción (defaultToday) — el input existe ahora
+  const fechaRecepEl = document.getElementById('fecha-recepcion');
+  if (fechaRecepEl && !fechaRecepEl.value) {
+    fechaRecepEl.value = new Date().toISOString().split('T')[0];
+  }
+
+  // Inicializar campos condicionales DESPUÉS de que el DOM existe
+  const tipoSolicitudEE   = document.getElementById('penal-tipo-solicitud-ee');
+  const tipoSolicitudMemo = document.getElementById('penal-tipo-solicitud-memo');
+  if (tipoSolicitudEE)   onTipoSolicitudChange(tipoSolicitudEE);
+  if (tipoSolicitudMemo) onTipoSolicitudChange(tipoSolicitudMemo);
+
+  // Re-evaluar grupos condicionales por tipo si ya hay uno seleccionado
+  if (state.tipo) {
+    document.querySelectorAll('[data-visible-when-tipo]').forEach(el => {
+      el.classList.toggle('hidden', state.tipo !== el.dataset.visibleWhenTipo);
+    });
+  }
+
+  // Mostrar secciones
   document.getElementById('dynamic-section').classList.remove('hidden');
   document.getElementById('asignacion-section').classList.remove('hidden');
   document.getElementById('docs-section').classList.remove('hidden');
   document.getElementById('actions-row').classList.remove('hidden');
-}
 
-// ── Recolecta valores de los campos mesa del tipo activo ──────────────────────
-function getCamposMesaValores(tipo, area) {
-  const campos = window.SACO.getCamposFormulario(tipo, 'mesa', area);
-  const valores = {};
-  campos.forEach(f => {
-    const el = document.getElementById(f.id);
-    if (el) valores[f.id] = el.value || '';
-  });
-  return valores;
+  // Inyectar alerta de N° causa duplicada junto al campo num-causa
+  const numCausaEl = document.getElementById('num-causa');
+  if (numCausaEl) {
+    const parentDiv = numCausaEl.parentElement;
+    if (parentDiv && !document.getElementById('alerta-causa-duplicada')) {
+      parentDiv.insertAdjacentHTML('afterend', `
+        <div id="alerta-causa-duplicada" class="hidden md:col-span-2 p-4 bg-amber-50 rounded-xl border border-amber-200">
+          <div class="flex items-start gap-3 mb-3">
+            <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
+            <div>
+              <p class="text-sm font-bold text-amber-800">N° de causa ya registrado en el sistema</p>
+              <p class="text-xs text-amber-700 mt-0.5">Existe al menos un expediente con ese número de causa. Podés vincularlos al crear el nuevo expediente.</p>
+            </div>
+          </div>
+          <div id="causa-duplicada-lista" class="space-y-2 mb-3"></div>
+        </div>`);
+    }
+  }
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ESTADO Y LÓGICA DE NEGOCIO
@@ -528,13 +602,13 @@ function setCanal(c) {
   document.getElementById('canal-info-text').textContent = infos[c];
   document.getElementById('canal-info').classList.remove('hidden');
 
-  // Re-filtrar tipos y re-renderizar form si hay área y tipo
+  // Re-filtrar tipos y re-renderizar form si hay área
   if (state.area) {
     poblarTipos(state.area, c);
-    if (state.tipo) renderCamposMesa(state.tipo, state.area);
+    renderDynamicForm();
   }
 
-  updateResumenDinamico();
+  updateResumen();
 }
 
 // ── Poblar tipos ────────────────────────────────────────────────────────────
@@ -590,13 +664,9 @@ function setArea(a) {
   document.getElementById('res-numero').textContent = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
   document.getElementById('res-area').textContent = a;
 
-  // Ocultar sección dinámica hasta que se seleccione tipo
-  document.getElementById('dynamic-section').classList.add('hidden');
-  document.getElementById('asignacion-section').classList.add('hidden');
-  document.getElementById('docs-section').classList.add('hidden');
-  document.getElementById('actions-row').classList.add('hidden');
-
-  updateResumenDinamico();
+  // Render dinámico
+  renderDynamicForm();
+  updateResumen();
 }
 
 // ── Tipo de gestión ─────────────────────────────────────────────────────────
@@ -604,6 +674,14 @@ function onTipoChange() {
   const sel = document.getElementById('tipo-select');
   state.tipo = sel.value;
   document.getElementById('res-tipo').textContent = sel.options[sel.selectedIndex]?.text || '—';
+
+  // Mostrar/ocultar grupos condicionales (DEMANDA_CIVIL/LABORAL activan el grupo DEMANDA)
+  document.querySelectorAll('[data-visible-when-tipo]').forEach(el => {
+    const trigger = el.dataset.visibleWhenTipo;
+    const match = state.tipo === trigger
+      || (trigger === 'DEMANDA' && ['DEMANDA_CIVIL','DEMANDA_LABORAL'].includes(state.tipo));
+    el.classList.toggle('hidden', !match);
+  });
 
   const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
 
@@ -619,26 +697,26 @@ function onTipoChange() {
     setCanal(tipoData.canal);
   }
 
-  // Renderizar campos mesa del tipo seleccionado
-  renderCamposMesa(state.tipo, state.area);
+  // Reincidencia simulada: si el campo num-causa existe y empieza con 'FSM'
+  const causaEl = document.getElementById('num-causa');
+  if (causaEl) {
+    document.getElementById('reincidencia-alert').classList.toggle('hidden', !causaEl.value.startsWith('FSM'));
+  }
 
-  updateResumenDinamico();
+  updateResumen();
 }
 
 // ── Línea ferroviaria (Penal) ───────────────────────────────────────────────
 function onLineaChange() {
   if (state.area !== 'PENAL') return;
-  // Buscar el campo linea activo (puede tener id mesa_linea u otro)
-  const campos = window.SACO.getCamposFormulario(state.tipo, 'mesa', 'PENAL');
-  const lineaField = campos.find(f => f.type === 'linea');
-  const lineaEl = lineaField ? document.getElementById(lineaField.id) : null;
-  if (!lineaEl || !lineaEl.value) return;
+  const lineaEl = document.getElementById('linea-ferroviaria');
+  if (!lineaEl) return;
   const linea = window.SACO.LINEAS_FERROVIARIAS.find(l => l.code === lineaEl.value);
   if (!linea) return;
   const abogSel = document.getElementById('abogado-select');
   abogSel.innerHTML = `<option value="${linea.abogado}">${linea.abogado} — Letrado línea ${linea.label}</option>`;
   state.abogado = linea.abogado;
-  updateResumenDinamico();
+  updateResumen();
 }
 
 // ── Toggle para campos tipo checkbox (Ley 25.344, etc.) ──────────────────────
@@ -731,7 +809,7 @@ function formatCurrency(input) {
 
 // ── Detección de N° causa duplicado ─────────────────────────────────────────
 function onNumeroCausaChange(valor) {
-  updateResumenDinamico();
+  updateResumen();
   const trimmed = valor.trim();
   if (!trimmed || trimmed.toUpperCase() === 'SS SOFSE') { ocultarAlertaDuplicado(); return; }
   const todos = [
@@ -782,25 +860,14 @@ function seleccionarParaVincularDesdeAlta(id) {
   SACO_UI.showToast(`Al crear el expediente se vinculará automáticamente con ${id}.`, 'info');
 }
 
-// ── Resumen live ─────────────────────────────────────────────────────────────
-function updateResumenDinamico() {
+// ── Resumen live ────────────────────────────────────────────────────────────
+function updateResumen() {
   document.getElementById('res-canal').textContent = state.canal || '—';
   const abogEl = document.getElementById('abogado-select');
   document.getElementById('res-abogado').textContent = abogEl ? abogEl.value || state.abogado || '—' : state.abogado || '—';
-  // Carátula: buscar campo mesa_caratula o cualquier campo con 'caratula' en el id
-  let caratulaVal = '—';
-  if (state.tipo && state.area) {
-    const campos = window.SACO.getCamposFormulario(state.tipo, 'mesa', state.area);
-    const cf = campos.find(f => f.id && f.id.includes('caratula'));
-    if (cf) {
-      const el = document.getElementById(cf.id);
-      if (el && el.value) caratulaVal = el.value;
-    }
-  }
-  document.getElementById('res-caratula').textContent = caratulaVal;
+  const caratulaEl = document.getElementById('caratula');
+  document.getElementById('res-caratula').textContent = caratulaEl ? caratulaEl.value || '—' : '—';
 }
-// Alias de compatibilidad
-function updateResumen() { updateResumenDinamico(); }
 
 // ── Archivos ─────────────────────────────────────────────────────────────────
 let files = [];
@@ -836,30 +903,12 @@ function crearExpediente() {
   if (!state.area) errores.push('Seleccioná el área jurídica');
   if (!state.tipo) errores.push('Seleccioná el tipo de gestión');
 
-  // Carátula: buscar en campos mesa o auto-generar del label del tipo
-  let caratula = '';
-  if (state.tipo && state.area) {
-    const campos = window.SACO.getCamposFormulario(state.tipo, 'mesa', state.area);
-    const cf = campos.find(f => f.id && f.id.includes('caratula'));
-    if (cf) {
-      const el = document.getElementById(cf.id);
-      caratula = el ? el.value.trim() : '';
-      if (!caratula) errores.push('Ingresá la carátula');
-    } else {
-      // Sin campo carátula en mesa → auto-generar
-      const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
-      caratula = tipoData ? tipoData.label : state.tipo;
-    }
-  }
+  const caratulaEl = document.getElementById('caratula');
+  if (!caratulaEl || !caratulaEl.value.trim()) errores.push('Ingresá la carátula');
 
-  // Validar línea si Penal
-  if (state.area === 'PENAL' && state.tipo) {
-    const campos = window.SACO.getCamposFormulario(state.tipo, 'mesa', 'PENAL');
-    const lineaField = campos.find(f => f.type === 'linea');
-    if (lineaField) {
-      const lineaEl = document.getElementById(lineaField.id);
-      if (!lineaEl || !lineaEl.value) errores.push('Seleccioná la línea ferroviaria');
-    }
+  if (state.area === 'PENAL') {
+    const lineaEl = document.getElementById('linea-ferroviaria');
+    if (!lineaEl || !lineaEl.value) errores.push('Seleccioná la línea ferroviaria');
   }
 
   if (errores.length) { SACO_UI.showToast(errores[0], 'warn'); return; }
@@ -872,13 +921,6 @@ function crearExpediente() {
   const n = ++state.numerosActivos[state.area];
   const numInterno = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
 
-  // Recolectar valores de campos mesa para guardar en el expediente
-  const camposMesaValores = getCamposMesaValores(state.tipo, state.area);
-
-  // Buscar número de causa desde campos mesa
-  const camposCausaKeys = Object.keys(camposMesaValores).filter(k => k.includes('num_causa'));
-  const numeroCausaCreado = camposCausaKeys.length ? camposMesaValores[camposCausaKeys[0]] : '';
-
   // Si hay un expediente para vincular, agregar relación bidireccional
   if (expedienteParaVincular) {
     const expDestino = window.SACO.getExpedienteById(expedienteParaVincular);
@@ -888,11 +930,11 @@ function crearExpediente() {
         id: numInterno,
         area: state.area,
         tipo: state.tipo,
-        caratula,
+        caratula: document.getElementById('caratula')?.value || '',
         estado: 'EN_TRAMITE',
-        estadoLabel: estadoInicial,
+        estadoLabel: 'Recepcionado',
         tipo_relacion: 'MISMA_CAUSA',
-        numero_causa: numeroCausaCreado,
+        numero_causa: document.getElementById('num-causa')?.value || '',
         abogado: document.getElementById('abogado-select')?.value || '',
       });
     }
@@ -921,18 +963,6 @@ function crearExpediente() {
       if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
     }
   });
-})();
-
-// Aplicar offset correcto del sidebar al cargar
-(function applyInitialSidebarOffset() {
-  try {
-    var collapsed = localStorage.getItem('saco_sidebar_collapsed') === '1';
-    var ml = collapsed ? '52px' : '256px';
-    var main   = document.getElementById('main-content');
-    var topbar = document.getElementById('topbar-content');
-    if (main)   main.style.marginLeft = ml;
-    if (topbar) topbar.style.left     = ml;
-  } catch(e) {}
 })();
 </script>
 </body>
