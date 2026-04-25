@@ -45,6 +45,37 @@ function _avatarCls(rol) {
   return map[rol] || 'bg-[#bcc0c9] text-[#1b3a5c]';
 }
 
+// ── Sidebar collapse state ─────────────────────────────────────────────────
+function _isSidebarCollapsed() {
+  try { return localStorage.getItem('saco_sidebar_collapsed') === '1'; } catch(e) { return false; }
+}
+function _setSidebarCollapsed(v) {
+  try { localStorage.setItem('saco_sidebar_collapsed', v ? '1' : '0'); } catch(e) {}
+}
+
+function toggleSidebar() {
+  const collapsed = !_isSidebarCollapsed();
+  _setSidebarCollapsed(collapsed);
+
+  const sidebar = document.getElementById('sidebar');
+  const main    = document.getElementById('main-content');
+  const topbar  = document.getElementById('topbar-content');
+
+  if (sidebar) {
+    sidebar.classList.toggle('w-64',  !collapsed);
+    sidebar.classList.toggle('w-[52px]', collapsed);
+    sidebar.querySelectorAll('.sidebar-label').forEach(el => el.classList.toggle('hidden', collapsed));
+    sidebar.querySelectorAll('.sidebar-logo-text').forEach(el => el.classList.toggle('hidden', collapsed));
+    const userSection = sidebar.querySelector('.sidebar-user-section');
+    if (userSection) userSection.classList.toggle('hidden', collapsed);
+    const collapseIcon = document.getElementById('sidebar-collapse-icon');
+    if (collapseIcon) collapseIcon.style.transform = collapsed ? 'rotate(180deg)' : '';
+  }
+  const ml = collapsed ? '52px' : '256px';
+  if (main)   main.style.marginLeft   = ml;
+  if (topbar) topbar.style.left       = ml;
+}
+
 // ── Sidebar ────────────────────────────────────────────────────────────────
 function renderSidebar(activePage) {
   window._sacoPageKey = activePage;
@@ -83,22 +114,36 @@ function renderSidebar(activePage) {
   const nombre     = u ? u.nombre.replace(/^Dr\. |^Dra\. /, '') : 'Sin sesión';
   const cargo      = u ? u.cargo : 'Seleccionar usuario';
   const avatarCls  = u ? _avatarCls(u.rol) : 'bg-[#bcc0c9] text-[#1b3a5c]';
+  const collapsed  = _isSidebarCollapsed();
+  const wCls       = collapsed ? 'w-[52px]' : 'w-64';
+
+  const navItems = nav.map(n => {
+    const active = activePage === n.key;
+    if (active) {
+      return `<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#256386] text-white font-semibold text-sm overflow-hidden" href="${n.href}" title="${n.label}">
+        <span class="flex-shrink-0">${n.svg}</span><span class="sidebar-label whitespace-nowrap${collapsed ? ' hidden' : ''}">${n.label}</span>
+      </a>`;
+    }
+    return `<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#4f6080] hover:bg-[#f0f7f8] hover:text-[#256386] transition-all text-sm font-medium overflow-hidden" href="${n.href}" title="${n.label}">
+      <span class="flex-shrink-0">${n.svg}</span><span class="sidebar-label whitespace-nowrap${collapsed ? ' hidden' : ''}">${n.label}</span>
+    </a>`;
+  }).join('');
 
   return `
-  <aside id="sidebar" class="h-screen w-64 fixed left-0 top-0 bg-white border-r border-[#e5e7eb] flex flex-col z-50">
-    <div class="bg-[#242D4F] px-5 flex items-center gap-3 flex-shrink-0" style="height:64px">
-      <div class="border-l-[3px] border-white pl-2.5">
+  <aside id="sidebar" class="h-screen ${wCls} fixed left-0 top-0 bg-white border-r border-[#e5e7eb] flex flex-col z-50 transition-all duration-200 overflow-hidden">
+    <div class="bg-[#242D4F] px-3 flex items-center gap-3 flex-shrink-0" style="height:64px;min-width:0">
+      <div class="border-l-[3px] border-white pl-2.5 sidebar-logo-text${collapsed ? ' hidden' : ''}">
         <p class="text-white font-black text-[13px] leading-tight tracking-tight" style="font-family:'Public Sans',sans-serif;">TRENES</p>
         <p class="text-white font-black text-[13px] leading-tight tracking-tight" style="font-family:'Public Sans',sans-serif;">ARGENTINOS</p>
       </div>
-      <div class="ml-auto">
-        <span class="text-[9px] font-bold text-[#7dbad2] uppercase tracking-widest bg-white/10 px-1.5 py-0.5 rounded">SACO</span>
-      </div>
+      <button onclick="SACO_UI.toggleSidebar()" class="${collapsed ? '' : 'ml-auto'} p-1.5 rounded-md hover:bg-white/15 transition-colors flex-shrink-0 flex items-center justify-center" title="${collapsed ? 'Expandir menú' : 'Colapsar menú'}">
+        <svg id="sidebar-collapse-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white/70 transition-transform duration-200" style="${collapsed ? 'transform:rotate(180deg)' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">${items}</div>
+    <div class="flex-1 overflow-y-auto px-1.5 py-4 space-y-0.5">${navItems}</div>
 
-    <div class="px-3 pb-3 pt-2 border-t border-[#e5e7eb]">
+    <div class="px-1.5 pb-3 pt-2 border-t border-[#e5e7eb] sidebar-user-section${collapsed ? ' hidden' : ''}">
       <button onclick="SACO_UI.toggleUserDropdown()" class="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[#f0f7f8] transition-colors text-left">
         <div id="sidebar-user-avatar" class="w-8 h-8 rounded-full ${avatarCls} flex items-center justify-center font-bold text-xs flex-shrink-0">${iniciales}</div>
         <div class="min-w-0 flex-1">
@@ -113,6 +158,8 @@ function renderSidebar(activePage) {
 
 // ── Topbar ─────────────────────────────────────────────────────────────────
 function renderTopbar(title, breadcrumb) {
+  const collapsed   = _isSidebarCollapsed();
+  const leftOffset  = collapsed ? '52px' : '256px';
   const bc = breadcrumb
     ? `<nav class="hidden md:flex items-center gap-1.5 text-xs text-white/70">
         <span class="font-medium">SACO</span>
@@ -127,7 +174,7 @@ function renderTopbar(title, breadcrumb) {
   const avatarCls   = u ? _avatarCls(u.rol) : 'bg-[#bcc0c9] text-[#1b3a5c]';
 
   return `
-  <header class="fixed top-0 left-64 right-0 z-40 bg-[#63B2DA] flex justify-between items-center px-6 shadow-md" style="height:64px">
+  <header id="topbar-content" class="fixed top-0 right-0 z-40 bg-[#63B2DA] flex justify-between items-center px-6 shadow-md transition-all duration-200" style="height:64px;left:${leftOffset}">
     <div class="flex items-center gap-5">
       ${bc}
       ${!breadcrumb ? `<h1 class="text-sm font-bold tracking-tight text-white" style="font-family:'Public Sans',sans-serif;">${title}</h1>` : ''}
@@ -301,17 +348,19 @@ function showModal(title, content, actions='') {
   closeModal();
   const m = document.createElement('div');
   m.id = 'modal-overlay';
-  m.className = 'fixed inset-0 bg-[#1b3a5c]/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4';
+  m.className = 'fixed inset-0 bg-[#1b3a5c]/40 backdrop-blur-sm z-[100] overflow-y-auto';
   m.innerHTML = `
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border border-[#e5e7eb]">
-      <div class="px-6 py-4 border-b border-[#e5e7eb] flex justify-between items-center bg-[#f0f7f8]">
-        <h3 class="font-bold text-[#1b3a5c] text-sm" style="font-family:'Public Sans',sans-serif;">${title}</h3>
-        <button onclick="closeModal()" class="p-1 hover:bg-[#e5e7eb] rounded-full transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#6c6c6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+    <div class="flex min-h-full items-start justify-center p-4 py-8">
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg border border-[#e5e7eb]">
+        <div class="px-6 py-4 border-b border-[#e5e7eb] flex justify-between items-center bg-[#f0f7f8] sticky top-0 rounded-t-xl z-10">
+          <h3 class="font-bold text-[#1b3a5c] text-sm" style="font-family:'Public Sans',sans-serif;">${title}</h3>
+          <button onclick="closeModal()" class="p-1 hover:bg-[#e5e7eb] rounded-full transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#6c6c6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="p-6">${content}</div>
+        ${actions ? `<div class="px-6 py-4 border-t border-[#e5e7eb] flex justify-end gap-3 bg-[#f9fafb] rounded-b-xl sticky bottom-0">${actions}</div>` : ''}
       </div>
-      <div class="p-6">${content}</div>
-      ${actions ? `<div class="px-6 py-4 border-t border-[#e5e7eb] flex justify-end gap-3 bg-[#f9fafb]">${actions}</div>` : ''}
     </div>`;
   m.addEventListener('click', e => { if (e.target === m) closeModal(); });
   document.body.appendChild(m);
@@ -332,4 +381,5 @@ window.SACO_UI = {
   renderSidebar, renderTopbar, estadoBadge, areaBadge, estadoBadgeCustom,
   showToast, showModal, closeModal, toggleNotifPanel,
   toggleUserDropdown, selectUser, puedeReasignar, updateUserPill: _updateUserPill,
+  toggleSidebar,
 };

@@ -333,7 +333,7 @@ window.SACO = {
 ```
 
 ### Reglas de los datos
-- Los tipos de gestión están en `TIPOS_GESTION` separados por área (CIVIL tiene 14, LABORAL 8, PENAL 8)
+- Los tipos de gestión están en `TIPOS_GESTION` separados por área (CIVIL 12, LABORAL 8, PENAL 7 — ver sección 8.1)
 - `ESTADOS_POR_TIPO` define los estados válidos para cada `tipo_gestion`; usar siempre `getEstadosPorTipo(tipo)` para obtenerlos
 - `EXPEDIENTE_DETALLE` contiene los arrays `timeline[]`, `documentos[]`, `vinculos[]` e `intervinientes[]` que se modifican en runtime
 - `exp.estadoLabel` guarda el estado como texto libre del catálogo (e.g. "Etapa de instrucción"); `exp.estado` conserva el código legacy para compatibilidad
@@ -346,11 +346,22 @@ window.SACO = {
 Estas reglas vienen del análisis funcional y **no son negociables**. Claude Code debe implementarlas fielmente.
 
 ### 8.1 Clasificación de expedientes
-- Dos niveles: **Área** (CIVIL / LABORAL / PENAL) → **Tipo de gestión** (15 subtipos)
-- El selector de tipo de gestión **filtra según el área seleccionada** — nunca mostrar todos los tipos sin filtrar
+- Dos niveles: **Área** (CIVIL / LABORAL / PENAL) → **Tipo de gestión**
+- El selector de tipo muestra **todos los tipos del área** — no filtra por canal
+- Al seleccionar un tipo, el canal se auto-sugiere según `tipo.canal` (campo por defecto)
+- Si el canal seleccionado no está en `tipo.canales[]`, se muestra toast informativo (no bloquea)
 - Los tipos disponibles por área están en `SACO.TIPOS_GESTION[area]`
-- Se agrega el tipo de gestión: `OTROS` para las 3 áreas
-- Permite registrar documentación no clasificada en los tipos existentes
+
+**Fuente:** Matriz_Actualizada.xlsx — Abril 2026. Cada tipo tiene `canal` (sugerido) y `canales[]` (todos los válidos).
+
+| Área | Cantidad | Códigos |
+|------|----------|---------|
+| CIVIL | 12 tipos | OFICIO, CARTA_DOC, MEDIACION, BENEFICIO_LITIGAR, DEMANDA_CIVIL, COBRO_CANON, RECLAMO_CONTRAT, LANZAMIENTO, RECUPERO, EJECUCION_GAR, DEFENSA_CIVIL, PEDIDO_CAUSA_PENAL |
+| LABORAL | 8 tipos | OFICIO, CARTA_DOC, MEDIACION, DEMANDA_CIVIL, DEMANDA_LABORAL, CONSIGNACION, DESAFUERO, PEDIDO_CAUSA_PENAL |
+| PENAL | 7 tipos | OFICIO, MEDIACION, QUERELLA, DEFENSA_PENAL, CARTA_SUCESO, PEDIDO_CAUSA_PENAL, OTROS |
+
+- `OTROS` solo aplica al área PENAL
+- `DEMANDA_CIVIL` y `DEMANDA_LABORAL` reemplazan el código genérico `DEMANDA`; en los datos históricos puede aparecer `DEMANDA` como código legacy
 
 ### 8.2 Numeración automática
 ```
@@ -675,7 +686,7 @@ Las siguientes páginas están diseñadas funcionalmente pero no codificadas aú
 | Mesa SACO | — | Área administrativa que recibe y asigna |
 | Letrado / Abogado | `abogado` | Profesional asignado al caso |
 | Área | `area` | CIVIL / LABORAL / PENAL |
-| Tipo de Gestión | `tipo_gestion` | Uno de los 15 subtipos |
+| Tipo de Gestión | `tipo_gestion` | 27 subtipos en total (CIVIL 12, LABORAL 8, PENAL 7) |
 | Canal | `canal_ingreso` | EE_GDE / MEMO_GDE / MAIL |
 | GDE | — | Gestión Documental Electrónica (plataforma Estado) |
 | IFGRA | — | Informe Gráfico (tipo doc GDE con firma digital) |
@@ -793,6 +804,7 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 | v1.2 | Abr 2026 | detalle-expediente: layout fullwidth v2 — 4 tabs principales (Datos/Timeline/Docs/Previsión), sub-tabs Información/Vínculos, filtro de estado integrado en Timeline, uid string para movimientos |
 | v1.3 | Abr 2026 | mock.js: ESTADOS_POR_TIPO (catálogo completo por tipo de gestión) + getEstadosPorTipo(); shared.js: estadoBadgeCustom(); detalle: modal cambio de estado filtrado por tipo; alta: campo estado inicial dinámico; labels TIPOS_GESTION actualizados |
 | v1.4 | Abr 2026 | N° causa opcional + detección de duplicado con vinculación bidireccional: mock.js (buscarPorNumeroCausa, getExpedienteById, abrirExpediente, intervinientes[] y vinculos[] bidireccionales en los 3 expedientes demo); alta: alerta duplicado con selección de vínculo + vinculación automática al crear; detalle: N° causa editable inline (#causa-editable-wrap) con alerta de duplicado y vinculación bidireccional; tab Intervinientes con CRUD + badge "Mismo siniestro" + navegación entre expedientes vinculados |
+| v1.5 | Abr 2026 | Matriz_Actualizada.xlsx: TIPOS_GESTION redefinido (CIVIL 12, LABORAL 8, PENAL 7); campo canal[] + canales[]; ESTADOS_POR_TIPO ampliado (BENEFICIO_LITIGAR, LANZAMIENTO, DEMANDA_CIVIL, DEMANDA_LABORAL, PEDIDO_CAUSA_PENAL); alta-expediente: tipos sin filtro por canal, auto-set canal al seleccionar tipo, estado-inicial-wrap, compatibilidad canal toast |
 
 ---
 

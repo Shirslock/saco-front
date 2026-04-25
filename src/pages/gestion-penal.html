@@ -31,7 +31,15 @@ tailwind.config = {
   body { font-family:'Inter',sans-serif; }
   h1,h2,h3,h4 { font-family:'Public Sans',sans-serif; }
   .shadow-card { box-shadow:0 1px 3px rgba(27,58,92,0.08),0 1px 2px rgba(27,58,92,0.04); }
-  
+  .shadow-card-lg { box-shadow:0 4px 12px rgba(27,58,92,0.1); }
+  .causa-row { cursor:pointer; }
+  .causa-row:hover td { background:#e2eff5; }
+  .exp-row { transition: background 0.1s; }
+  .exp-row:hover td { background:#f0f7f8; }
+  .child-row td { background:#fafcfd; }
+  .child-row:hover td { background:#f0f7f8; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+  .child-row { animation: slideDown 0.15s ease-out both; }
 </style>
 </head>
 <body class="bg-[#f0f7f8] text-[#1b3a5c]">
@@ -39,7 +47,7 @@ tailwind.config = {
 <div id="sidebar-mount"></div>
 <div id="topbar-mount"></div>
 
-<main class="ml-64 min-h-screen" style="padding-top:64px">
+<main id="main-content" class="min-h-screen transition-all duration-200" style="padding-top:64px;margin-left:256px">
 <div class="p-8 space-y-7">
 
   <!-- Header -->
@@ -81,28 +89,35 @@ tailwind.config = {
       <!-- Tabla causas activas -->
       <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
         <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
-          <h2 class="font-headline font-bold text-[#1b3a5c]">Causas Penales Activas</h2>
-          <a href="bandeja-abogado.html" class="text-xs font-bold text-[#256386] flex items-center gap-1 hover:underline">
-            Ver bandeja completa
-            <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
-          </a>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#256386]" style="font-variation-settings:'FILL' 1;">policy</span>
+            <h2 class="font-headline font-bold text-[#1b3a5c]">Causas Penales Activas</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] font-bold bg-[#e2eff5] text-[#4f6080] px-3 py-1 rounded-full border border-[#bcc0c9]/80" id="penal-count">0 expedientes</span>
+            <button onclick="expandAllPenal()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">unfold_more</span>Expandir
+            </button>
+            <button onclick="collapseAllPenal()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">unfold_less</span>Colapsar
+            </button>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-[#f0f7f8]">
-              <tr>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula / Origen</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Línea</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Progreso</th>
-                <th class="px-6 py-3.5"></th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-outline-variant/5" id="causas-tbody"></tbody>
-          </table>
-        </div>
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-[#f0f7f8] border-b-2 border-[#dde6ec]">
+            <tr>
+              <th class="px-4 py-3.5 w-10"></th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa / Exp</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
+              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
+              <th class="px-4 py-3.5"></th>
+            </tr>
+          </thead>
+          <tbody id="penal-tbody" class="divide-y divide-[#bcc0c9]/20"></tbody>
+        </table>
       </div>
 
     </div>
@@ -224,39 +239,158 @@ function ignorarCarta(idx) {
   SACO_UI.showToast('Carta Suceso archivada.', 'info');
 }
 
-// ── Causas activas ─────────────────────────────────────────────────────────
-function renderCausas() {
-  const data = window.SACO.CAUSAS_PENALES;
-  document.getElementById('causas-tbody').innerHTML = data.map(c => {
-    const barColor = c.progreso > 70 ? 'bg-primary' : c.progreso > 40 ? 'bg-secondary' : 'bg-tertiary';
-    return `
-    <tr class="hover:bg-[#f0f7f8] transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
-      <td class="px-6 py-4 font-mono text-xs font-bold text-[#1b3a5c]">${c.id}</td>
-      <td class="px-6 py-4 max-w-[200px]">
-        <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-1">${c.caratula}</p>
-        <p class="text-[10px] text-[#4f6080] mt-0.5">Origen: ${c.origen}</p>
+// ── Lógica de agrupación (igual que area-civil y area-laboral) ─────────────
+
+let expandedCausasPenal = new Set();
+let allItemsPenal = [];
+
+function construirItemsPenal(expedientes) {
+  const causaMap = {};
+  const sueltos  = [];
+  expedientes.forEach(e => {
+    const nc = (e.numero_causa || '').trim();
+    if (nc && nc.toUpperCase() !== 'SS SOFSE') {
+      if (!causaMap[nc]) causaMap[nc] = [];
+      causaMap[nc].push(e);
+    } else {
+      sueltos.push(e);
+    }
+  });
+  const items = [];
+  Object.entries(causaMap).forEach(([nc, exps]) => items.push({ kind:'causa', numeroCausa:nc, expedientes:exps }));
+  sueltos.forEach(e => items.push({ kind:'suelto', exp:e }));
+  return items;
+}
+
+function renderTablaPenal() {
+  const data = window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'PENAL');
+  document.getElementById('penal-count').textContent = `${data.length} expediente${data.length !== 1 ? 's' : ''}`;
+  allItemsPenal = construirItemsPenal(data);
+  renderRowsPenal();
+}
+
+function renderRowsPenal() {
+  const tbody = document.getElementById('penal-tbody');
+  if (!allItemsPenal.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes penales activos.</td></tr>`;
+    return;
+  }
+  let html = '';
+  allItemsPenal.forEach(item => {
+    if (item.kind === 'causa') html += renderCausaRowPenal(item);
+    else html += renderExpRowPenal(item.exp, false, false);
+  });
+  tbody.innerHTML = html;
+}
+
+function renderCausaRowPenal(item) {
+  const nc = item.numeroCausa;
+  const exps = item.expedientes;
+  const expanded = expandedCausasPenal.has(nc);
+  const hasAlerta = exps.some(e => e.tiene_alerta);
+  const abogados = [...new Set(exps.map(e => e.abogado))];
+  const ncEsc = nc.replace(/'/g, "\\'");
+
+  let html = `
+    <tr class="causa-row bg-[#e8f0f5] border-l-4 border-[#256386]/30 hover:border-[#256386]/60 transition-all" onclick="toggleCausaPenal('${ncEsc}')">
+      <td class="px-4 py-3.5">
+        <div class="w-7 h-7 flex items-center justify-center rounded-lg ${expanded ? 'bg-[#256386] text-white' : 'bg-[#c5e0ea] text-[#256386]'} transition-colors">
+          <span class="material-symbols-outlined text-[16px] transition-transform duration-200" style="${expanded ? 'transform:rotate(90deg)' : ''}">chevron_right</span>
+        </div>
       </td>
-      <td class="px-6 py-4">
+      <td class="px-4 py-3.5">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-[#1b3a5c]">${c.abogado}</span>
-          <span class="bg-${c.asignacion==='Smart'?'primary':'surface-container'}/10 text-${c.asignacion==='Smart'?'primary':'on-surface-variant'} text-[9px] px-1.5 rounded font-bold">${c.asignacion}</span>
+          ${hasAlerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[14px] flex-shrink-0" style="font-variation-settings:'FILL' 1;">warning</span>` : ''}
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[#256386] text-[15px]" style="font-variation-settings:'FILL' 1;">folder</span>
+              <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
+            </div>
+            <p class="text-[10px] text-[#4f6080] mt-0.5">${exps.length} expediente${exps.length !== 1 ? 's' : ''}</p>
+          </div>
         </div>
       </td>
-      <td class="px-6 py-4">
-        <span class="text-[10px] font-bold px-2 py-0.5 bg-[#e0e7ef] text-[#3a4f6a] rounded-full">${c.linea}</span>
+      <td class="px-4 py-3.5">
+        ${hasAlerta ? `<p class="text-[10px] text-[#cd5055] font-semibold">${exps.find(e=>e.tiene_alerta)?.alerta_msg || ''}</p>` : '<span class="text-[10px] text-[#4f6080]">—</span>'}
       </td>
-      <td class="px-6 py-4">${SACO_UI.estadoBadge(c.estado, c.estado.replace(/_/g,' '))}</td>
-      <td class="px-6 py-4">
-        <div class="w-20 h-1.5 bg-[#bcc0c9]/30 rounded-full overflow-hidden">
-          <div class="${barColor} h-full rounded-full" style="width:${c.progreso}%"></div>
-        </div>
-        <p class="text-[9px] text-[#4f6080] mt-1">${c.progreso}%</p>
+      <td class="px-4 py-3.5">
+        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#256386]/10 text-[#256386]">
+          <span class="material-symbols-outlined text-[11px]">link</span>Causa judicial
+        </span>
       </td>
-      <td class="px-6 py-4 text-right">
-        <button class="material-symbols-outlined text-[#4f6080] hover:text-[#256386] transition-colors">more_vert</button>
+      <td class="px-4 py-3.5">
+        ${abogados.length === 1
+          ? `<span class="text-xs text-[#1b3a5c]">${abogados[0].replace(/^Dr\. |^Dra\. /, '')}</span>`
+          : abogados.map(a => `<p class="text-[10px] text-[#4f6080]">${a.replace(/^Dr\. |^Dra\. /, '')}</p>`).join('')
+        }
+      </td>
+      <td class="px-4 py-3.5"></td>
+      <td class="px-4 py-3.5"></td>
+      <td class="px-4 py-3.5 text-right">
+        <button onclick="event.stopPropagation()" class="text-[11px] font-bold text-[#256386] hover:underline">Ver todo</button>
       </td>
     </tr>`;
-  }).join('');
+
+  if (expanded) {
+    exps.forEach((exp, i) => { html += renderExpRowPenal(exp, true, i === exps.length - 1); });
+  }
+  return html;
+}
+
+function renderExpRowPenal(e, isChild, isLast) {
+  const sinCausa = !e.numero_causa || e.numero_causa.trim() === '' || e.numero_causa.toUpperCase() === 'SS SOFSE';
+  const nombreCorto = (e.abogado || '').replace(/^Dr\. |^Dra\. /, '');
+  return `
+    <tr class="${isChild ? 'child-row' : 'exp-row'} cursor-pointer ${isChild ? 'border-l-4 border-[#256386]/10' : ''}" onclick="window.location='detalle-expediente.html?id=${e.id}'">
+      <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}">
+        ${isChild ? `
+          <div class="absolute left-4 top-0 bottom-0 w-px bg-[#bcc0c9]" ${isLast ? 'style="bottom:50%"' : ''}></div>
+          <div class="absolute left-4 top-1/2 w-3.5 h-px bg-[#bcc0c9]"></div>
+          <div class="w-6 h-6 flex items-center justify-center relative ml-3">
+            ${e.tiene_alerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>` : `<span class="material-symbols-outlined text-[#4f6080] text-[16px]">description</span>`}
+          </div>` : `
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg ${e.tiene_alerta ? 'bg-[#fee2e2]' : 'bg-[#f0f7f8]'}">
+            ${e.tiene_alerta ? `<span class="material-symbols-outlined text-[#cd5055] text-[18px]" style="font-variation-settings:'FILL' 1;">warning</span>` : `<span class="material-symbols-outlined text-[#4f6080] text-[18px]">description</span>`}
+          </div>`}
+      </td>
+      <td class="px-4 py-3.5">
+        <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
+        <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa || ''}</p>
+        ${sinCausa ? `<span class="text-[9px] font-bold text-[#cd5055] flex items-center gap-0.5"><span class="material-symbols-outlined text-[11px]">link_off</span>Sin causa</span>` : ''}
+      </td>
+      <td class="px-4 py-3.5 max-w-xs">
+        <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
+        ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-0.5">${e.alerta_msg}</p>` : ''}
+      </td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${(e.tipo||'').replace(/_/g,' ')}</td>
+      <td class="px-4 py-3.5 text-xs text-[#1b3a5c]">${nombreCorto}</td>
+      <td class="px-4 py-3.5">${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
+      <td class="px-4 py-3.5">
+        <a href="detalle-expediente.html?id=${e.id}" onclick="event.stopPropagation()" class="text-[#256386] hover:text-primary-dim font-bold text-xs uppercase tracking-tight">Abrir</a>
+      </td>
+    </tr>`;
+}
+
+function toggleCausaPenal(nc) {
+  if (expandedCausasPenal.has(nc)) expandedCausasPenal.delete(nc);
+  else expandedCausasPenal.add(nc);
+  renderRowsPenal();
+}
+
+function expandAllPenal() {
+  allItemsPenal.forEach(item => { if (item.kind === 'causa') expandedCausasPenal.add(item.numeroCausa); });
+  renderRowsPenal();
+}
+
+function collapseAllPenal() {
+  expandedCausasPenal.clear();
+  renderRowsPenal();
+}
+
+// ── Causas activas (legacy — ya no se usa la tabla vieja) ─────────────────
+function renderCausas() {
+  renderTablaPenal();
 }
 
 // ── Letrados por línea ─────────────────────────────────────────────────────
@@ -276,13 +410,13 @@ function renderLetraados() {
 }
 
 renderCartas();
-renderCausas();
+renderTablaPenal();
 renderLetraados();
 
 SACO_SYNC.syncListen(({ type, payload }) => {
-  if (type === 'EXPEDIENTE_ASIGNADO' && payload?.area === 'PENAL') {
-    renderCausas();
-    SACO_UI.showToast('Causas penales actualizadas desde otra pestaña.', 'info');
+  if (type === 'ESTADO_CAMBIADO' || type === 'EXPEDIENTE_ASIGNADO') {
+    renderTablaPenal();
+    SACO_UI.showToast('Expedientes penales actualizados desde otra pestaña.', 'info');
   }
   if (type === 'USUARIO_CAMBIADO') {
     if (payload && payload.usuario) window.SACO.CURRENT_USER = payload.usuario;
@@ -290,6 +424,18 @@ SACO_SYNC.syncListen(({ type, payload }) => {
     if (payload && payload.usuario) SACO_UI.updateUserPill(payload.usuario);
   }
 });
+
+// Aplicar offset correcto del sidebar al cargar
+(function applyInitialSidebarOffset() {
+  try {
+    var collapsed = localStorage.getItem('saco_sidebar_collapsed') === '1';
+    var ml = collapsed ? '52px' : '256px';
+    var main   = document.getElementById('main-content');
+    var topbar = document.getElementById('topbar-content');
+    if (main)   main.style.marginLeft = ml;
+    if (topbar) topbar.style.left     = ml;
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
