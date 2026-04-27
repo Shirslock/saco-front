@@ -298,6 +298,7 @@ function renderCampo(campo, colSpan2) {
   const required = campo.required;
   const mono = campo.mono ? ' font-mono' : '';
   const fullClass = colSpan2 || campo.full ? 'md:col-span-2' : '';
+  const hiddenClass = campo.dependsOn ? ' hidden' : '';
   const placeholder = campo.placeholder || '';
   const hint = campo.hint || '';
 
@@ -336,7 +337,7 @@ function renderCampo(campo, colSpan2) {
     }
     case 'boolean': {
       return `
-        <div class="${fullClass}">
+        <div id="wrap_${id}" class="${fullClass}${hiddenClass}">
           <div class="flex items-center justify-between p-3 bg-[#f0f7f8] rounded-lg border border-[#d1d9df]">
             <label for="toggle-${id}" class="text-sm font-medium text-[#1b3a5c] cursor-pointer flex-1">${label}</label>
             <button type="button" id="toggle-${id}" role="switch" aria-checked="false"
@@ -380,7 +381,7 @@ function renderCampo(campo, colSpan2) {
 
   const labelEl = `<label class="field-label${required ? ' field-required' : ''}" for="${id}">${label}</label>`;
   return `
-    <div class="${fullClass}">
+    <div id="wrap_${id}" class="${fullClass}${hiddenClass}">
       ${labelEl}
       ${inputHtml}
       ${hint ? `<p class="field-hint">${hint}</p>` : ''}
@@ -457,6 +458,25 @@ function renderDynamicForm() {
       if (grid) grid.appendChild(alertDiv);
     }
   }
+
+  bindDependentFields();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CAMPOS CONDICIONALES (dependsOn)
+// ─────────────────────────────────────────────────────────────────────────────
+function bindDependentFields() {
+  const campos = window.SACO.getCamposFormulario(state.tipo, 'mesa', state.area);
+  const camposConDep = campos.filter(c => c.dependsOn);
+  camposConDep.forEach(campo => {
+    const parentInput = document.getElementById(campo.dependsOn.field);
+    const wrapper = document.getElementById(`wrap_${campo.id}`);
+    if (!parentInput || !wrapper) return;
+    parentInput.addEventListener('change', () => {
+      const mostrar = parentInput.value === 'true' && campo.dependsOn.value === true;
+      wrapper.classList.toggle('hidden', !mostrar);
+    });
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -621,12 +641,12 @@ function toggleCheckbox(inputId, toggleId) {
     btn.setAttribute('aria-checked', 'false');
     btn.classList.remove('bg-[#256386]'); btn.classList.add('bg-[#bcc0c9]/60');
     dot.classList.remove('translate-x-4'); dot.classList.add('translate-x-0.5');
-    if (input) input.value = 'false';
+    if (input) { input.value = 'false'; input.dispatchEvent(new Event('change')); }
   } else {
     btn.setAttribute('aria-checked', 'true');
     btn.classList.add('bg-[#256386]'); btn.classList.remove('bg-[#bcc0c9]/60');
     dot.classList.add('translate-x-4'); dot.classList.remove('translate-x-0.5');
-    if (input) input.value = 'true';
+    if (input) { input.value = 'true'; input.dispatchEvent(new Event('change')); }
   }
 }
 

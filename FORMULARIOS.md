@@ -110,8 +110,9 @@ Nota: Se eliminaron ley_25344 y variante de ingreso.
 ### EJECUCION_GAR — Ejecución de Pólizas (Civil)
 | Etapa | Campos |
 |-------|--------|
-| mesa | caratula, fecha_recep, linea, monto, tipo_garantia, contrato, parte_dem |
-| abogado | num_causa, juzgado, num_sigej, fecha_venc, piso, parte_actora, codemandados, obs |
+| mesa | abogado, contratista, area_req, nro_exp, causa_vinculada, cuantif_danos, fecha_ingreso, es_extrajudicial (boolean), abogado_extraj (condicional — visible solo si es_extrajudicial = Sí) |
+| abogado | aseguradora, nro_polizas, tipo_polizas, monto_ejecutar, fecha_prescr, fecha_rescision, acuerdo |
+Nota: fecha_rescision se movió a etapa Abogado. causa_vinculada y cuantif_danos se agregaron a etapa Mesa SACO. abogado_extraj es condicional — aparece solo si es_extrajudicial = Sí.
 
 ### LANZAMIENTO — Lanzamientos (Civil)
 | Etapa | Campos |
