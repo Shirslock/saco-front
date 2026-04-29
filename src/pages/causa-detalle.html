@@ -79,17 +79,64 @@ tailwind.config = {
   <!-- ── Panel timeline unificado ──────────────────────────────────── -->
   <div class="bg-white rounded-2xl shadow-card overflow-hidden">
 
-    <!-- Barra de filtro del timeline -->
-    <div class="flex flex-wrap items-center gap-3 px-6 py-4 border-b border-[#e2eff5]">
-      <span class="material-symbols-outlined text-[#4f6080] text-xl">timeline</span>
-      <h3 class="font-headline font-bold text-base text-[#1b3a5c] mr-auto">Línea de tiempo unificada</h3>
-      <div class="flex items-center gap-2">
-        <label class="text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Filtrar por expediente</label>
-        <select id="filtro-exp"
-          onchange="renderTimeline()"
-          class="bg-[#f0f7f8] border-none rounded-lg py-2 px-3 text-sm text-[#1b3a5c] focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
-          <option value="">Todos</option>
-        </select>
+    <!-- Header del timeline -->
+    <div class="px-6 pt-5 pb-4 border-b border-[#e2eff5]">
+
+      <!-- Título + botón Nueva Actividad -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-headline font-bold text-[#1b3a5c]">Historial completo de la causa</h3>
+        <button onclick="abrirModalNuevaActividad()"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span>
+          Nueva Actividad
+        </button>
+      </div>
+
+      <!-- Tres filtros combinables -->
+      <div class="flex flex-wrap items-center gap-3">
+
+        <!-- Filtro Expediente -->
+        <div class="relative">
+          <select id="filtro-exp"
+            onchange="renderTimelineUnificado()"
+            class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[180px]">
+            <option value="">Expediente: Todos</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+        </div>
+
+        <!-- Filtro Tipo de documento -->
+        <div class="relative">
+          <select id="filtro-tipo"
+            onchange="renderTimelineUnificado()"
+            class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[180px]">
+            <option value="">Tipo: Todos</option>
+            <option value="RECEPCION">Recepción</option>
+            <option value="NOTA_RESPUESTA">Nota / Respuesta</option>
+            <option value="MOVIMIENTO">Movimiento</option>
+            <option value="DERIVACION">Derivación</option>
+            <option value="CIERRE">Cierre</option>
+            <option value="OTRO">Otro</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+        </div>
+
+        <!-- Filtro Actividad (texto libre) -->
+        <div class="relative flex-1 min-w-[200px]">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
+          <input id="filtro-actividad"
+            oninput="renderTimelineUnificado()"
+            class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+            placeholder="Buscar por título de actividad..."/>
+        </div>
+
+        <!-- Limpiar filtros -->
+        <button onclick="limpiarFiltrosCausa()"
+          class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] flex items-center gap-1 transition-colors whitespace-nowrap">
+          <span class="material-symbols-outlined text-[14px]">close</span>
+          Limpiar
+        </button>
+
       </div>
     </div>
 
@@ -118,6 +165,7 @@ document.getElementById('topbar-mount').innerHTML =
 const expedientes = numeroCausa
   ? window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.numero_causa === numeroCausa)
   : [];
+const expsDeCausa = expedientes;
 
 // ── Header ────────────────────────────────────────────────────────────
 document.getElementById('causa-title').textContent = numeroCausa || 'Sin número de causa';
@@ -190,51 +238,60 @@ function renderCards() {
 
 // ── Render select de filtro ───────────────────────────────────────────
 function poblarFiltroExp() {
-  const sel = document.getElementById('filtro-exp');
-  expedientes.forEach(exp => {
+  const filtroExpSel = document.getElementById('filtro-exp');
+  expsDeCausa.forEach(e => {
     const opt = document.createElement('option');
-    opt.value = exp.id;
-    opt.textContent = `${exp.id} — ${AREA_LABELS[exp.area] || exp.area}`;
-    sel.appendChild(opt);
+    opt.value = e.id;
+    opt.textContent = `${e.id} — ${e.tipo.replace(/_/g,' ')}`;
+    filtroExpSel.appendChild(opt);
   });
 }
 
-// ── Construir entradas unificadas del timeline ────────────────────────
-function construirEntradasTimeline() {
-  const entradas = [];
-  expedientes.forEach(exp => {
-    (exp.timeline || []).forEach(t => {
-      entradas.push({
-        ...t,
-        _expId: exp.id,
-        _expArea: exp.area,
+function limpiarFiltrosCausa() {
+  document.getElementById('filtro-exp').value       = '';
+  document.getElementById('filtro-tipo').value      = '';
+  document.getElementById('filtro-actividad').value = '';
+  renderTimelineUnificado();
+}
+
+// ── Construir entradas filtradas del timeline ─────────────────────────
+function buildTimelineUnificado() {
+  const filtroExp       = document.getElementById('filtro-exp').value;
+  const filtroTipo      = document.getElementById('filtro-tipo').value;
+  const filtroActividad = (document.getElementById('filtro-actividad').value || '').toLowerCase().trim();
+
+  const exps = filtroExp
+    ? expsDeCausa.filter(e => e.id === filtroExp)
+    : expsDeCausa;
+
+  const movimientos = [];
+  exps.forEach(exp => {
+    (exp.timeline || []).forEach(mov => {
+      if (filtroTipo && mov.tipo !== filtroTipo) return;
+      if (filtroActividad && !(mov.titulo || '').toLowerCase().includes(filtroActividad)) return;
+      movimientos.push({
+        ...mov,
+        _expId:       exp.id,
+        _expArea:     exp.area,
+        _expTipo:     exp.tipo,
         _expCaratula: exp.caratula,
       });
     });
   });
-  // Activos primero; luego ordenar por fecha desc (texto, best-effort)
-  entradas.sort((a, b) => {
+
+  movimientos.sort((a, b) => {
     if (a.activo && !b.activo) return -1;
     if (!a.activo && b.activo) return 1;
-    // Intentar ordenar por fecha textual (dd/mm/aaaa)
-    const parseDate = f => {
-      if (!f) return 0;
-      const m = f.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-      if (!m) return Date.now(); // "Hoy" → más reciente
-      return new Date(`${m[3]}-${m[2]}-${m[1]}`).getTime();
-    };
-    return parseDate(b.fecha) - parseDate(a.fecha);
+    return (b.fecha || '').localeCompare(a.fecha || '');
   });
-  return entradas;
+
+  return movimientos;
 }
 
 // ── Render timeline ───────────────────────────────────────────────────
-function renderTimeline() {
-  const filtroExp = document.getElementById('filtro-exp').value;
-  const wrap      = document.getElementById('timeline-wrap');
-
-  let entradas = construirEntradasTimeline();
-  if (filtroExp) entradas = entradas.filter(e => e._expId === filtroExp);
+function renderTimelineUnificado() {
+  const wrap    = document.getElementById('timeline-wrap');
+  const entradas = buildTimelineUnificado();
 
   if (entradas.length === 0) {
     wrap.innerHTML = `<p class="text-sm text-[#4f6080] italic py-4">No hay movimientos para mostrar.</p>`;
@@ -245,18 +302,16 @@ function renderTimeline() {
     const icon  = TIPO_ICONS[t.tipo] || 'notes';
     const esUlt = idx === entradas.length - 1;
     return `
-    <div class="relative pl-10 pb-6 ${esUlt ? '' : ''}">
+    <div class="relative pl-10 pb-6">
       ${!esUlt ? `<div class="tl-line"></div>` : ''}
       <div class="tl-dot ${t.activo ? 'activo' : ''}"></div>
       <div class="bg-white border border-[#e2eff5] rounded-xl px-4 py-3 shadow-card">
-        <!-- Etiqueta de origen del expediente -->
         <div class="flex flex-wrap items-center gap-2 mb-2">
           ${areaBadgeHTML(t._expArea)}
           <span class="text-[10px] font-mono text-[#4f6080]">${t._expId}</span>
           <span class="text-[10px] text-[#4f6080] italic truncate max-w-[260px]">${t._expCaratula}</span>
           ${t.activo ? `<span class="ml-auto text-[10px] font-black uppercase tracking-widest text-[#256386]">Activo</span>` : ''}
         </div>
-        <!-- Contenido del movimiento -->
         <div class="flex items-start gap-3">
           <span class="material-symbols-outlined text-[#6d8eb0] text-lg mt-0.5 flex-shrink-0">${icon}</span>
           <div class="flex-1 min-w-0">
@@ -273,6 +328,163 @@ function renderTimeline() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ── Modal Nueva Actividad ─────────────────────────────────────────────
+const TIPOS_MOVIMIENTO = [
+  { value: 'RECEPCION',      label: 'Recepción' },
+  { value: 'NOTA_RESPUESTA', label: 'Nota / Respuesta' },
+  { value: 'MOVIMIENTO',     label: 'Movimiento' },
+  { value: 'DERIVACION',     label: 'Derivación' },
+  { value: 'CIERRE',         label: 'Cierre' },
+  { value: 'OTRO',           label: 'Otro' },
+];
+
+function abrirModalNuevaActividad() {
+  SACO_UI.showModal('Nueva Actividad', `
+    <div class="space-y-4">
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Expediente destino *</label>
+        <select id="nav-exp-destino"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+          <option value="">— Seleccioná el expediente —</option>
+          ${expsDeCausa.map(e => `
+            <option value="${e.id}">${e.id} — ${e.tipo.replace(/_/g,' ')} (${e.area})${e.es_principal ? ' ★ Principal' : ''}</option>`).join('')}
+        </select>
+        <p class="text-[10px] text-[#4f6080] mt-1">La actividad se registrará en el timeline del expediente seleccionado.</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de actividad *</label>
+        <select id="nav-tipo"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+          <option value="">— Seleccioná el tipo —</option>
+          ${TIPOS_MOVIMIENTO.map(t => `<option value="${t.value}">${t.label}</option>`).join('')}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Fecha del movimiento</label>
+        <input type="date" id="nav-fecha"
+          value="${new Date().toISOString().split('T')[0]}"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Descripción *</label>
+        <textarea id="nav-desc" rows="3"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          placeholder="Descripción del movimiento..."></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">N° Documento GDE <span class="font-normal normal-case text-[#4f6080]">(opcional)</span></label>
+        <input type="text" id="nav-gde"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          placeholder="IF-2026-XXXXXXX-APN-SACO#SOFSE"/>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Archivo adjunto <span class="font-normal normal-case text-[#4f6080]">(opcional)</span></label>
+        <div id="nav-dropzone"
+          class="border-2 border-dashed border-[#bcc0c9] rounded-lg p-4 text-center hover:border-[#256386]/40 hover:bg-[#f0f7f8]/50 transition-all cursor-pointer"
+          onclick="document.getElementById('nav-file-input').click()">
+          <span class="material-symbols-outlined text-2xl text-[#bcc0c9] mb-1 block">upload_file</span>
+          <p class="text-xs text-[#4f6080]">Click para seleccionar — PDF o DOCX hasta 25MB</p>
+          <p id="nav-file-name" class="text-xs font-bold text-[#256386] mt-1 hidden"></p>
+        </div>
+        <input type="file" id="nav-file-input" class="hidden" accept=".pdf,.docx"
+          onchange="onNavFileSelected(this)"/>
+      </div>
+
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()"
+      class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-[#f0f7f8] rounded-lg transition-colors">
+      Cancelar
+    </button>
+    <button onclick="guardarNuevaActividad()"
+      class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg transition-colors">
+      Guardar Actividad
+    </button>`
+  );
+}
+
+let navFileSelected = null;
+
+function onNavFileSelected(input) {
+  const f = input.files[0];
+  if (!f) return;
+  if (f.size > 25 * 1024 * 1024) {
+    SACO_UI.showToast('El archivo supera 25MB.', 'warn');
+    return;
+  }
+  navFileSelected = f;
+  const nameEl = document.getElementById('nav-file-name');
+  if (nameEl) { nameEl.textContent = f.name; nameEl.classList.remove('hidden'); }
+}
+
+function guardarNuevaActividad() {
+  const expId = document.getElementById('nav-exp-destino').value;
+  const tipo  = document.getElementById('nav-tipo').value;
+  const fecha = document.getElementById('nav-fecha').value;
+  const desc  = document.getElementById('nav-desc').value.trim();
+  const gde   = document.getElementById('nav-gde').value.trim();
+
+  if (!expId) { SACO_UI.showToast('Seleccioná el expediente destino.', 'warn'); return; }
+  if (!tipo)  { SACO_UI.showToast('Seleccioná el tipo de actividad.', 'warn'); return; }
+  if (!desc)  { SACO_UI.showToast('Ingresá una descripción.', 'warn'); return; }
+
+  const expDestino = window.SACO.EXPEDIENTES_ABOGADO.find(e => e.id === expId);
+  if (!expDestino) { SACO_UI.showToast('Expediente no encontrado.', 'error'); return; }
+
+  const hora = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  const hoy  = new Date().toISOString().split('T')[0];
+  const fechaLabel = fecha === hoy
+    ? `Hoy · ${hora}`
+    : `${fecha.split('-').reverse().join('/')} · ${hora}`;
+
+  const tipoLabel = TIPOS_MOVIMIENTO.find(t => t.value === tipo)?.label || tipo.replace(/_/g,' ');
+  const nuevoMov = {
+    fecha:            fechaLabel,
+    tipo,
+    titulo:           tipoLabel.charAt(0).toUpperCase() + tipoLabel.slice(1),
+    desc,
+    doc:              gde || (navFileSelected ? navFileSelected.name : null),
+    activo:           true,
+    estadoExpediente: expDestino.estado,
+    subMovimientos:   [],
+  };
+
+  if (!expDestino.timeline) expDestino.timeline = [];
+  expDestino.timeline.forEach(m => m.activo = false);
+  expDestino.timeline.unshift(nuevoMov);
+
+  if (navFileSelected) {
+    if (!expDestino.documentos) expDestino.documentos = [];
+    expDestino.documentos.unshift({
+      nombre: navFileSelected.name,
+      tipo:   'Adjunto',
+      fecha:  new Date().toLocaleDateString('es-AR'),
+      size:   `${(navFileSelected.size / 1024).toFixed(0)} KB`,
+      icon:   'picture_as_pdf',
+      color:  'error',
+    });
+  }
+
+  if (window.SACO.EXPEDIENTE_DETALLE && window.SACO.EXPEDIENTE_DETALLE.id === expId) {
+    window.SACO.EXPEDIENTE_DETALLE.timeline.forEach(m => m.activo = false);
+    window.SACO.EXPEDIENTE_DETALLE.timeline.unshift(nuevoMov);
+  }
+
+  if (window.SACO_SYNC) {
+    SACO_SYNC.syncEmit('MOVIMIENTO_AGREGADO', { expedienteId: expId, movimiento: nuevoMov });
+  }
+
+  navFileSelected = null;
+  SACO_UI.closeModal();
+  renderTimelineUnificado();
+  SACO_UI.showToast(`Actividad registrada en ${expId}.`, 'success');
 }
 
 // ── Estado vacío ──────────────────────────────────────────────────────
@@ -292,7 +504,7 @@ if (expedientes.length === 0) {
 } else {
   renderCards();
   poblarFiltroExp();
-  renderTimeline();
+  renderTimelineUnificado();
 }
 </script>
 </body>
