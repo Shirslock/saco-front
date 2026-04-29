@@ -67,10 +67,8 @@ tailwind.config = {
     </a>
   </div>
 
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+  <div class="flex flex-col gap-6 max-w-3xl mx-auto">
 
-    <!-- ── Columna formulario ──────────────────────────────────────────── -->
-    <div class="xl:col-span-8 flex flex-col gap-6">
 
       <!-- ── Sección 1: Origen y Tipo ───────────────────────────────────── -->
       <div class="saco-card">
@@ -83,7 +81,7 @@ tailwind.config = {
 
           <!-- Canal -->
           <div>
-            <label class="field-label">Canal de Ingreso</label>
+            <label class="field-label field-required">Canal de Ingreso</label>
             <div class="flex p-1 bg-[#e2eff5] rounded-xl gap-1" id="canal-selector">
               <button onclick="setCanal('EE_GDE')"   class="canal-btn flex-1 py-2.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#256386] transition-all" data-val="EE_GDE">EE GDE</button>
               <button onclick="setCanal('MEMO_GDE')" class="canal-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-[#1b3a5c] transition-all" data-val="MEMO_GDE">Memo GDE</button>
@@ -93,13 +91,13 @@ tailwind.config = {
 
           <!-- Ref EE/Memo/Mail -->
           <div>
-            <label class="field-label" id="ref-label">N° Expediente Electrónico (GDE)</label>
+            <label class="field-label field-required" id="ref-label">N° Expediente Electrónico (GDE)</label>
             <input id="ref-input" class="field-input font-mono" placeholder="EX-2026-XXXXXXX-APN-SACO#SOFSE"/>
           </div>
 
           <!-- Área -->
           <div>
-            <label class="field-label">Área Jurídica</label>
+            <label class="field-label field-required">Área Jurídica</label>
             <div class="flex p-1 bg-[#e2eff5] rounded-xl gap-1" id="area-selector">
               <button onclick="setArea('CIVIL')"   class="area-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-[#1b3a5c] transition-all rounded-lg" data-val="CIVIL">Civil</button>
               <button onclick="setArea('LABORAL')" class="area-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-[#1b3a5c] transition-all rounded-lg" data-val="LABORAL">Laboral</button>
@@ -109,7 +107,7 @@ tailwind.config = {
 
           <!-- Tipo de gestión -->
           <div>
-            <label class="field-label">Tipo de Gestión</label>
+            <label class="field-label field-required">Tipo de Gestión</label>
             <select id="tipo-select" onchange="onTipoChange()" class="field-input">
               <option value="">— Seleccioná área primero —</option>
             </select>
@@ -166,105 +164,47 @@ tailwind.config = {
         </div>
       </div>
 
-      <!-- ── Sección 4: Documentación ────────────────────────────────────── -->
+      <!-- ── Sección 4: Documentación GDE ─────────────────────────────────── -->
       <div id="docs-section" class="hidden saco-card">
-        <div class="flex items-center gap-3 mb-6">
+        <div class="flex items-center gap-3 mb-2">
           <div class="step-badge bg-[#c5e0ea] text-[#256386]">4</div>
-          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Documentación Adjunta</h3>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Documento GDE <span class="text-[#cd5055]">*</span></h3>
         </div>
+        <p class="text-xs text-[#4f6080] mb-5 ml-11">Adjuntá el PDF del expediente GDE. Es obligatorio para poder derivar.</p>
 
         <div id="drop-zone"
-          class="border-2 border-dashed border-[#bcc0c9] rounded-xl p-12 text-center bg-[#f0f7f8]/50 hover:bg-[#e2eff5] transition-all cursor-pointer group"
+          class="border-2 border-dashed border-[#bcc0c9] rounded-xl p-10 text-center bg-[#f0f7f8]/50 hover:bg-[#e2eff5] transition-all cursor-pointer group"
           ondragover="event.preventDefault();this.classList.add('border-[#256386]/50','bg-[#c5e0ea]/20')"
           ondragleave="this.classList.remove('border-[#256386]/50','bg-[#c5e0ea]/20')"
           ondrop="handleDrop(event)"
           onclick="document.getElementById('file-input').click()">
-          <span class="material-symbols-outlined text-5xl text-[#bcc0c9] group-hover:text-[#256386] transition-colors mb-3 block">cloud_upload</span>
-          <h4 class="text-sm font-bold text-[#1b3a5c] mb-1">Arrastrá y soltá los archivos aquí</h4>
-          <p class="text-xs text-[#4f6080]">PDF, DOCX hasta 25 MB — el PDF principal quedará como Documento GDE vinculado</p>
-          <input type="file" id="file-input" class="hidden" multiple accept=".pdf,.docx" onchange="handleFiles(this.files)"/>
+          <span class="material-symbols-outlined text-4xl text-[#bcc0c9] group-hover:text-[#256386] transition-colors mb-2 block" style="font-variation-settings:'FILL' 1;">upload_file</span>
+          <h4 class="text-sm font-bold text-[#1b3a5c] mb-1">Arrastrá el PDF aquí o hacé click para seleccionar</h4>
+          <p class="text-xs text-[#4f6080]">Solo PDF — máximo 10 MB</p>
+          <input type="file" id="file-input" class="hidden" accept=".pdf" onchange="handleFiles(this.files)"/>
         </div>
-        <ul id="file-list" class="mt-4 space-y-2"></ul>
+
+        <!-- Archivo adjunto (solo 1) -->
+        <div id="file-preview" class="hidden mt-4 flex items-center gap-3 p-4 bg-[#dcfce7] rounded-xl border border-[#bbf7d0]">
+          <span class="material-symbols-outlined text-[#166534] text-2xl flex-shrink-0" style="font-variation-settings:'FILL' 1;">picture_as_pdf</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-[#14532d] truncate" id="file-name-display"></p>
+            <p class="text-[11px] text-[#166534]" id="file-size-display"></p>
+          </div>
+          <button onclick="quitarArchivo()" class="p-1.5 hover:bg-[#bbf7d0] rounded-lg transition-colors flex-shrink-0">
+            <span class="material-symbols-outlined text-[#166534] text-[18px]">close</span>
+          </button>
+        </div>
       </div>
 
       <!-- Acciones -->
       <div id="actions-row" class="hidden flex justify-end gap-3 pt-2">
         <a href="mesa-saco.html" class="px-5 py-3 text-sm font-semibold text-[#4f6080] hover:bg-[#e2eff5] rounded-xl transition-colors">Cancelar</a>
-        <button onclick="crearExpediente()" class="bg-[#256386] hover:bg-[#1d4e6b] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center gap-2">
+        <button onclick="abrirModalDerivacion()" class="bg-[#256386] hover:bg-[#1d4e6b] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center gap-2">
           <span class="material-symbols-outlined">task_alt</span>
-          Crear Expediente
+          Revisar y Derivar
         </button>
       </div>
-
-    </div>
-
-    <!-- ── Sidebar resumen ─────────────────────────────────────────────── -->
-    <aside class="xl:col-span-4 flex flex-col gap-5 sticky top-20">
-
-      <!-- Flujo de proceso -->
-      <div class="bg-[#f0f7f8] rounded-xl p-5 border border-[#bcc0c9]/40">
-        <div class="flex items-center gap-2 mb-4">
-          <span class="material-symbols-outlined text-[#256386]">auto_stories</span>
-          <h4 class="font-headline font-bold text-[#1b3a5c] text-sm">Flujo de Proceso</h4>
-        </div>
-        <div class="space-y-4">
-          <div class="relative pl-6 pb-4 border-l-2 border-[#256386]/20">
-            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#256386] border-4 border-[#f0f7f8]"></div>
-            <p class="text-xs font-bold text-[#256386]">1. Ingreso GDE / Mail</p>
-            <p class="text-[11px] text-[#4f6080] mt-1">EE, Memo o Mail de Carta Suceso llega a Mesa SACO.</p>
-          </div>
-          <div class="relative pl-6 pb-4 border-l-2 border-[#256386]/20">
-            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#c5e0ea] border-4 border-[#f0f7f8]"></div>
-            <p class="text-xs font-bold text-[#4f6080]">2. Clasificación y Apertura</p>
-            <p class="text-[11px] text-[#4f6080] mt-1">Mesa SACO clasifica por área y tipo. Se genera N° interno.</p>
-          </div>
-          <div class="relative pl-6">
-            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#c5e0ea] border-4 border-[#f0f7f8]"></div>
-            <p class="text-xs font-bold text-[#4f6080]">3. Asignación al Letrado</p>
-            <p class="text-[11px] text-[#4f6080] mt-1">Civil/Laboral: FIFO secuencial. Penal: por línea ferroviaria.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Resumen en tiempo real -->
-      <div class="bg-white rounded-xl p-5 shadow-card">
-        <h4 class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-4">Resumen del Nuevo Registro</h4>
-        <dl class="space-y-3">
-          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
-            <dt class="text-[11px] text-[#4f6080]">N° Interno</dt>
-            <dd class="text-[11px] font-bold text-[#256386] font-mono" id="res-numero">—</dd>
-          </div>
-          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
-            <dt class="text-[11px] text-[#4f6080]">Área</dt>
-            <dd class="text-[11px] font-bold" id="res-area">—</dd>
-          </div>
-          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
-            <dt class="text-[11px] text-[#4f6080]">Tipo de gestión</dt>
-            <dd class="text-[11px] font-bold" id="res-tipo">—</dd>
-          </div>
-          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
-            <dt class="text-[11px] text-[#4f6080]">Canal</dt>
-            <dd class="text-[11px] font-bold" id="res-canal">—</dd>
-          </div>
-          <div class="flex justify-between items-center py-2 border-b border-[#bcc0c9]/40">
-            <dt class="text-[11px] text-[#4f6080]">Letrado</dt>
-            <dd class="text-[11px] font-bold" id="res-abogado">—</dd>
-          </div>
-          <div class="flex justify-between items-start py-2">
-            <dt class="text-[11px] text-[#4f6080]">Carátula</dt>
-            <dd class="text-[11px] font-semibold text-right max-w-[180px] leading-snug" id="res-caratula">—</dd>
-          </div>
-        </dl>
-        <div class="mt-4 p-3 bg-[#e0e7ef]/30 rounded-lg">
-          <div class="flex items-center gap-2 text-[#3a4f6a] text-[10px] font-bold">
-            <span class="material-symbols-outlined text-[14px]">lock</span>
-            DATOS PROTEGIDOS
-          </div>
-          <p class="text-[9px] text-[#3a4f6a] mt-1">Expediente visible solo por el área asignada y auditoría.</p>
-        </div>
-      </div>
-
-    </aside>
 
   </div>
 </div>
@@ -286,7 +226,6 @@ const state = {
 };
 
 let expedienteParaVincular = null;
-let files = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RENDER DE CAMPO INDIVIDUAL
@@ -365,7 +304,7 @@ function renderCampo(campo, colSpan2) {
       const opts = window.SACO.LINEAS_FERROVIARIAS.map(l =>
         `<option value="${l.code}">${l.label}</option>`
       ).join('');
-      inputHtml = `<select id="${id}" class="field-input" onchange="onLineaChange(this)">${opts}</select>`;
+      inputHtml = `<select id="${id}" class="field-input" onchange="onLineaChange(this)"><option value="">— Seleccioná línea —</option>${opts}</select>`;
       break;
     }
     case 'juzgado': {
@@ -543,11 +482,9 @@ function setArea(a) {
     <p class="text-xs font-bold text-[#4f6080] uppercase tracking-tight">Regla de asignación</p>
     <p class="text-[11px] text-[#4f6080] mt-1">${regla}</p>`;
 
-  // N° interno preview
+  // N° interno preview (solo interno, no hay sidebar)
   const n = state.numerosActivos[a] + 1;
   const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[a];
-  document.getElementById('res-numero').textContent = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
-  document.getElementById('res-area').textContent = a;
 
   // Limpiar form anterior y ocultar secciones
   document.getElementById('dynamic-form').innerHTML = '';
@@ -574,7 +511,6 @@ function poblarTipos(area, canal) {
   if (filtrados.some(t => t.code === prevVal)) sel.value = prevVal;
   else {
     state.tipo = '';
-    document.getElementById('res-tipo').textContent = '—';
     document.getElementById('tipo-label-header').textContent = '';
   }
 }
@@ -586,7 +522,6 @@ function onTipoChange() {
   const sel = document.getElementById('tipo-select');
   state.tipo = sel.value;
   const label = sel.options[sel.selectedIndex]?.text || '—';
-  document.getElementById('res-tipo').textContent = label;
   document.getElementById('tipo-label-header').textContent = label;
 
   if (!state.tipo) {
@@ -714,21 +649,10 @@ function seleccionarVinculo(id) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RESUMEN LIVE
+// ARCHIVO ÚNICO (PDF, máx 10 MB)
 // ─────────────────────────────────────────────────────────────────────────────
-function updateResumen() {
-  document.getElementById('res-canal').textContent = state.canal || '—';
-  const abogEl = document.getElementById('abogado-select');
-  document.getElementById('res-abogado').textContent = abogEl?.value || '—';
+let archivoGDE = null;
 
-  // Buscar campo carátula en el formulario dinámico
-  const caratulaEl = document.getElementById('mesa_caratula');
-  document.getElementById('res-caratula').textContent = caratulaEl?.value || '—';
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ARCHIVOS
-// ─────────────────────────────────────────────────────────────────────────────
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('drop-zone').classList.remove('border-[#256386]/50', 'bg-[#c5e0ea]/20');
@@ -736,50 +660,198 @@ function handleDrop(e) {
 }
 
 function handleFiles(fl) {
-  Array.from(fl).forEach(f => {
-    if (f.size > 25 * 1024 * 1024) { SACO_UI.showToast(`${f.name} excede 25 MB.`, 'warn'); return; }
-    files.push(f);
-  });
-  renderFiles();
+  const f = fl[0];
+  if (!f) return;
+  if (!f.name.toLowerCase().endsWith('.pdf')) {
+    SACO_UI.showToast('Solo se aceptan archivos PDF.', 'warn');
+    return;
+  }
+  if (f.size > 10 * 1024 * 1024) {
+    SACO_UI.showToast(`El archivo excede 10 MB (${(f.size/1024/1024).toFixed(1)} MB).`, 'warn');
+    return;
+  }
+  archivoGDE = f;
+  renderFilePreview();
 }
 
-function renderFiles() {
-  document.getElementById('file-list').innerHTML = files.map((f, i) => `
-    <li class="flex items-center gap-3 p-3 bg-[#f0f7f8] rounded-lg border border-[#d1d9df]">
-      <span class="material-symbols-outlined text-[#cd5055] text-[20px]" style="font-variation-settings:'FILL' 1;">picture_as_pdf</span>
-      <div class="flex-1 min-w-0">
-        <p class="text-xs font-semibold text-[#1b3a5c] truncate">${f.name}</p>
-        <p class="text-[10px] text-[#4f6080]">${(f.size / 1024).toFixed(0)} KB</p>
-      </div>
-      <button onclick="files.splice(${i},1);renderFiles()" class="p-1 hover:bg-[#e2eff5] rounded transition-colors">
-        <span class="material-symbols-outlined text-[#4f6080] text-[16px]">close</span>
-      </button>
-    </li>`).join('');
+function renderFilePreview() {
+  const preview   = document.getElementById('file-preview');
+  const dropZone  = document.getElementById('drop-zone');
+  const nameEl    = document.getElementById('file-name-display');
+  const sizeEl    = document.getElementById('file-size-display');
+  if (archivoGDE) {
+    const kb = archivoGDE.size / 1024;
+    const sizeStr = kb >= 1024 ? `${(kb/1024).toFixed(1)} MB` : `${Math.round(kb)} KB`;
+    nameEl.textContent = archivoGDE.name;
+    sizeEl.textContent = sizeStr;
+    preview.classList.remove('hidden');
+    dropZone.classList.add('hidden');
+  } else {
+    preview.classList.add('hidden');
+    dropZone.classList.remove('hidden');
+  }
+}
+
+function quitarArchivo() {
+  archivoGDE = null;
+  document.getElementById('file-input').value = '';
+  renderFilePreview();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CREAR EXPEDIENTE
+// RESUMEN (solo para uso interno — ya no hay sidebar)
 // ─────────────────────────────────────────────────────────────────────────────
-function crearExpediente() {
-  if (!state.area) { SACO_UI.showToast('Seleccioná el área jurídica.', 'warn'); return; }
-  if (!state.tipo) { SACO_UI.showToast('Seleccioná el tipo de gestión.', 'warn'); return; }
+function updateResumen() {
+  // noop — el resumen se arma solo en el modal de derivación
+}
 
-  const caratulaEl = document.getElementById('mesa_caratula');
-  if (caratulaEl && !caratulaEl.value.trim()) {
-    SACO_UI.showToast('Ingresá la carátula del expediente.', 'warn');
-    caratulaEl.focus();
+// ─────────────────────────────────────────────────────────────────────────────
+// MODAL DE DERIVACIÓN — doble check antes de confirmar
+// ─────────────────────────────────────────────────────────────────────────────
+function abrirModalDerivacion() {
+  // Validaciones obligatorias
+  if (!state.canal) { SACO_UI.showToast('Seleccioná el canal de ingreso.', 'warn'); return; }
+
+  const refVal = (document.getElementById('ref-input')?.value || '').trim();
+  if (!refVal) {
+    SACO_UI.showToast('Ingresá el número de expediente GDE.', 'warn');
+    document.getElementById('ref-input')?.focus();
     return;
   }
 
+  if (!state.area) { SACO_UI.showToast('Seleccioná el área jurídica.', 'warn'); return; }
+  if (!state.tipo) { SACO_UI.showToast('Seleccioná el tipo de gestión.', 'warn'); return; }
+
+  if (!archivoGDE) {
+    SACO_UI.showToast('Adjuntá el PDF del expediente GDE antes de derivar.', 'warn');
+    document.getElementById('drop-zone').classList.add('border-[#cd5055]','bg-[#fee2e2]/30');
+    setTimeout(() => document.getElementById('drop-zone').classList.remove('border-[#cd5055]','bg-[#fee2e2]/30'), 2000);
+    return;
+  }
+
+  // Datos para el resumen
+  const tipoSel    = document.getElementById('tipo-select');
+  const tipoLabel  = tipoSel?.options[tipoSel.selectedIndex]?.text || state.tipo;
+  const abogSel    = document.getElementById('abogado-select');
+  const abogado    = abogSel?.value || '—';
+  const caratulaEl = document.getElementById('mesa_caratula');
+  const caratula   = caratulaEl?.value?.trim() || '—';
+  const canalLabels = { EE_GDE:'EE GDE', MEMO_GDE:'Memo GDE', MAIL:'Mail SAE' };
+
+  // Recopilar campos opcionales completados
+  const camposExtra = [];
+  const campos = window.SACO.getCamposFormulario(state.tipo, 'mesa', state.area)
+                  .filter(c => c.type !== 'abogado');
+  campos.forEach(c => {
+    if (c.id === 'mesa_caratula') return;
+    const el = document.getElementById(c.id);
+    if (!el) return;
+    let val = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') ? el.value.trim()
+             : el.tagName === 'SELECT' ? el.options[el.selectedIndex]?.text
+             : el.value;
+    if (val && val !== '— Seleccioná juzgado —' && val !== '— Seleccioná línea —' && val !== '' && el.value !== 'false') {
+      camposExtra.push({ label: c.label, value: val });
+    }
+  });
+
+  const filaSizeKb = archivoGDE.size / 1024;
+  const filaSize   = filaSizeKb >= 1024 ? `${(filaSizeKb/1024).toFixed(1)} MB` : `${Math.round(filaSizeKb)} KB`;
+
+  const filaExtra = camposExtra.length
+    ? `<div class="mt-3 pt-3 border-t border-[#bcc0c9]/40">
+        <p class="text-[10px] font-black uppercase tracking-wider text-[#4f6080] mb-2">Campos adicionales</p>
+        <div class="space-y-1.5">
+          ${camposExtra.map(f => `
+            <div class="flex justify-between gap-4">
+              <span class="text-[11px] text-[#4f6080] flex-shrink-0">${f.label}</span>
+              <span class="text-[11px] font-semibold text-[#1b3a5c] text-right truncate max-w-[200px]">${f.value}</span>
+            </div>`).join('')}
+        </div>
+      </div>`
+    : '';
+
+  const areaColors = { CIVIL:'bg-[#c5e0ea] text-[#1b3a5c]', LABORAL:'bg-[#dbeafe] text-[#1e3a5f]', PENAL:'bg-[#e0e7ef] text-[#3a4f6a]' };
+  const areaCls    = areaColors[state.area] || 'bg-[#e2eff5] text-[#4f6080]';
+
+  SACO_UI.showModal(
+    'Confirmar Derivación',
+    `<div class="space-y-4">
+      <div class="p-4 bg-[#f0f7f8] rounded-xl border border-[#bcc0c9]/40">
+        <p class="text-[10px] font-black uppercase tracking-wider text-[#4f6080] mb-3">Datos del expediente a derivar</p>
+
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center gap-4">
+            <span class="text-[11px] text-[#4f6080] flex-shrink-0">Canal de ingreso</span>
+            <span class="text-[11px] font-bold text-[#1b3a5c]">${canalLabels[state.canal] || state.canal}</span>
+          </div>
+          <div class="flex justify-between items-start gap-4">
+            <span class="text-[11px] text-[#4f6080] flex-shrink-0">N° GDE</span>
+            <span class="text-[11px] font-bold font-mono text-[#1b3a5c] text-right">${refVal}</span>
+          </div>
+          <div class="flex justify-between items-center gap-4">
+            <span class="text-[11px] text-[#4f6080] flex-shrink-0">Área</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded ${areaCls}">${state.area}</span>
+          </div>
+          <div class="flex justify-between items-center gap-4">
+            <span class="text-[11px] text-[#4f6080] flex-shrink-0">Tipo de gestión</span>
+            <span class="text-[11px] font-bold text-[#1b3a5c]">${tipoLabel}</span>
+          </div>
+          ${caratula !== '—' ? `
+          <div class="flex justify-between items-start gap-4">
+            <span class="text-[11px] text-[#4f6080] flex-shrink-0">Carátula</span>
+            <span class="text-[11px] font-semibold text-[#1b3a5c] text-right leading-snug max-w-[220px]">${caratula}</span>
+          </div>` : ''}
+          ${filaExtra}
+        </div>
+      </div>
+
+      <!-- Documento adjunto -->
+      <div class="flex items-center gap-3 p-3 bg-[#dcfce7] rounded-xl border border-[#bbf7d0]">
+        <span class="material-symbols-outlined text-[#166534] text-xl flex-shrink-0" style="font-variation-settings:'FILL' 1;">picture_as_pdf</span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold text-[#14532d] truncate">${archivoGDE.name}</p>
+          <p class="text-[10px] text-[#166534]">${filaSize}</p>
+        </div>
+        <span class="text-[9px] font-black text-[#166534] bg-[#bbf7d0] px-2 py-0.5 rounded-full">GDE VINCULADO</span>
+      </div>
+
+      <!-- Letrado receptor -->
+      <div class="flex items-center gap-3 p-4 bg-[#256386]/5 rounded-xl border border-[#256386]/15">
+        <div class="w-9 h-9 rounded-full bg-[#256386] text-white flex items-center justify-center text-xs font-black flex-shrink-0">
+          ${abogado.match(/\b(\w)/g)?.slice(-2).join('') || 'LE'}
+        </div>
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-wider text-[#4f6080]">Letrado receptor</p>
+          <p class="text-sm font-bold text-[#1b3a5c]">${abogado}</p>
+        </div>
+        <span class="ml-auto text-[9px] font-black text-[#256386] bg-[#c5e0ea] px-2 py-0.5 rounded-full">${state.area}</span>
+      </div>
+
+      <p class="text-[11px] text-[#4f6080] text-center">Una vez derivado, el expediente quedará en la bandeja del letrado asignado.</p>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-5 py-2.5 text-sm font-semibold text-[#4f6080] hover:bg-[#e2eff5] rounded-xl transition-colors border border-[#bcc0c9]">Cancelar</button>
+     <button onclick="confirmarDerivacion()" class="bg-[#256386] hover:bg-[#1d4e6b] text-white px-7 py-2.5 rounded-xl font-bold text-sm shadow-md hover:brightness-105 active:scale-[0.98] transition-all flex items-center gap-2">
+       <span class="material-symbols-outlined text-[16px]">forward</span>Derivar
+     </button>`
+  );
+}
+
+function confirmarDerivacion() {
+  const refVal   = (document.getElementById('ref-input')?.value || '').trim();
+  const abogSel  = document.getElementById('abogado-select');
+  const abogado  = abogSel?.value || '—';
+  const tipoSel  = document.getElementById('tipo-select');
+  const tipoLabel = tipoSel?.options[tipoSel.selectedIndex]?.text || state.tipo;
   const estadoInicial = window.SACO.getEstadosPorTipo(state.tipo)[0] || 'Recepcionado';
-  const prefix = { CIVIL: 'C', LABORAL: 'L', PENAL: 'P' }[state.area];
-  const n = ++state.numerosActivos[state.area];
-  const numInterno = `${prefix}-${String(n).padStart(4, '0')}/${new Date().getFullYear()}`;
+  const prefix   = { CIVIL:'C', LABORAL:'L', PENAL:'P' }[state.area];
+  const n        = ++state.numerosActivos[state.area];
+  const numInterno = `${prefix}-${String(n).padStart(4,'0')}/${new Date().getFullYear()}`;
 
   if (expedienteParaVincular) {
     const expDestino = window.SACO.getExpedienteById(expedienteParaVincular);
     if (expDestino) {
       if (!expDestino.vinculos) expDestino.vinculos = [];
+      const caratulaEl = document.getElementById('mesa_caratula');
       expDestino.vinculos.push({
         id: numInterno, area: state.area, tipo: state.tipo,
         caratula: caratulaEl?.value || '',
@@ -789,8 +861,10 @@ function crearExpediente() {
     }
   }
 
-  SACO_UI.showToast(`Expediente ${numInterno} creado — estado: ${estadoInicial}.`, 'success');
-  setTimeout(() => { window.location.href = 'bandeja-abogado.html'; }, 1500);
+  SACO_SYNC.syncEmit('EXPEDIENTE_ASIGNADO', { id: numInterno, area: state.area, abogado });
+  SACO_UI.closeModal();
+  SACO_UI.showToast(`Expediente ${numInterno} derivado a ${abogado}.`, 'success');
+  setTimeout(() => { window.location.href = 'mesa-saco.html'; }, 1500);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

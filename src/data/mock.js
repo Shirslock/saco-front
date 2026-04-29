@@ -4,43 +4,36 @@
 // canal: sugerido por defecto | canales: todos los canales válidos para el tipo
 const TIPOS_GESTION = {
   CIVIL: [
-    // Externos
-    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'CARTA_DOC',          label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'BENEFICIO_LITIGAR',  label: 'Beneficios de litigar sin gastos', canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEMANDA_CIVIL',      label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    // Internos
-    { code: 'COBRO_CANON',        label: 'Cobro de Cánones',                 canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'RECLAMO_CONTRAT',    label: 'Reclamo a Contratistas',           canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'LANZAMIENTO',        label: 'Lanzamientos',                     canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'RECUPERO',           label: 'Recuperos',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'EJECUCION_GAR',      label: 'Ejecución de Pólizas',             canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEFENSA_CIVIL',      label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'CARTA_DOC',         label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'MEDIACION',         label: 'Mediaciones',                      canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'BENEFICIO_LITIGAR', label: 'Beneficios de litigar sin gastos', canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'COBRO_CANON',       label: 'Cobro de Cánones',                 canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'RECLAMO_CONTRAT',   label: 'Reclamo a Contratista / Proveedor',canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'LANZAMIENTO',       label: 'Lanzamientos',                     canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'RECUPERO',          label: 'Recuperos',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'EJECUCION_GAR',     label: 'Ejecución de Pólizas',             canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEMANDA_CIVIL',     label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEFENSA_CIVIL',     label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
   LABORAL: [
-    // Externos
-    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'CARTA_DOC',          label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'DEMANDA_CIVIL',      label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEMANDA_LABORAL',    label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    // Internos
-    { code: 'CONSIGNACION',       label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'DESAFUERO',          label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'CARTA_DOC',         label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'SECLOS',            label: 'SECLO',                            canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'CONSIGNACION',      label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'DESAFUERO',         label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
   PENAL: [
-    // Externos
-    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    // Internos
-    { code: 'QUERELLA',           label: 'Querellas',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'DEFENSA_PENAL',      label: 'Defensas Penales',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'CARTA_SUCESO',       label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
-    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'OTROS',              label: 'Otros',                            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'MEDIACION',         label: 'Mediaciones',                      canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'QUERELLA',          label: 'Querellas',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'DEFENSA_PENAL',     label: 'Defensas Penales',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'CARTA_SUCESO',      label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
+    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
 };
 
@@ -2946,37 +2939,105 @@ function getAccesos(usuario) {
 
 const FORMULARIOS = {
 
+  // ── OFICIO ─────────────────────────────────────────────────────────────────
+  OFICIO: {
+    label: 'Oficio',
+    mesa: [
+      { id: 'mesa_num_causa',    label: 'N° de Causa',                          type: 'causa',   required: true,  placeholder: 'FSM-XXXXX/2026', mono: true },
+      { id: 'mesa_juzgado',      label: 'Juzgado / Tribunal / Organismo remitente', type: 'juzgado', required: true },
+      { id: 'mesa_secretaria',   label: 'Secretaría',                           type: 'text' },
+      { id: 'mesa_caratula',     label: 'Carátula',                             type: 'text',    full: true },
+      { id: 'mesa_fecha_oficio', label: 'Fecha del Oficio',                     type: 'date' },
+      { id: 'mesa_caracter',     label: 'Carácter',                             type: 'select',  options: [{ value:'', label:'— Seleccioná —' },{ value:'URGENTE', label:'Urgente' },{ value:'REITERATORIO', label:'Reiteratorio' }] },
+    ],
+    abogado: [
+      { id: 'abg_objeto_req',      label: 'Objeto del requerimiento',           type: 'textarea', full: true },
+      { id: 'abg_area_informante', label: 'Área informante',                    type: 'text' },
+      { id: 'abg_fecha_contest',   label: 'Fecha de contestación',              type: 'date' },
+    ],
+    variante_penal: {
+      mesa: [
+        { id: 'mesa_num_causa',    label: 'N° de Causa / Sumario / IPP',        type: 'causa', placeholder: 'IPP-XXXX/2026 o CFP-XXXX/2026', mono: true, hint: 'Ingresá el número disponible: IPP, sumario o causa judicial' },
+        { id: 'mesa_caratula',     label: 'Carátula',                           type: 'text',     required: true, full: true },
+        { id: 'mesa_juzgado',      label: 'Juzgado',                            type: 'juzgado' },
+        { id: 'mesa_datos_req',    label: 'Fiscalía / Comisaría / Otro organismo requirente', type: 'text', required: true },
+        { id: 'mesa_datos_cont',   label: 'Datos de contacto del requirente',   type: 'textarea', full: true },
+        { id: 'mesa_fecha_recep',  label: 'Fecha de recepción del oficio',      type: 'date',     defaultToday: true },
+        { id: 'mesa_fecha_hecho',  label: 'Fecha del Hecho',                    type: 'date' },
+        { id: 'mesa_lugar_hecho',  label: 'Lugar del Hecho',                    type: 'text' },
+        { id: 'mesa_linea',        label: 'Línea Ferroviaria',                  type: 'linea' },
+        { id: 'mesa_damnificado',  label: 'Parte Damnificada',                  type: 'text' },
+        { id: 'mesa_imputado',     label: 'Parte Imputada',                     type: 'text' },
+      ],
+      abogado: [
+        { id: 'abg_tipo_hecho',    label: 'Tipo de Hecho',                      type: 'text' },
+        { id: 'abg_tipo_solic',    label: 'Tipo de Solicitud',                  type: 'text' },
+      ],
+    },
+  },
+
   // ── CARTA_DOC ──────────────────────────────────────────────────────────────
   CARTA_DOC: {
     label: 'Carta Documento',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado',  required: true },
-      { id: 'mesa_fecha_cd',       label: 'Fecha de la CD',                 type: 'date',     required: true },
-      { id: 'mesa_nro_ident',      label: 'N° identificatorio',             type: 'text',     placeholder: 'N° de la carta documento', mono: true },
-      { id: 'mesa_remitente',      label: 'Remitente',                      type: 'text',     placeholder: 'Nombre / organismo remitente' },
-      { id: 'mesa_tema_reclamo',   label: 'Tema / reclamo principal',       type: 'textarea', full: true },
+      { id: 'mesa_fecha_cd',     label: 'Fecha de la CD',                       type: 'date',     required: true },
+      { id: 'mesa_nro_ident',    label: 'N° identificatorio',                   type: 'text',     required: true, placeholder: 'N° de la carta documento', mono: true },
+      { id: 'mesa_remitente',    label: 'Remitente',                            type: 'text',     required: true },
+      { id: 'mesa_objeto',       label: 'Objeto',                               type: 'textarea', full: true },
     ],
     abogado: [
-      { id: 'abg_requiere_resp',   label: 'Requiere respuesta',             type: 'boolean' },
-      { id: 'abg_area_informante', label: 'Área informante',                type: 'text' },
-      { id: 'abg_vinculacion',     label: 'Vinculación con contrato o expediente', type: 'text' },
-      { id: 'abg_fecha_respuesta', label: 'Fecha de respuesta',             type: 'date' },
+      { id: 'abg_requiere_resp',   label: 'Requiere respuesta',                 type: 'boolean' },
+      { id: 'abg_area_informante', label: 'Área informante',                    type: 'text' },
+      { id: 'abg_fecha_respuesta', label: 'Fecha de respuesta',                 type: 'date' },
     ],
   },
 
-  // ── CARTA_SUCESO ───────────────────────────────────────────────────────────
-  CARTA_SUCESO: {
-    label: 'Carta Suceso',
-    mesa: [],
+  // ── MEDIACION ──────────────────────────────────────────────────────────────
+  MEDIACION: {
+    label: 'Mediación',
+    mesa: [
+      { id: 'mesa_requirente',      label: 'Requirente / Reclamante',           type: 'text',  required: true },
+      { id: 'mesa_requerido',       label: 'Requerido',                         type: 'text',  required: true },
+      { id: 'mesa_mediador',        label: 'Mediador/a',                        type: 'text' },
+      { id: 'mesa_nro_mediacion',   label: 'N° de Mediación',                   type: 'text',  mono: true },
+      { id: 'mesa_fecha_audiencia', label: 'Fecha de Audiencia',                type: 'date' },
+    ],
     abogado: [
-      { id: 'abg_abogado',         label: 'Abogado designado',              type: 'abogado' },
-      { id: 'abg_documental',      label: 'Documental',                     type: 'textarea', full: true },
-      { id: 'abg_tipo_hecho',      label: 'Tipo de Hecho',                  type: 'text' },
-      { id: 'abg_fecha_hecho',     label: 'Fecha del Hecho',                type: 'date' },
-      { id: 'abg_lugar_hecho',     label: 'Lugar del Hecho',                type: 'text' },
-      { id: 'abg_linea',           label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'abg_juzgado',         label: 'Juzgado / Fiscalía / UFI / Tribunal', type: 'text' },
-      { id: 'abg_num_causa',       label: 'N° de Causa',                    type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
+      { id: 'abg_objeto_reclamo',  label: 'Objeto del reclamo',                 type: 'textarea', full: true },
+      { id: 'abg_monto_reclam',    label: 'Monto reclamado',                    type: 'money',    placeholder: '0' },
+      { id: 'abg_resultado',       label: 'Resultado de audiencia',             type: 'text' },
+      { id: 'abg_fecha_cierre',    label: 'Fecha de cierre',                    type: 'date' },
+    ],
+  },
+
+  // ── SECLOS ─────────────────────────────────────────────────────────────────
+  SECLOS: {
+    label: 'SECLO',
+    mesa: [
+      { id: 'mesa_requirente', label: 'Requirente / Reclamante', type: 'text', required: true },
+      { id: 'mesa_requerido',  label: 'Requerido',               type: 'text', required: true },
+    ],
+    abogado: [
+      { id: 'abg_objeto_reclamo', label: 'Objeto del reclamo',   type: 'textarea', full: true },
+      { id: 'abg_monto_reclam',   label: 'Monto reclamado',      type: 'money',    placeholder: '0' },
+      { id: 'abg_resultado',      label: 'Resultado',            type: 'text' },
+      { id: 'abg_fecha_cierre',   label: 'Fecha de cierre',      type: 'date' },
+    ],
+  },
+
+  // ── BENEFICIO_LITIGAR ──────────────────────────────────────────────────────
+  BENEFICIO_LITIGAR: {
+    label: 'Beneficio de litigar sin gastos',
+    mesa: [
+      { id: 'mesa_caratula',      label: 'Carátula',                            type: 'text',    required: true, full: true },
+      { id: 'mesa_juzgado',       label: 'Juzgado',                             type: 'juzgado', required: true },
+      { id: 'mesa_secretaria',    label: 'Secretaría',                          type: 'text',    required: true },
+      { id: 'mesa_exp_vinculado', label: 'Expediente Principal Vinculado',      type: 'text',    placeholder: 'N° interno SACO o N° causa', mono: true },
+    ],
+    abogado: [
+      { id: 'abg_estado_proc',  label: 'Estado Procesal',                       type: 'text' },
+      { id: 'abg_plazo_interv', label: 'Plazo de intervención',                 type: 'text',    placeholder: 'Ej: 30 días hábiles' },
+      { id: 'abg_resultado',    label: 'Resultado',                             type: 'textarea', full: true },
     ],
   },
 
@@ -2984,99 +3045,103 @@ const FORMULARIOS = {
   COBRO_CANON: {
     label: 'Cobro de Canon',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_permisionario',  label: 'Permisionario',                  type: 'text',    placeholder: 'Nombre del permisionario' },
-      { id: 'mesa_ref_contrato',   label: 'Referencia de contrato / permiso', type: 'text', mono: true },
-      { id: 'mesa_area_req',       label: 'Área requirente',                type: 'text' },
+      { id: 'mesa_permisionario', label: 'Permisionario',                       type: 'text', required: true },
+      { id: 'mesa_ref_contrato',  label: 'Referencia de contrato / N° PPU',     type: 'text', mono: true },
+      { id: 'mesa_area_req',      label: 'Área requirente',                     type: 'text', required: true },
     ],
     abogado: [
-      { id: 'abg_periodo',         label: 'Período adeudado',               type: 'text',    placeholder: 'Ej: Enero–Marzo 2026' },
-      { id: 'abg_monto_info',      label: 'Monto informado',                type: 'money',   placeholder: '0' },
-      { id: 'abg_monto_act',       label: 'Monto actualizado',              type: 'money',   placeholder: '0' },
-      { id: 'abg_garante',         label: 'Garante',                        type: 'text' },
+      { id: 'abg_periodo',      label: 'Período adeudado',                      type: 'text',  placeholder: 'Ej: Enero–Marzo 2026' },
+      { id: 'abg_monto_info',   label: 'Monto informado',                       type: 'money', placeholder: '0' },
+      { id: 'abg_monto_act',    label: 'Monto actualizado',                     type: 'money', placeholder: '0' },
+      { id: 'abg_garante',      label: 'Garante',                               type: 'text' },
     ],
   },
 
-  // ── CONSIGNACION ───────────────────────────────────────────────────────────
-  CONSIGNACION: {
-    label: 'Consignación',
+  // ── RECLAMO_CONTRAT ────────────────────────────────────────────────────────
+  RECLAMO_CONTRAT: {
+    label: 'Reclamo a Contratista / Proveedor',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_nombre_causante',label: 'Nombre del causante / ex trabajador', type: 'text', required: true },
+      { id: 'mesa_contratista',   label: 'Contratista / Proveedor',             type: 'text',     required: true },
+      { id: 'mesa_objeto_nro_exp',label: 'Objeto / N° Expediente / Contratación', type: 'text',   required: true, full: true },
+      { id: 'mesa_motivo_visible',label: 'Motivo visible',                      type: 'textarea', full: true },
+      { id: 'mesa_area_req',      label: 'Área requirente',                     type: 'text',     required: true },
     ],
     abogado: [
-      { id: 'abg_fecha_deceso',    label: 'Fecha del deceso',               type: 'date' },
-      { id: 'abg_herederos_leg',   label: 'Herederos denunciados en el legajo', type: 'textarea', full: true },
-      { id: 'abg_otros_hered',     label: 'Otros supuestos herederos',      type: 'textarea', full: true },
-      { id: 'abg_dir_hered',       label: 'Dirección de los herederos',     type: 'textarea', full: true },
-      { id: 'abg_motivos',         label: 'Motivos de la consignación',     type: 'textarea', full: true },
-      { id: 'abg_monto',           label: 'Monto a consignar',              type: 'money',    placeholder: '0' },
-      { id: 'abg_tope_convenio',   label: 'Tope de convenio (detalle)',     type: 'text' },
-      { id: 'abg_categoria',       label: 'Categoría',                      type: 'text' },
-      { id: 'abg_convenio',        label: 'Convenio colectivo aplicable',   type: 'text' },
+      { id: 'abg_fecha_prescr', label: 'Fecha prescripción',                    type: 'date' },
+      { id: 'abg_motivo_jur',   label: 'Motivo jurídico',                       type: 'textarea', full: true },
+      { id: 'abg_danos',        label: 'Daños acreditados',                     type: 'textarea', full: true },
     ],
   },
 
-  // ── DEFENSA_CIVIL ──────────────────────────────────────────────────────────
-  DEFENSA_CIVIL: {
-    label: 'Defensas Civiles',
+  // ── LANZAMIENTO ────────────────────────────────────────────────────────────
+  LANZAMIENTO: {
+    label: 'Lanzamiento',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',             type: 'abogado', required: true },
-      { id: 'mesa_num_causa',      label: 'N° de Causa',                   type: 'causa',   placeholder: 'FSM-XXXXX/2026', mono: true },
-      { id: 'mesa_juzgado',        label: 'Juzgado',                       type: 'juzgado' },
-      { id: 'mesa_caratula',       label: 'Carátula',                      type: 'text',    required: true, full: true },
-      { id: 'mesa_datos_depend',   label: 'Datos de los dependientes',     type: 'textarea', full: true, placeholder: 'Nombre, cargo, legajo' },
-      { id: 'mesa_tipo_hecho',     label: 'Tipo de Hecho',                 type: 'text' },
-      { id: 'mesa_fecha_hecho',    label: 'Fecha del Hecho',               type: 'date' },
-      { id: 'mesa_lugar_hecho',    label: 'Lugar del Hecho',               type: 'text' },
-      { id: 'mesa_linea',          label: 'Línea Ferroviaria',             type: 'linea' },
-      { id: 'mesa_etapa_proc',     label: 'Etapa Procesal',                type: 'text' },
+      { id: 'mesa_area_req',         label: 'Área requirente',                  type: 'text', required: true },
+      { id: 'mesa_fecha_requerimiento', label: 'Fecha del requerimiento',       type: 'date', required: true },
+      { id: 'mesa_linea',            label: 'Línea Ferroviaria',                type: 'linea', required: true },
+      { id: 'mesa_lugar',            label: 'Lugar / Estación / Km',            type: 'text', required: true },
     ],
-    abogado: [],
+    abogado: [
+      { id: 'abg_espacio_recup', label: 'Espacio recuperado extrajudicialmente', type: 'boolean' },
+      { id: 'abg_devuelto',      label: 'Devuelto al sector requirente',         type: 'boolean' },
+    ],
   },
 
-  // ── DEFENSA_PENAL ──────────────────────────────────────────────────────────
-  DEFENSA_PENAL: {
-    label: 'Defensa Penal',
+  // ── RECUPERO ───────────────────────────────────────────────────────────────
+  RECUPERO: {
+    label: 'Recupero de Daño',
     mesa: [
-      { id: 'mesa_abogado',         label: 'Abogado designado',              type: 'abogado',  required: true },
-      { id: 'mesa_num_causa',       label: 'N° de Causa',                    type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
-      { id: 'mesa_juzgado',         label: 'Juzgado',                        type: 'text' },
-      { id: 'mesa_caratula',        label: 'Carátula',                       type: 'text',     required: true, full: true },
-      { id: 'mesa_area_req',        label: 'Área requirente',                type: 'text' },
-      { id: 'mesa_datos_empleado',  label: 'Datos del empleado',             type: 'textarea', full: true, placeholder: 'Nombre, cargo, legajo' },
-      { id: 'mesa_datos_imputados', label: 'Datos de imputados',             type: 'textarea', full: true },
-      { id: 'mesa_tipo_hecho',      label: 'Tipo de Hecho',                  type: 'text' },
-      { id: 'mesa_fecha_hecho',     label: 'Fecha del Hecho',                type: 'date' },
-      { id: 'mesa_lugar_hecho',     label: 'Lugar del Hecho',                type: 'text' },
-      { id: 'mesa_linea',           label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'mesa_etapa_proc',      label: 'Etapa Procesal',                 type: 'text' },
+      { id: 'mesa_num_siniestro', label: 'N° Siniestro',                        type: 'text', required: true, mono: true, hint: 'SS = Sin Siniestro' },
+      { id: 'mesa_fecha_sin',     label: 'Fecha del Siniestro',                 type: 'date', required: true },
+      { id: 'mesa_linea',         label: 'Línea Ferroviaria',                   type: 'linea', required: true },
+      { id: 'mesa_pan',           label: 'PAN',                                 type: 'text', mono: true },
     ],
-    abogado: [],
+    abogado: [
+      { id: 'abg_seguro',      label: 'Seguro',                                 type: 'text' },
+      { id: 'abg_danos',       label: 'Daños acreditados',                      type: 'textarea', full: true },
+      { id: 'abg_documental',  label: 'Documental',                             type: 'textarea', full: true },
+    ],
+  },
+
+  // ── EJECUCION_GAR ──────────────────────────────────────────────────────────
+  EJECUCION_GAR: {
+    label: 'Ejecución de Pólizas',
+    mesa: [
+      { id: 'mesa_contratista',   label: 'Contratista / Proveedor',             type: 'text', required: true },
+      { id: 'mesa_area_req',      label: 'Área requirente',                     type: 'text', required: true },
+      { id: 'mesa_fecha_ingreso', label: 'Fecha de Ingreso a SACO',             type: 'date', required: true, defaultToday: true },
+      { id: 'mesa_nro_exp',       label: 'N° Expediente Electrónico',           type: 'text', required: true, mono: true },
+    ],
+    abogado: [
+      { id: 'abg_aseguradora',     label: 'Aseguradora',                        type: 'text' },
+      { id: 'abg_nro_polizas',     label: 'N° Pólizas',                         type: 'text',  mono: true },
+      { id: 'abg_tipo_polizas',    label: 'Tipo de pólizas',                    type: 'text' },
+      { id: 'abg_monto_ejecutar',  label: 'Monto a ejecutar',                   type: 'money', placeholder: '0' },
+      { id: 'abg_fecha_prescr',    label: 'Fecha prescripción',                 type: 'date' },
+      { id: 'abg_acuerdo',         label: 'Acuerdo',                            type: 'textarea', full: true },
+    ],
   },
 
   // ── DEMANDA_CIVIL ──────────────────────────────────────────────────────────
   DEMANDA_CIVIL: {
     label: 'Demanda Civil',
     mesa: [
-      { id: 'mesa_abogado',       label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_num_causa',     label: 'N° de Causa',                    type: 'causa',   placeholder: 'FSM-XXXXX/2026', mono: true },
-      { id: 'mesa_juzgado',       label: 'Juzgado',                        type: 'juzgado' },
-      { id: 'mesa_caratula',      label: 'Carátula',                       type: 'text',    required: true, full: true },
-      { id: 'mesa_abogado_contr', label: 'Abogado de la contraria',        type: 'text' },
-      { id: 'mesa_parte_actora',  label: 'Parte Actora',                   type: 'text' },
-      { id: 'mesa_parte_dem',     label: 'Parte Demandada',                type: 'text' },
-      { id: 'mesa_coactores',     label: 'Coactores',                      type: 'text',    placeholder: 'Opcional' },
-      { id: 'mesa_codemandados',  label: 'Codemandado',                    type: 'text',    placeholder: 'Opcional' },
-      { id: 'mesa_fecha_inicio',  label: 'Fecha de Inicio',                type: 'date' },
-      { id: 'mesa_juicio',        label: 'Juicio',                         type: 'text' },
-      { id: 'mesa_monto',         label: 'Monto de la demanda',            type: 'money',   placeholder: '0' },
-      { id: 'mesa_tipo_hecho',    label: 'Tipo de Hecho',                  type: 'text' },
-      { id: 'mesa_fecha_hecho',   label: 'Fecha del Hecho',                type: 'date' },
-      { id: 'mesa_lugar_hecho',   label: 'Lugar del Hecho',                type: 'text' },
-      { id: 'mesa_linea',         label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'mesa_num_siniestro', label: 'N° de Siniestro',               type: 'text',    placeholder: 'SS-XXXX / SS SOFSE', hint: 'SS = Sin Siniestro' },
-      { id: 'mesa_etapa_proc',    label: 'Etapa Procesal',                 type: 'text' },
+      { id: 'mesa_num_causa',     label: 'N° de Causa',                         type: 'causa',   required: true, placeholder: 'FSM-XXXXX/2026', mono: true },
+      { id: 'mesa_juzgado',       label: 'Juzgado',                             type: 'juzgado', required: true },
+      { id: 'mesa_caratula',      label: 'Carátula',                            type: 'text',    required: true, full: true },
+      { id: 'mesa_abogado_contr', label: 'Abogado de la Contraria',             type: 'text',    required: true },
+      { id: 'mesa_parte_actora',  label: 'Parte Actora',                        type: 'text',    required: true },
+      { id: 'mesa_parte_dem',     label: 'Parte Demandada',                     type: 'text',    required: true },
+      { id: 'mesa_coactores',     label: 'Coactores',                           type: 'text',    required: true },
+      { id: 'mesa_codemandados',  label: 'Codemandado',                         type: 'text',    required: true },
+      { id: 'mesa_fecha_inicio',  label: 'Fecha de Inicio',                     type: 'date',    required: true },
+      { id: 'mesa_tipo_juicio',   label: 'Tipo de Juicio',                      type: 'text',    required: true },
+      { id: 'mesa_monto',         label: 'Monto de la demanda',                 type: 'money',   required: true, placeholder: '0' },
+      { id: 'mesa_tipo_hecho',    label: 'Tipo de Hecho',                       type: 'text',    required: true },
+      { id: 'mesa_fecha_hecho',   label: 'Fecha del Hecho',                     type: 'date' },
+      { id: 'mesa_lugar_hecho',   label: 'Lugar del Hecho',                     type: 'text' },
+      { id: 'mesa_linea',         label: 'Línea Ferroviaria',                   type: 'linea' },
     ],
     abogado: [],
   },
@@ -3085,240 +3150,138 @@ const FORMULARIOS = {
   DEMANDA_LABORAL: {
     label: 'Demanda Laboral',
     mesa: [
-      { id: 'mesa_abogado',       label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_num_causa',     label: 'N° de Causa',                    type: 'causa',   placeholder: 'FLP-XXXXX/2026', mono: true },
-      { id: 'mesa_juzgado',       label: 'Juzgado',                        type: 'juzgado' },
-      { id: 'mesa_caratula',      label: 'Carátula',                       type: 'text',    required: true, full: true },
-      { id: 'mesa_abogado_contr', label: 'Abogado de la contraria',        type: 'text' },
-      { id: 'mesa_parte_actora',  label: 'Parte Actora',                   type: 'text' },
-      { id: 'mesa_parte_dem',     label: 'Parte Demandada',                type: 'text' },
-      { id: 'mesa_coactores',     label: 'Coactores',                      type: 'text',    placeholder: 'Opcional' },
-      { id: 'mesa_codemandados',  label: 'Codemandado',                    type: 'text',    placeholder: 'Opcional' },
-      { id: 'mesa_fecha_inicio',  label: 'Fecha de Inicio',                type: 'date' },
-      { id: 'mesa_juicio',        label: 'Juicio',                         type: 'text' },
-      { id: 'mesa_monto',         label: 'Monto de la demanda',            type: 'money',   placeholder: '0' },
-      { id: 'mesa_tipo_hecho',    label: 'Tipo de Hecho',                  type: 'text' },
-      { id: 'mesa_fecha_hecho',   label: 'Fecha del Hecho',                type: 'date' },
-      { id: 'mesa_lugar_hecho',   label: 'Lugar del Hecho',                type: 'text' },
-      { id: 'mesa_linea',         label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'mesa_num_siniestro', label: 'N° de Siniestro',               type: 'text',    placeholder: 'SS-XXXX / SS SOFSE', hint: 'SS = Sin Siniestro' },
-      { id: 'mesa_etapa_proc',    label: 'Etapa Procesal',                 type: 'text' },
+      { id: 'mesa_num_causa',     label: 'N° de Causa',                         type: 'causa',   required: true, placeholder: 'FLP-XXXXX/2026', mono: true },
+      { id: 'mesa_juzgado',       label: 'Juzgado',                             type: 'juzgado', required: true },
+      { id: 'mesa_caratula',      label: 'Carátula',                            type: 'text',    required: true, full: true },
+      { id: 'mesa_abogado_contr', label: 'Abogado de la Contraria',             type: 'text',    required: true },
+      { id: 'mesa_parte_actora',  label: 'Parte Actora',                        type: 'text',    required: true },
+      { id: 'mesa_parte_dem',     label: 'Parte Demandada',                     type: 'text',    required: true },
+      { id: 'mesa_coactores',     label: 'Coactores',                           type: 'text',    required: true },
+      { id: 'mesa_codemandados',  label: 'Codemandado',                         type: 'text',    required: true },
+      { id: 'mesa_fecha_inicio',  label: 'Fecha de Inicio',                     type: 'date',    required: true },
+      { id: 'mesa_tipo_juicio',   label: 'Tipo de Juicio',                      type: 'text',    required: true },
+      { id: 'mesa_monto',         label: 'Monto de la demanda',                 type: 'money',   required: true, placeholder: '0' },
+      { id: 'mesa_tipo_hecho',    label: 'Tipo de Hecho',                       type: 'text',    required: true },
+      { id: 'mesa_fecha_hecho',   label: 'Fecha del Hecho',                     type: 'date' },
+      { id: 'mesa_lugar_hecho',   label: 'Lugar del Hecho',                     type: 'text' },
+      { id: 'mesa_linea',         label: 'Línea Ferroviaria',                   type: 'linea' },
     ],
     abogado: [],
+  },
+
+  // ── CONSIGNACION ───────────────────────────────────────────────────────────
+  CONSIGNACION: {
+    label: 'Consignación',
+    mesa: [
+      { id: 'mesa_nombre_causante', label: 'Nombre del Causante / Ex trabajador', type: 'text', required: true },
+    ],
+    abogado: [
+      { id: 'abg_fecha_deceso',    label: 'Fecha del deceso',                   type: 'date' },
+      { id: 'abg_herederos_leg',   label: 'Herederos denunciados en el legajo', type: 'textarea', full: true },
+      { id: 'abg_otros_hered',     label: 'Otros supuestos herederos',          type: 'textarea', full: true },
+      { id: 'abg_dir_hered',       label: 'Dirección de los herederos',         type: 'textarea', full: true },
+      { id: 'abg_motivos',         label: 'Motivos de la consignación',         type: 'textarea', full: true },
+      { id: 'abg_monto',           label: 'Monto a consignar',                  type: 'money',    placeholder: '0' },
+      { id: 'abg_categoria',       label: 'Categoría',                          type: 'text' },
+      { id: 'abg_convenio',        label: 'Convenio colectivo aplicable',       type: 'text' },
+    ],
   },
 
   // ── DESAFUERO ──────────────────────────────────────────────────────────────
   DESAFUERO: {
     label: 'Desafuero',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_area_req',       label: 'Área requirente',                type: 'text' },
-      { id: 'mesa_linea_req',      label: 'Línea requirente',               type: 'linea' },
-      { id: 'mesa_nombre_trab',    label: 'Nombre del trabajador',          type: 'text',    required: true },
+      { id: 'mesa_area_req',    label: 'Área Requirente',    type: 'text',  required: true },
+      { id: 'mesa_linea_req',   label: 'Línea Requirente',   type: 'linea', required: true },
+      { id: 'mesa_nombre_trab', label: 'Nombre del Trabajador', type: 'text', required: true },
     ],
     abogado: [
-      { id: 'abg_motivo_hecho',    label: 'Motivo / hecho denunciado',      type: 'textarea', full: true },
-      { id: 'abg_tipo_hecho',      label: 'Tipo de hecho',                  type: 'text' },
-      { id: 'abg_fecha_hecho',     label: 'Fecha del hecho',                type: 'date' },
-      { id: 'abg_sancion',         label: 'Sanción perseguida',             type: 'text' },
-      { id: 'abg_fecha_informe',   label: 'Fecha del informe',              type: 'date' },
-      { id: 'abg_num_causa_penal', label: 'N° Causa Penal',                 type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
-      { id: 'abg_nro_ucit',        label: 'N° Informe UCIT',                type: 'text',     mono: true },
+      { id: 'abg_motivo_hecho',    label: 'Motivo / Hecho denunciado',          type: 'textarea', full: true },
+      { id: 'abg_tipo_hecho',      label: 'Tipo de hecho',                      type: 'text' },
+      { id: 'abg_fecha_hecho',     label: 'Fecha del hecho',                    type: 'date' },
+      { id: 'abg_sancion',         label: 'Sanción perseguida',                 type: 'text' },
+      { id: 'abg_num_causa_penal', label: 'N° Causa Penal',                     type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
+      { id: 'abg_nro_ucit',        label: 'N° Informe UCIT',                    type: 'text',     mono: true },
     ],
-  },
-
-  // ── EJECUCION_GAR ──────────────────────────────────────────────────────────
-  EJECUCION_GAR: {
-    label: 'Ejecución de Pólizas',
-    mesa: [
-      { id: 'mesa_abogado',          label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_contratista',      label: 'Contratista',                    type: 'text',    required: true },
-      { id: 'mesa_area_req',         label: 'Área requirente',                type: 'text' },
-      { id: 'mesa_nro_exp',          label: 'N° Expediente',                  type: 'text',    mono: true },
-      { id: 'mesa_causa_vinculada',  label: 'Causa vinculada',                type: 'text',    mono: true, placeholder: 'N° interno SACO o N° causa' },
-      { id: 'mesa_cuantif_danos',    label: 'Cuantificación de daños',        type: 'money',   placeholder: '0' },
-      { id: 'mesa_fecha_ingreso',    label: 'Fecha ingreso SACO',             type: 'date',    defaultToday: true },
-      { id: 'mesa_es_extrajudicial', label: '¿Es extrajudicial?',             type: 'boolean' },
-      { id: 'mesa_abogado_extraj',   label: 'Abogado extrajudicial',          type: 'abogado', dependsOn: { field: 'mesa_es_extrajudicial', value: true }, hint: 'Solo si la gestión es extrajudicial' },
-    ],
-    abogado: [
-      { id: 'abg_aseguradora',      label: 'Aseguradora',                    type: 'text' },
-      { id: 'abg_nro_polizas',      label: 'N° Pólizas',                     type: 'text',    mono: true },
-      { id: 'abg_tipo_polizas',     label: 'Tipo de pólizas',                type: 'text' },
-      { id: 'abg_monto_ejecutar',   label: 'Monto a ejecutar',               type: 'money',   placeholder: '0' },
-      { id: 'abg_fecha_prescr',     label: 'Fecha prescripción',             type: 'date' },
-      { id: 'abg_fecha_rescision',  label: 'Fecha rescisión',                type: 'date' },
-      { id: 'abg_acuerdo',          label: 'Acuerdo',                        type: 'textarea', full: true },
-    ],
-  },
-
-  // ── LANZAMIENTO ────────────────────────────────────────────────────────────
-  LANZAMIENTO: {
-    label: 'Lanzamiento',
-    mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_caratula',       label: 'Carátula',                       type: 'text',    required: true, full: true },
-      { id: 'mesa_fecha_recep',    label: 'Fecha de Recepción en SACO',     type: 'date',    defaultToday: true },
-      { id: 'mesa_linea',          label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'mesa_lugar_ocup',     label: 'Lugar ocupado',                  type: 'text',    placeholder: 'Descripción del espacio' },
-      { id: 'mesa_autorizado',     label: 'Juicio iniciado',                type: 'boolean' },
-    ],
-    abogado: [
-      { id: 'abg_espacio_recup',   label: 'Espacio recuperado extrajudicialmente', type: 'boolean' },
-      { id: 'abg_devuelto',        label: 'Devuelto al sector requirente',  type: 'boolean' },
-    ],
-  },
-
-  // ── MEDIACION ──────────────────────────────────────────────────────────────
-  MEDIACION: {
-    label: 'Mediación',
-    mesa: [
-      { id: 'mesa_abogado',         label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_requirente',      label: 'Requirente / reclamante',        type: 'text',    required: true },
-      { id: 'mesa_mediador',        label: 'Mediador/a',                     type: 'text' },
-      { id: 'mesa_nro_mediacion',   label: 'N° de mediación',                type: 'text',    mono: true },
-      { id: 'mesa_fecha_audiencia', label: 'Fecha de audiencia',             type: 'date' },
-    ],
-    abogado: [
-      { id: 'abg_objeto_reclamo',  label: 'Objeto del reclamo',             type: 'textarea', full: true },
-      { id: 'abg_monto_reclam',    label: 'Monto reclamado',                type: 'money',    placeholder: '0' },
-      { id: 'abg_resultado',       label: 'Resultado audiencia',            type: 'text' },
-      { id: 'abg_fecha_cierre',    label: 'Fecha de cierre',                type: 'date' },
-      { id: 'abg_req_asistencia',  label: 'Requiere asistencia',            type: 'boolean' },
-    ],
-  },
-
-  // ── OFICIO ─────────────────────────────────────────────────────────────────
-  OFICIO: {
-    label: 'Oficio',
-    mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_num_causa',      label: 'N° Causa',                       type: 'causa',   placeholder: 'FSM-XXXXX/2026', mono: true },
-      { id: 'mesa_juzgado',        label: 'Juzgado',                        type: 'juzgado' },
-      { id: 'mesa_secretaria',     label: 'Secretaría',                     type: 'text' },
-      { id: 'mesa_caratula',       label: 'Carátula',                       type: 'text',    required: true, full: true },
-      { id: 'mesa_fecha_oficio',   label: 'Fecha del oficio',               type: 'date' },
-      { id: 'mesa_caracter',       label: 'Carácter',                       type: 'text',    placeholder: 'Ej: Informativo, Ejecutorio' },
-    ],
-    abogado: [
-      { id: 'abg_objeto_req',      label: 'Objeto del requerimiento',       type: 'textarea', full: true },
-      { id: 'abg_area_informante', label: 'Área informante',                type: 'text' },
-      { id: 'abg_fecha_contest',   label: 'Fecha de contestación',          type: 'date' },
-    ],
-    variante_penal: {
-      mesa: [
-        { id: 'mesa_num_causa',    label: 'N° Causa / Sumario / IPP',       type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
-        { id: 'mesa_caratula',     label: 'Carátula',                       type: 'text',     required: true, full: true },
-        { id: 'mesa_datos_req',    label: 'Datos requirente',               type: 'textarea', full: true },
-        { id: 'mesa_datos_cont',   label: 'Datos de contacto',              type: 'textarea', full: true },
-        { id: 'mesa_fecha_recep',  label: 'Fecha recepción',                type: 'date',     defaultToday: true },
-        { id: 'mesa_fecha_hecho',  label: 'Fecha hecho',                    type: 'date' },
-        { id: 'mesa_lugar_hecho',  label: 'Lugar hecho',                    type: 'text' },
-        { id: 'mesa_linea',        label: 'Línea ferroviaria',              type: 'linea' },
-        { id: 'mesa_damnificado',  label: 'Damnificado',                    type: 'text' },
-        { id: 'mesa_imputado',     label: 'Imputado',                       type: 'text' },
-      ],
-      abogado: [
-        { id: 'abg_tipo_hecho',    label: 'Tipo de hecho',                  type: 'text' },
-        { id: 'abg_tipo_solic',    label: 'Tipo de solicitud',              type: 'text' },
-      ],
-    },
-  },
-
-  // ── PEDIDO_CAUSA_PENAL ─────────────────────────────────────────────────────
-  PEDIDO_CAUSA_PENAL: {
-    label: 'Pedido de Causa Penal',
-    mesa: [],
-    abogado: [
-      { id: 'abg_linea',          label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'abg_num_causa',      label: 'N° de Causa',                    type: 'causa',   placeholder: 'IPP-XXXX/2026', mono: true },
-      { id: 'abg_num_sumario',    label: 'N° de Sumario',                  type: 'text',    mono: true },
-      { id: 'abg_comisaria',      label: 'Comisaría',                      type: 'text' },
-      { id: 'abg_requirente',     label: 'Requirente',                     type: 'text' },
-      { id: 'abg_tipo_solicitud', label: 'Tipo de solicitud',              type: 'text' },
-      { id: 'abg_fecha_hecho',    label: 'Fecha del Hecho',                type: 'date' },
-      { id: 'abg_obs',            label: 'Observaciones',                  type: 'textarea', full: true },
-    ],
-    nota: 'Sin campos en Mesa SACO. Asignación automática: Civil/Laboral por orden FIFO, Penal por línea ferroviaria.',
   },
 
   // ── QUERELLA ───────────────────────────────────────────────────────────────
   QUERELLA: {
     label: 'Querella',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_num_causa',      label: 'N° Causa',                       type: 'causa',   placeholder: 'IPP-XXXX/2026', mono: true },
-      { id: 'mesa_juzgado',        label: 'Juzgado',                        type: 'text' },
-      { id: 'mesa_caratula',       label: 'Carátula',                       type: 'text',    required: true, full: true },
-      { id: 'mesa_tipo_hecho',     label: 'Tipo de Hecho',                  type: 'text' },
-      { id: 'mesa_fecha_hecho',    label: 'Fecha del Hecho',                type: 'date' },
-      { id: 'mesa_lugar_hecho',    label: 'Lugar del Hecho',                type: 'text' },
-      { id: 'mesa_linea',          label: 'Línea Ferroviaria',              type: 'linea' },
-      { id: 'mesa_etapa_proc',     label: 'Etapa Procesal',                 type: 'text' },
+      { id: 'mesa_num_causa',  label: 'N° de Causa',      type: 'causa',   placeholder: 'IPP-XXXX/2026', mono: true },
+      { id: 'mesa_juzgado',    label: 'Juzgado',          type: 'juzgado' },
+      { id: 'mesa_caratula',   label: 'Carátula',         type: 'text',  full: true },
+      { id: 'mesa_tipo_hecho', label: 'Tipo de Hecho',    type: 'text' },
+      { id: 'mesa_fecha_hecho',label: 'Fecha del Hecho',  type: 'date' },
+      { id: 'mesa_lugar_hecho',label: 'Lugar del Hecho',  type: 'text' },
+      { id: 'mesa_linea',      label: 'Línea Ferroviaria',type: 'linea' },
     ],
     abogado: [],
   },
 
-  // ── RECLAMO_CONTRAT ────────────────────────────────────────────────────────
-  RECLAMO_CONTRAT: {
-    label: 'Reclamo Contractual',
+  // ── DEFENSA_CIVIL ──────────────────────────────────────────────────────────
+  DEFENSA_CIVIL: {
+    label: 'Defensas Civiles',
     mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado',  required: true },
-      { id: 'mesa_contratista',    label: 'Contratista',                    type: 'text',     required: true },
-      { id: 'mesa_objeto_exp',     label: 'Objeto / Expediente',            type: 'text' },
-      { id: 'mesa_motivo_visible', label: 'Motivo visible',                 type: 'textarea', full: true },
-      { id: 'mesa_area_req',       label: 'Área requirente',                type: 'text' },
-    ],
-    abogado: [
-      { id: 'abg_fecha_prescr',    label: 'Fecha prescripción',             type: 'date' },
-      { id: 'abg_motivo_jur',      label: 'Motivo jurídico',                type: 'textarea', full: true },
-      { id: 'abg_danos',           label: 'Daños acreditados',              type: 'textarea', full: true },
-    ],
-  },
-
-  // ── RECUPERO ───────────────────────────────────────────────────────────────
-  RECUPERO: {
-    label: 'Recupero de Daño',
-    mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado', required: true },
-      { id: 'mesa_num_siniestro',  label: 'N° siniestro',                   type: 'text',    mono: true, hint: 'SS = Sin Siniestro' },
-      { id: 'mesa_fecha_sin',      label: 'Fecha siniestro',                type: 'date' },
-      { id: 'mesa_linea',          label: 'Línea ferroviaria',              type: 'linea' },
-      { id: 'mesa_pan',            label: 'PAN',                            type: 'text',    mono: true },
-    ],
-    abogado: [
-      { id: 'abg_seguro',          label: 'Seguro',                         type: 'text' },
-      { id: 'abg_danos',           label: 'Daños acreditados',              type: 'textarea', full: true },
-      { id: 'abg_documental',      label: 'Documental',                     type: 'textarea', full: true },
-    ],
-  },
-
-  // ── BENEFICIO_LITIGAR ──────────────────────────────────────────────────────
-  BENEFICIO_LITIGAR: {
-    label: 'Beneficio de litigar sin gastos',
-    mesa: [
-      { id: 'mesa_caratula',      label: 'Carátula',                       type: 'text',    required: true, full: true },
-      { id: 'mesa_juzgado',       label: 'Juzgado / Secretaría',           type: 'juzgado' },
-      { id: 'mesa_exp_vinculado', label: 'Expediente Principal Vinculado', type: 'text',    placeholder: 'N° interno SACO o N° causa', mono: true },
-      { id: 'mesa_abogado',       label: 'Abogado designado',              type: 'abogado', required: true },
-    ],
-    abogado: [
-      { id: 'abg_estado_proc',    label: 'Estado Procesal',                type: 'text' },
-      { id: 'abg_plazo_interv',   label: 'Plazo de intervención',          type: 'text',    placeholder: 'Ej: 30 días hábiles' },
-      { id: 'abg_resultado',      label: 'Resultado',                      type: 'textarea', full: true },
-    ],
-  },
-
-  // ── OTROS ──────────────────────────────────────────────────────────────────
-  OTROS: {
-    label: 'Otros (Penal)',
-    mesa: [
-      { id: 'mesa_abogado',        label: 'Abogado designado',              type: 'abogado',  required: true },
-      { id: 'mesa_caratula',       label: 'Carátula',                       type: 'text',     required: true, full: true },
-      { id: 'mesa_descripcion',    label: 'Descripción',                    type: 'textarea', full: true },
+      { id: 'mesa_num_causa',    label: 'N° de Causa',                         type: 'causa',    required: true, placeholder: 'FSM-XXXXX/2026', mono: true },
+      { id: 'mesa_juzgado',      label: 'Juzgado',                             type: 'juzgado',  required: true },
+      { id: 'mesa_caratula',     label: 'Carátula',                            type: 'text',     required: true, full: true },
+      { id: 'mesa_datos_depend', label: 'Datos de los dependientes',           type: 'textarea', required: true, full: true, placeholder: 'Nombre, cargo, legajo' },
+      { id: 'mesa_tipo_hecho',   label: 'Tipo de Hecho',                       type: 'text' },
+      { id: 'mesa_fecha_hecho',  label: 'Fecha del Hecho',                     type: 'date' },
+      { id: 'mesa_lugar_hecho',  label: 'Lugar del Hecho',                     type: 'text' },
+      { id: 'mesa_linea',        label: 'Línea Ferroviaria',                   type: 'linea' },
     ],
     abogado: [],
   },
+
+  // ── DEFENSA_PENAL ──────────────────────────────────────────────────────────
+  DEFENSA_PENAL: {
+    label: 'Defensa Penal',
+    mesa: [
+      { id: 'mesa_area_req',        label: 'Área requirente',                  type: 'text',     required: true },
+      { id: 'mesa_num_causa',       label: 'N° de Causa',                      type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
+      { id: 'mesa_juzgado',         label: 'Juzgado',                          type: 'juzgado' },
+      { id: 'mesa_caratula',        label: 'Carátula',                         type: 'text',     full: true },
+      { id: 'mesa_datos_empleado',  label: 'Datos del empleado a asistir',     type: 'textarea', full: true, placeholder: 'Nombre, cargo, legajo' },
+      { id: 'mesa_datos_imputados', label: 'Datos de los imputados',           type: 'textarea', full: true },
+      { id: 'mesa_tipo_hecho',      label: 'Tipo de Hecho',                    type: 'text' },
+      { id: 'mesa_fecha_hecho',     label: 'Fecha del Hecho',                  type: 'date' },
+      { id: 'mesa_lugar_hecho',     label: 'Lugar del Hecho',                  type: 'text' },
+      { id: 'mesa_linea',           label: 'Línea Ferroviaria',                type: 'linea' },
+    ],
+    abogado: [],
+  },
+
+  // ── CARTA_SUCESO ───────────────────────────────────────────────────────────
+  CARTA_SUCESO: {
+    label: 'Carta Suceso',
+    mesa: [],
+    abogado: [
+      { id: 'abg_documental',  label: 'Documental',                             type: 'textarea', full: true },
+      { id: 'abg_tipo_hecho',  label: 'Tipo de Hecho',                          type: 'text' },
+      { id: 'abg_fecha_hecho', label: 'Fecha del Hecho',                        type: 'date' },
+      { id: 'abg_lugar_hecho', label: 'Lugar del Hecho',                        type: 'text' },
+      { id: 'abg_linea',       label: 'Línea Ferroviaria',                      type: 'linea' },
+      { id: 'abg_juzgado',     label: 'Juzgado / Fiscalía / UFI / Tribunal',    type: 'juzgado' },
+      { id: 'abg_fiscalia',    label: 'Fiscalía / UFI / Tribunal',              type: 'text' },
+      { id: 'abg_num_causa',   label: 'N° de Causa',                            type: 'causa',    placeholder: 'IPP-XXXX/2026', mono: true },
+    ],
+  },
+
+  // ── OTRAS ──────────────────────────────────────────────────────────────────
+  OTRAS: {
+    label: 'Otras presentaciones / gestiones',
+    mesa: [
+      { id: 'mesa_fecha_ingreso', label: 'Fecha del ingreso',                   type: 'date',     required: true, defaultToday: true },
+      { id: 'mesa_descripcion',   label: 'Descripción del ingreso',             type: 'textarea', required: true, full: true },
+      { id: 'mesa_remitente',     label: 'Remitente',                           type: 'text',     required: true },
+      { id: 'mesa_tema_reclamo',  label: 'Tema / Reclamo principal',            type: 'textarea', full: true },
+    ],
+    abogado: [],
+  },
+
 };
 
 function getCamposFormulario(tipoGestion, etapa, area) {
@@ -3351,6 +3314,13 @@ const ESTADOS_POR_TIPO = {
     'Recepcionado',
     'En análisis',
     'Solicitud de información',
+    'Cumplido (acuerdo)',
+    'Cumplido (no acuerdo)',
+    'Archivado',
+  ],
+  SECLOS: [
+    'Recepcionado',
+    'En análisis',
     'Cumplido (acuerdo)',
     'Cumplido (no acuerdo)',
     'Archivado',
