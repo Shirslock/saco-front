@@ -441,12 +441,13 @@ function renderTabla(items) {
 
 // ── Fila de causa agrupadora ──────────────────────────────────────────────
 function renderCausaRow(item, showAbogado = false) {
-  const nc        = item.numeroCausa;
-  const exps      = item.expedientes;
-  const expanded  = expandedCausas.has(nc);
-  const hasAlerta = exps.some(e => e.tiene_alerta);
-  const areas     = [...new Set(exps.map(e => e.area))];
-  const abogados  = [...new Set(exps.map(e => e.abogado))];
+  const nc           = item.numeroCausa;
+  const exps         = item.expedientes;
+  const expanded     = expandedCausas.has(nc);
+  const hasAlerta    = exps.some(e => e.tiene_alerta);
+  const areas        = [...new Set(exps.map(e => e.area))];
+  const abogados     = [...new Set(exps.map(e => e.abogado))];
+  const expPrincipal = exps.find(e => e.es_principal) || exps[0];
 
   let html = `
     <tr class="causa-row bg-[#f0f7f8] border-l-4 border-[#256386]/30 hover:border-[#256386]/60 transition-all" onclick="toggleCausa('${nc.replace(/'/g, "\\'")}')">
@@ -486,8 +487,10 @@ function renderCausaRow(item, showAbogado = false) {
           : abogados.map(a => `<p class="text-[10px] text-[#4f6080]">${a.replace(/^Dr\. |^Dra\. /,'')}</p>`).join('')
         }
       </td>` : ''}
-      <td class="px-4 py-3.5"></td>
-      <td class="px-4 py-3.5"></td>
+      <td class="px-4 py-3.5">
+        ${SACO_UI.estadoBadge(expPrincipal.estado, expPrincipal.estadoLabel || expPrincipal.estado.replace(/_/g,' '))}
+      </td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${expPrincipal.fecha_recepcion || ''}</td>
       <td class="px-4 py-3.5 text-right">
         <button onclick="event.stopPropagation();verTodoCausa('${nc.replace(/'/g, "\\'")}')"
           class="text-[11px] font-bold text-[#256386] hover:underline">
@@ -509,9 +512,17 @@ function renderCausaRow(item, showAbogado = false) {
 function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = false) {
   const sinCausa    = !e.numero_causa || e.numero_causa === null || e.numero_causa.trim() === '' || e.numero_causa.trim().toUpperCase() === 'SS SOFSE';
   const nombreCorto = (e.abogado || '').replace(/^Dr\. |^Dra\. /, '');
+  const esPrincipal = isChild && e.es_principal === true;
+
+  const trClass = isChild
+    ? `child-row cursor-pointer border-l-4 ${esPrincipal ? 'border-emerald-400/60' : 'border-[#256386]/10'}`
+    : 'exp-row cursor-pointer';
+  const trStyle = esPrincipal
+    ? 'background: linear-gradient(to right, rgba(209,250,229,0.45), rgba(236,253,245,0.2), transparent);'
+    : '';
 
   return `
-    <tr class="${isChild ? 'child-row' : 'exp-row'} cursor-pointer ${isChild ? 'border-l-4 border-[#256386]/10' : ''}" onclick="verDetalle('${e.id}')">
+    <tr class="${trClass}" style="${trStyle}" onclick="verDetalle('${e.id}')">
       <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}">
         ${isChild ? `
           <div class="absolute left-4 top-0 bottom-0 w-px bg-[#bcc0c9]" ${isLast ? 'style="bottom:50%"' : ''}></div>
@@ -533,11 +544,16 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
         <div class="flex flex-col gap-0.5">
           <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
           <span class="text-[10px] px-1.5 py-0.5 rounded font-bold w-fit ${areaColors[e.area]||''}">${e.area}</span>
-          ${sinCausa ? `
+          ${esPrincipal ? `
+            <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200/60">
+              <span class="material-symbols-outlined text-[10px]">hub</span>
+              Principal · PJN
+            </span>` : ''}
+          ${sinCausa && !isChild ? `
             <button onclick="event.stopPropagation();abrirModalAgrupar('${e.id}')"
-              class="mt-0.5 text-[9px] font-bold text-[#3a70a9] flex items-center gap-0.5 hover:underline">
-              <span class="material-symbols-outlined text-[11px]">folder_open</span>
-              Agrupar a causa
+              class="mt-0.5 text-[9px] font-bold text-[#4f6080] flex items-center gap-0.5 hover:text-[#256386] hover:underline transition-colors">
+              <span class="material-symbols-outlined text-[11px]">folder_off</span>
+              Sin Causa · Agrupar
             </button>` : ''}
         </div>
       </td>
@@ -605,11 +621,11 @@ function abrirModalAgrupar(expId) {
   const exp = window.SACO.getExpedienteById(expId);
   if (!exp) return;
 
-  const exps = getExpedientesDelUsuario();
-  const causasExistentes = [...new Set(
-    exps.filter(e => e.numero_causa && e.numero_causa.trim() && e.numero_causa.toUpperCase() !== 'SS SOFSE')
-        .map(e => e.numero_causa.trim())
-  )];
+  const todasLasCausas = [...new Set(
+    window.SACO.EXPEDIENTES_ABOGADO
+      .filter(e => e.numero_causa && e.numero_causa.trim() && e.id !== expId)
+      .map(e => e.numero_causa.trim())
+  )].sort();
 
   SACO_UI.showModal('Agrupar a Causa', `
     <div class="space-y-4">
@@ -623,21 +639,37 @@ function abrirModalAgrupar(expId) {
         <input id="modal-causa-input" oninput="onModalCausaInput(this.value)"
           class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
           placeholder="FSM-XXXXX/2026"/>
-        <p class="text-[10px] text-[#4f6080] mt-1">Ingresá el número tal como figura en el expediente judicial.</p>
+        <p class="text-[10px] text-[#4f6080] mt-1">Ingresá el número o seleccioná una causa existente.</p>
       </div>
 
-      ${causasExistentes.length ? `
+      ${todasLasCausas.length ? `
         <div>
-          <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">O seleccioná una causa existente en tu bandeja</p>
-          <div class="space-y-1.5 max-h-36 overflow-y-auto">
-            ${causasExistentes.map(nc => `
-              <button onclick="document.getElementById('modal-causa-input').value='${nc}';onModalCausaInput('${nc}')"
-                class="w-full text-left p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container transition-colors flex items-center gap-2">
-                <span class="material-symbols-outlined text-[#256386] text-[14px]">folder</span>
-                <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
-              </button>`).join('')}
+          <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Causas existentes en el sistema</p>
+          <div class="space-y-1.5 max-h-40 overflow-y-auto">
+            ${todasLasCausas.map(nc => {
+              const expsGrupo = window.SACO.EXPEDIENTES_ABOGADO.filter(e => (e.numero_causa||'').trim() === nc);
+              const areas = [...new Set(expsGrupo.map(e => e.area))].join(' · ');
+              return `
+                <button onclick="document.getElementById('modal-causa-input').value='${nc}';onModalCausaInput('${nc}')"
+                  class="w-full text-left p-3 bg-[#f0f7f8] rounded-lg hover:bg-[#e2eff5] transition-colors">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-[#256386] text-[14px]" style="font-variation-settings:'FILL' 1;">folder</span>
+                      <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-[#4f6080]">${expsGrupo.length} exp.</span>
+                      <span class="text-[10px] text-[#4f6080]">${areas}</span>
+                    </div>
+                  </div>
+                </button>`;
+            }).join('')}
           </div>
-        </div>` : ''}
+        </div>` : `
+        <div class="p-3 bg-[#f0f7f8] rounded-xl text-center">
+          <p class="text-xs text-[#4f6080]">No hay causas existentes en el sistema. Ingresá un número nuevo para crear la primera causa.</p>
+        </div>`}
+
     </div>`,
     `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg">Cancelar</button>
      <button onclick="confirmarAgrupar('${expId}')" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Agrupar</button>`
@@ -656,15 +688,22 @@ function confirmarAgrupar(expId) {
   if (!exp) return;
 
   const exps = window.SACO.EXPEDIENTES_ABOGADO;
-  const conMismaCausa = exps.filter(e => e.id !== expId && (e.numero_causa||'').trim() === nc);
-  if (conMismaCausa.length) {
-    SACO_UI.showToast(`Causa ${nc} ya existe. El expediente quedará bajo el mismo agrupador.`, 'info');
-  }
+  const yaExistePrincipal = exps.some(e =>
+    e.id !== expId &&
+    (e.numero_causa||'').trim() === nc &&
+    e.es_principal === true
+  );
 
   exp.numero_causa = nc;
+  exp.es_principal = !yaExistePrincipal;
+
   SACO_UI.closeModal();
   applyFilters();
-  SACO_UI.showToast(`N° de causa ${nc} asignado a ${expId}.`, 'success');
+  if (!yaExistePrincipal) {
+    SACO_UI.showToast(`${expId} agrupado como expediente principal de ${nc}.`, 'success');
+  } else {
+    SACO_UI.showToast(`${expId} agrupado a causa ${nc}.`, 'success');
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -701,7 +740,25 @@ function confirmarDesagrupar(expId) {
   const exp = window.SACO.getExpedienteById(expId);
   if (!exp) return;
   const causaAnterior = exp.numero_causa;
+  const eraPrincipal  = exp.es_principal;
+
   exp.numero_causa = null;
+  exp.es_principal = false;
+
+  if (eraPrincipal) {
+    const siguiente = window.SACO.EXPEDIENTES_ABOGADO.find(e =>
+      e.id !== expId &&
+      (e.numero_causa||'').trim() === causaAnterior
+    );
+    if (siguiente) {
+      siguiente.es_principal = true;
+      SACO_UI.closeModal();
+      applyFilters();
+      SACO_UI.showToast(`${expId} desagrupado. ${siguiente.id} es ahora el expediente principal.`, 'info');
+      return;
+    }
+  }
+
   SACO_UI.closeModal();
   applyFilters();
   SACO_UI.showToast(`${expId} desagrupado de ${causaAnterior}.`, 'info');

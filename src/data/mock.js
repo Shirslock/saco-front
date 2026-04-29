@@ -183,6 +183,7 @@ const EXPEDIENTES_ABOGADO = [
     tiene_alerta: true,
     alerta_msg: 'Vence período probatorio en 12 días',
     prioridad: 'ALTA',
+    es_principal: true,
     vinculos: [], intervinientes: [],
     campos_mesa: {}, campos_abogado: {},
     timeline: [
@@ -217,6 +218,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Dr. Alejandro Rossi', linea: 'LM',
     tiene_alerta: false, alerta_msg: null,
     prioridad: 'NORMAL',
+    es_principal: false,
     vinculos: [], intervinientes: [],
     campos_mesa: {}, campos_abogado: {},
     timeline: [
@@ -239,6 +241,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Dr. Alejandro Rossi', linea: 'LM',
     tiene_alerta: false, alerta_msg: null,
     prioridad: 'NORMAL',
+    es_principal: false,
     vinculos: [], intervinientes: [],
     campos_mesa: {}, campos_abogado: {},
     timeline: [
@@ -263,6 +266,7 @@ const EXPEDIENTES_ABOGADO = [
     tiene_alerta: true,
     alerta_msg: 'Audiencia el 29/04/2026 — confirmar asistencia',
     prioridad: 'ALTA',
+    es_principal: true,
     vinculos: [], intervinientes: [],
     campos_mesa: {}, campos_abogado: {},
     timeline: [
@@ -285,6 +289,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Alejandra López', linea: 'LGR',
     tiene_alerta: false, alerta_msg: null,
     prioridad: 'NORMAL',
+    es_principal: false,
     vinculos: [], intervinientes: [],
     campos_mesa: {}, campos_abogado: {},
     timeline: [
@@ -308,6 +313,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Alejandra López', linea: null,
     tiene_alerta: false, alerta_msg: null,
     prioridad: 'NORMAL',
+    es_principal: false,
     vinculos: [], intervinientes: [],
     campos_mesa: {}, campos_abogado: {},
     timeline: [
@@ -329,6 +335,7 @@ const EXPEDIENTE_DETALLE = {
   tipo: 'DEMANDA',
   caratula: 'Martínez, Juan Carlos c/ Trenes Argentinos SOFSE s/ daños y perjuicios',
   numero_causa: 'FSM-11802/2023',
+  es_principal: true,
   numero_siniestro: 'SS-2023-0441',
   juzgado: 'Juzgado Federal Civil y Comercial N°8 — Secretaría 15',
   dependencia: 'Fuero Federal Civil y Comercial — CABA',
