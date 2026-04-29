@@ -326,6 +326,30 @@ const EXPEDIENTES_ABOGADO = [
     documentos: [],
   },
 
+  // ── SUELTO — Dr. Alejandro Rossi ─────────────────────────────────
+  {
+    id: 'C-0071/2026', area: 'CIVIL', tipo: 'OFICIO',
+    caratula: 'Oficio Juzgado Nacional Civil N°5 — solicitud antecedentes siniestro ferroviario',
+    numero_causa: null,
+    juzgado: 'Juzgado Nacional Civil N°5',
+    estado: 'EN_TRAMITE', estadoLabel: 'Pedido de información',
+    fecha_recepcion: '2026-04-20',
+    abogado: 'Dr. Alejandro Rossi', linea: null,
+    tiene_alerta: false, alerta_msg: null,
+    prioridad: 'NORMAL',
+    es_principal: false,
+    vinculos: [], intervinientes: [],
+    campos_mesa: {}, campos_abogado: {},
+    timeline: [
+      { fecha: '20/04/2026 · 09:00', tipo: 'RECEPCION',
+        titulo: 'Apertura — Oficio Civil',
+        desc: 'Oficio recibido por EE GDE. Solicitud de antecedentes del siniestro.',
+        doc: 'EX-2026-02801-APN-SACO#SOFSE', activo: true,
+        estadoExpediente: 'EN_TRAMITE', subMovimientos: [] },
+    ],
+    documentos: [],
+  },
+
 ];
 
 // Detalle de expediente (C-0023/2026) — demanda civil siniestro Km 4.5 Línea Mitre

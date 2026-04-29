@@ -517,13 +517,15 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
   const trClass = isChild
     ? `child-row cursor-pointer border-l-4 ${esPrincipal ? 'border-emerald-400/60' : 'border-[#256386]/10'}`
     : 'exp-row cursor-pointer';
-  const trStyle = esPrincipal
-    ? 'background: linear-gradient(to right, rgba(209,250,229,0.45), rgba(236,253,245,0.2), transparent);'
+
+  // Degradé aplicado td por td (el background del tr no se propaga en todos los browsers)
+  const tdGs = esPrincipal
+    ? 'style="background: linear-gradient(to right, rgba(209,250,229,0.5), rgba(236,253,245,0.35));"'
     : '';
 
   return `
-    <tr class="${trClass}" style="${trStyle}" onclick="verDetalle('${e.id}')">
-      <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}">
+    <tr class="${trClass}" onclick="verDetalle('${e.id}')">
+      <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}" ${tdGs}>
         ${isChild ? `
           <div class="absolute left-4 top-0 bottom-0 w-px bg-[#bcc0c9]" ${isLast ? 'style="bottom:50%"' : ''}></div>
           <div class="absolute left-4 top-1/2 w-3.5 h-px bg-[#bcc0c9]"></div>
@@ -533,19 +535,21 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
               : `<span class="material-symbols-outlined text-[#4f6080] text-[16px]">description</span>`
             }
           </div>` : `
-          <div class="w-8 h-8 flex items-center justify-center rounded-lg ${e.tiene_alerta ? 'bg-[#fee2e2]' : 'bg-[#f0f7f8]'}">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg ${e.tiene_alerta ? 'bg-[#fee2e2]' : esPrincipal ? 'bg-emerald-100/80' : 'bg-[#f0f7f8]'}">
             ${e.tiene_alerta
               ? `<span class="material-symbols-outlined text-[#cd5055] text-[18px]" style="font-variation-settings:'FILL' 1;">warning</span>`
-              : `<span class="material-symbols-outlined text-[#4f6080] text-[18px]">description</span>`
+              : esPrincipal
+                ? `<span class="material-symbols-outlined text-emerald-600 text-[18px]" style="font-variation-settings:'FILL' 1;">hub</span>`
+                : `<span class="material-symbols-outlined text-[#4f6080] text-[18px]">description</span>`
             }
           </div>`}
       </td>
-      <td class="px-4 py-3.5">
+      <td class="px-4 py-3.5" ${tdGs}>
         <div class="flex flex-col gap-0.5">
           <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
           <span class="text-[10px] px-1.5 py-0.5 rounded font-bold w-fit ${areaColors[e.area]||''}">${e.area}</span>
           ${esPrincipal ? `
-            <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200/60">
+            <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 w-fit bg-emerald-100 text-emerald-700 border border-emerald-200/60">
               <span class="material-symbols-outlined text-[10px]">hub</span>
               Principal · PJN
             </span>` : ''}
@@ -553,23 +557,23 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
             <button onclick="event.stopPropagation();abrirModalAgrupar('${e.id}')"
               class="mt-0.5 text-[9px] font-bold text-[#4f6080] flex items-center gap-0.5 hover:text-[#256386] hover:underline transition-colors">
               <span class="material-symbols-outlined text-[11px]">folder_off</span>
-              Sin Causa · Agrupar
+              Sin causa · Agrupar
             </button>` : ''}
         </div>
       </td>
-      <td class="px-4 py-3.5 max-w-xs">
+      <td class="px-4 py-3.5 max-w-xs" ${tdGs}>
         <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
         <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa||''}</p>
         ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-1">${e.alerta_msg}</p>` : ''}
       </td>
-      <td class="px-4 py-3.5 text-xs text-[#4f6080] font-medium">${(e.tipo||'').replace(/_/g,' ')}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080] font-medium" ${tdGs}>${(e.tipo||'').replace(/_/g,' ')}</td>
       ${showAbogado ? `
-      <td class="px-4 py-3.5">
+      <td class="px-4 py-3.5" ${tdGs}>
         <span class="text-xs text-[#1b3a5c]">${nombreCorto}</span>
       </td>` : ''}
-      <td class="px-4 py-3.5">${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
-      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
-      <td class="px-4 py-3.5">
+      <td class="px-4 py-3.5" ${tdGs}>${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]" ${tdGs}>${e.fecha_recepcion}</td>
+      <td class="px-4 py-3.5 text-right" ${tdGs}>
         <div class="flex items-center gap-3 justify-end">
           ${isChild ? `
           <button onclick="event.stopPropagation();desagrupar('${e.id}')"
