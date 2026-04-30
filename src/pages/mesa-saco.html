@@ -60,116 +60,66 @@ tailwind.config = {
     </a>
   </div>
 
-  <!-- ── Métricas ──────────────────────────────────────────────────────── -->
-  <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
-
-    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
-      <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-[#256386] p-2 bg-primary-container rounded-lg" style="font-variation-settings:'FILL' 1;">folder_open</span>
-        <span class="text-[10px] font-bold text-[#1e3a5f] bg-[#dbeafe] px-2 py-1 rounded-full uppercase tracking-tight">Total</span>
-      </div>
-      <div class="mt-4">
-        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-total">—</p>
-        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Asignados</p>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
-      <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-[#3a70a9] p-2 bg-[#dbeafe] rounded-lg" style="font-variation-settings:'FILL' 1;">gavel</span>
-        <span class="text-[10px] font-bold text-[#1e3a5f] bg-[#dbeafe] px-2 py-1 rounded-full uppercase tracking-tight">Civil</span>
-      </div>
-      <div class="mt-4">
-        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-civil">—</p>
-        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Civiles</p>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
-      <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-[#3a70a9] p-2 bg-[#dbeafe] rounded-lg" style="font-variation-settings:'FILL' 1;">work</span>
-        <span class="text-[10px] font-bold text-[#1e3a5f] bg-[#dbeafe] px-2 py-1 rounded-full uppercase tracking-tight">Laboral</span>
-      </div>
-      <div class="mt-4">
-        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-laboral">—</p>
-        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Laborales</p>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 flex flex-col justify-between">
-      <div class="flex justify-between items-start">
-        <span class="material-symbols-outlined text-[#6d8eb0] p-2 bg-[#e0e7ef] rounded-lg" style="font-variation-settings:'FILL' 1;">policy</span>
-        <span class="text-[10px] font-bold text-[#3a4f6a] bg-[#e0e7ef] px-2 py-1 rounded-full uppercase tracking-tight">Penal</span>
-      </div>
-      <div class="mt-4">
-        <p class="text-4xl font-black text-[#1b3a5c]" id="metric-penal">—</p>
-        <p class="text-xs font-bold text-[#4f6080] uppercase tracking-wider mt-1">Expedientes Penales</p>
-      </div>
-    </div>
-
-  </section>
-
   <!-- ── Filtros + Tabla ───────────────────────────────────────────────── -->
-  <section class="grid grid-cols-12 gap-6">
+  <section class="space-y-5">
 
-    <!-- ── Filtros ──────────────────────────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-3">
-      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5 space-y-5 sticky top-20">
+    <!-- ── Barra de filtros horizontal ──────────────────────────────────── -->
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-4">
+      <div class="flex flex-wrap gap-3 items-end">
 
-        <div class="relative">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
-          <input id="f-search" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Carátula, N° causa..."/>
+        <!-- Búsqueda -->
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Buscar</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px]">search</span>
+            <input id="f-search" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Carátula, N° causa, N° interno..."/>
+          </div>
         </div>
 
         <!-- Tipo de Gestión -->
-        <div>
-          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de Gestión</label>
-          <select id="f-tipo" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+        <div class="min-w-[160px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Tipo de Gestión</label>
+          <select id="f-tipo" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
             <option value="">Todos</option>
           </select>
         </div>
 
         <!-- Referencia GDE -->
-        <div>
-          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Referencia GDE</label>
-          <input id="f-gde" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="EX-2026-..."/>
-        </div>
-
-        <!-- Canal de Ingreso -->
-        <div>
-          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Canal de Ingreso</label>
-          <select id="f-canal" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
-            <option value="">Todos</option>
-            <option value="EE_GDE">EE GDE</option>
-            <option value="MEMO_GDE">Memo GDE</option>
-            <option value="MAIL">Mail</option>
-          </select>
+        <div class="min-w-[180px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Referencia GDE</label>
+          <input id="f-gde" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="EX-2026-..."/>
         </div>
 
         <!-- Letrado -->
-        <div>
-          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Letrado</label>
-          <select id="f-abogado" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+        <div class="min-w-[160px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Letrado</label>
+          <select id="f-abogado" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
             <option value="">Todos</option>
           </select>
         </div>
 
-        <!-- Fecha de Recepción -->
-        <div>
-          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Recepción desde</label>
-          <input id="f-fecha-desde" oninput="applyFilters()" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none mb-2"/>
-          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Recepción hasta</label>
-          <input id="f-fecha-hasta" oninput="applyFilters()" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
+        <!-- Recepción desde/hasta -->
+        <div class="min-w-[130px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Desde</label>
+          <input id="f-fecha-desde" oninput="applyFilters()" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
+        </div>
+        <div class="min-w-[130px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Hasta</label>
+          <input id="f-fecha-hasta" oninput="applyFilters()" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
         </div>
 
-        <button onclick="limpiarFiltros()" class="w-full py-2 border-2 border-dashed border-[#bcc0c9] rounded-xl text-xs font-bold text-[#4f6080] hover:border-[#256386]/50 hover:text-[#256386] transition-all">
-          Limpiar filtros
-        </button>
+        <!-- Limpiar -->
+        <div class="flex-shrink-0">
+          <button onclick="limpiarFiltros()" class="px-4 py-2 border border-dashed border-[#bcc0c9] rounded-lg text-xs font-bold text-[#4f6080] hover:border-[#256386]/50 hover:text-[#256386] transition-all whitespace-nowrap flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px]">filter_alt_off</span>Limpiar
+          </button>
+        </div>
+
       </div>
     </div>
 
     <!-- ── Tabla ─────────────────────────────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-9">
+    <div>
       <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
 
         <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
@@ -182,16 +132,17 @@ tailwind.config = {
 
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
-            <thead class="bg-[#f0f7f8]">
+            <thead class="bg-[#f0f7f8] border-b-2 border-[#dde6ec]">
               <tr>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo de Gestión</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Referencia GDE</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Canal</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
-                <th class="px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
-                <th class="px-6 py-3.5"></th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo de Gestión</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Referencia GDE</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Línea</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
+                <th class="px-4 py-3.5"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant/5" id="bandeja-tbody"></tbody>
@@ -258,14 +209,6 @@ function poblarFiltros() {
   });
 }
 
-// ── Métricas ───────────────────────────────────────────────────────────────
-function renderMetricas() {
-  const todos = window.SACO.EXPEDIENTES_ABOGADO;
-  document.getElementById('metric-total').textContent   = todos.length;
-  document.getElementById('metric-civil').textContent   = todos.filter(e => e.area === 'CIVIL').length;
-  document.getElementById('metric-laboral').textContent = todos.filter(e => e.area === 'LABORAL').length;
-  document.getElementById('metric-penal').textContent   = todos.filter(e => e.area === 'PENAL').length;
-}
 
 // ── Render tabla ───────────────────────────────────────────────────────────
 function renderTabla(datos) {
@@ -277,28 +220,34 @@ function renderTabla(datos) {
     return;
   }
 
+  const lineaLabels = Object.fromEntries(
+    (window.SACO.LINEAS_FERROVIARIAS || []).map(l => [l.code, l.label.replace('Línea ','').replace('Tren de la Costa','TDC')])
+  );
+
   tbody.innerHTML = datos.map(e => `
-    <tr class="row-hover transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html'">
-      <td class="px-6 py-4">
+    <tr class="row-hover transition-colors cursor-pointer" onclick="window.location='detalle-expediente.html?id=${e.id}'">
+      <td class="px-4 py-4">
         <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
         <span class="block text-[10px] px-1.5 py-0.5 rounded font-bold mt-1 w-fit ${areaColors[e.area] || ''}">${e.area}</span>
       </td>
-      <td class="px-6 py-4 max-w-[220px]">
-        <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
-        <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa || ''}</p>
+      <td class="px-4 py-4">
+        <span class="font-mono text-[10px] text-[#4f6080]">${e.numero_causa || '—'}</span>
       </td>
-      <td class="px-6 py-4 text-xs text-[#4f6080]">${e.tipo.replace(/_/g, ' ')}</td>
-      <td class="px-6 py-4">
+      <td class="px-4 py-4 max-w-[220px]">
+        <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
+      </td>
+      <td class="px-4 py-4 text-xs text-[#4f6080]">${e.tipo.replace(/_/g, ' ')}</td>
+      <td class="px-4 py-4">
         <span class="font-mono text-[10px] text-[#4f6080]">${e.ref || e.gde || '—'}</span>
       </td>
-      <td class="px-6 py-4">
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e2eff5] text-[#4f6080]">${canalLabels[e.canal_ingreso || e.canal] || '—'}</span>
+      <td class="px-4 py-4 text-xs text-[#1b3a5c]">${(e.abogado||'').replace(/^Dr\. |^Dra\. /,'')}</td>
+      <td class="px-4 py-4">
+        ${e.linea ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e0e7ef] text-[#3a4f6a]">${lineaLabels[e.linea] || e.linea}</span>` : '<span class="text-[#bcc0c9] text-[10px]">—</span>'}
       </td>
-      <td class="px-6 py-4 text-xs text-[#1b3a5c]">${e.abogado}</td>
-      <td class="px-6 py-4 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
-      <td class="px-6 py-4 text-right">
+      <td class="px-4 py-4 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
+      <td class="px-4 py-4 text-right">
         <button
-          onclick="event.stopPropagation(); window.location='detalle-expediente.html'"
+          onclick="event.stopPropagation(); window.location='detalle-expediente.html?id=${e.id}'"
           class="p-1.5 hover:bg-surface-container rounded-lg transition-colors"
           title="Visualizar expediente">
           <span class="material-symbols-outlined text-[#4f6080] hover:text-[#256386] text-[18px] transition-colors">visibility</span>
@@ -312,7 +261,6 @@ function applyFilters() {
   const search     = document.getElementById('f-search').value.toLowerCase();
   const tipo       = document.getElementById('f-tipo').value;
   const gde        = document.getElementById('f-gde').value.toLowerCase();
-  const canal      = document.getElementById('f-canal').value;
   const abogado    = document.getElementById('f-abogado').value;
   const fechaDesde = document.getElementById('f-fecha-desde').value;
   const fechaHasta = document.getElementById('f-fecha-hasta').value;
@@ -323,7 +271,6 @@ function applyFilters() {
         !(e.numero_causa || '').toLowerCase().includes(search)) return false;
     if (tipo    && e.tipo !== tipo)               return false;
     if (gde     && !(e.ref_gde || e.gde || '').toLowerCase().includes(gde)) return false;
-    if (canal   && e.canal_ingreso !== canal)     return false;
     if (abogado && e.abogado !== abogado)         return false;
     if (fechaDesde && e.fecha_recepcion < fechaDesde) return false;
     if (fechaHasta && e.fecha_recepcion > fechaHasta) return false;
@@ -337,7 +284,7 @@ function limpiarFiltros() {
   ['f-search','f-gde','f-fecha-desde','f-fecha-hasta'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  ['f-tipo','f-canal','f-abogado'].forEach(id => {
+  ['f-tipo','f-abogado'].forEach(id => {
     document.getElementById(id).value = '';
   });
   applyFilters();
@@ -345,12 +292,10 @@ function limpiarFiltros() {
 
 // ── Init ───────────────────────────────────────────────────────────────────
 poblarFiltros();
-renderMetricas();
 applyFilters();
 
 SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'EXPEDIENTE_ASIGNADO') {
-    renderMetricas();
     applyFilters();
     SACO_UI.showToast('Bandeja actualizada desde otra pestaña.', 'info');
   }

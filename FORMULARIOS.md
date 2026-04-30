@@ -77,8 +77,9 @@ SACO.getCamposFormulario(tipoGestion, etapa, area)
 ### DEFENSA_CIVIL — Defensas Civiles (Civil)
 | Etapa | Campos |
 |-------|--------|
-| mesa | *(ninguno — se origina desde área técnica)* |
+| mesa | abogado, num_causa, juzgado, caratula, datos_depend, tipo_hecho, fecha_hecho, lugar_hecho, linea, etapa_proc |
 | abogado | *(ninguno)* |
+Nota: Se eliminó la indicación anterior de "sin campos".
 
 ### DEFENSA_PENAL — Defensas Penales (Penal)
 | Etapa | Campos |
@@ -89,14 +90,16 @@ SACO.getCamposFormulario(tipoGestion, etapa, area)
 ### DEMANDA_CIVIL — Demanda Civil (Civil)
 | Etapa | Campos |
 |-------|--------|
-| mesa | caratula, parte_actora, parte_dem, coactores, codemandados, fecha_hecho, fecha_recepcion, linea, tipo_hecho, lugar_hecho, num_siniestro, monto, variante (A/B), ley_25344, obs |
-| abogado | num_causa, juzgado, num_sigej |
+| mesa | abogado, num_causa, juzgado, caratula, abogado_contr, parte_actora, parte_dem, coactores, codemandados, fecha_inicio, juicio, monto, tipo_hecho, fecha_hecho, lugar_hecho, linea, num_siniestro, etapa_proc |
+| abogado | *(ninguno)* |
+Nota: Se eliminaron ley_25344 y variante de ingreso.
 
 ### DEMANDA_LABORAL — Demanda Laboral (Laboral)
 | Etapa | Campos |
 |-------|--------|
-| mesa | caratula, parte_actora, parte_dem, coactores, codemandados, fecha_hecho, fecha_recepcion, linea, tipo_hecho, lugar_hecho, num_siniestro, monto, variante (A/B), ley_25344, obs |
-| abogado | num_causa, juzgado, num_sigej |
+| mesa | abogado, num_causa, juzgado, caratula, abogado_contr, parte_actora, parte_dem, coactores, codemandados, fecha_inicio, juicio, monto, tipo_hecho, fecha_hecho, lugar_hecho, linea, num_siniestro, etapa_proc |
+| abogado | *(ninguno)* |
+Nota: Se eliminaron ley_25344 y variante de ingreso.
 
 ### DESAFUERO — Desafueros (Laboral)
 | Etapa | Campos |
@@ -107,8 +110,9 @@ SACO.getCamposFormulario(tipoGestion, etapa, area)
 ### EJECUCION_GAR — Ejecución de Pólizas (Civil)
 | Etapa | Campos |
 |-------|--------|
-| mesa | caratula, fecha_recep, linea, monto, tipo_garantia, contrato, parte_dem |
-| abogado | num_causa, juzgado, num_sigej, fecha_venc, piso, parte_actora, codemandados, obs |
+| mesa | abogado, contratista, area_req, nro_exp, causa_vinculada, cuantif_danos, fecha_ingreso, es_extrajudicial (boolean), abogado_extraj (condicional — visible solo si es_extrajudicial = Sí) |
+| abogado | aseguradora, nro_polizas, tipo_polizas, monto_ejecutar, fecha_prescr, fecha_rescision, acuerdo |
+Nota: fecha_rescision se movió a etapa Abogado. causa_vinculada y cuantif_danos se agregaron a etapa Mesa SACO. abogado_extraj es condicional — aparece solo si es_extrajudicial = Sí.
 
 ### LANZAMIENTO — Lanzamientos (Civil)
 | Etapa | Campos |
@@ -137,8 +141,9 @@ SACO.getCamposFormulario(tipoGestion, etapa, area)
 ### PEDIDO_CAUSA_PENAL — Pedido de Causa Penal (Civil / Laboral / Penal)
 | Etapa | Campos |
 |-------|--------|
-| mesa | caratula |
+| mesa | *(ninguno)* |
 | abogado | linea, num_causa, num_sumario, comisaria, requirente, tipo_solicitud, fecha_hecho, obs |
+Nota: Sin campos en Mesa SACO. Asignación automática: Civil/Laboral por FIFO, Penal por línea ferroviaria.
 
 ### QUERELLA — Querellas (Penal)
 | Etapa | Campos |
@@ -161,8 +166,8 @@ SACO.getCamposFormulario(tipoGestion, etapa, area)
 ### BENEFICIO_LITIGAR — Beneficio de litigar sin gastos (Civil)
 | Etapa | Campos |
 |-------|--------|
-| mesa | *(ninguno)* |
-| abogado | *(ninguno)* |
+| mesa | caratula, juzgado, exp_vinculado, abogado |
+| abogado | estado_proc, plazo_interv, resultado |
 
 ### OTROS — Otros (Penal)
 | Etapa | Campos |
