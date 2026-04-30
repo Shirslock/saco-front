@@ -898,4 +898,4 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 
 ---
 
-*Mantenido por: Arquitectura Taligent — actualizar con cada sprint.*
+*Mantenido por: Funcionales Naiara y Cristian — actualizar con cada sprint.*
