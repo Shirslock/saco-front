@@ -60,7 +60,8 @@ saco-frontend/
         ├── detalle-expediente.html    ← Vista: Detalle + timeline + docs
         ├── gestion-penal.html         ← Vista: Coordinación penal
         ├── area-civil.html            ← Vista: Coordinación Civil
-        └── area-laboral.html          ← Vista: Coordinación Laboral
+        ├── area-laboral.html          ← Vista: Coordinación Laboral
+        └── causa-detalle.html         ← Vista: Timeline unificado por número de causa
 ```
 
 ### Regla de organización
@@ -522,13 +523,30 @@ Para expedientes del área PENAL:
 ### `bandeja-abogado.html` — Bandeja del Letrado
 **Rol:** Abogado (cualquier área)
 **Funcionalidades:**
-- Tabs: Activos / Cumplidos / Urgentes (filtros sobre `SACO.EXPEDIENTES_ABOGADO`)
-- Filtros sidebar: por área (CIVIL/LABORAL/PENAL) + checkbox "con alerta activa"
-- Búsqueda: filtra por carátula, N° causa, N° interno
-- Tabla: N° interno, área, carátula, tipo, estado (badge), fecha recepción
+- Tabs: **Activos** / **Urgentes** (filtros sobre `SACO.EXPEDIENTES_ABOGADO` — tab Cumplidos eliminado)
+- **Barra de filtros horizontal:** búsqueda libre, tipo de gestión, estado, rango de fechas, toggle alerta; chips de filtros activos con botón X por chip
+- Tabla agrupada por causa: expedientes con `numero_causa` igual se agrupan bajo una fila "causa" expandible; expedientes sin causa son filas sueltas
 - Filas con alerta (`tiene_alerta = true`) muestran ícono de warning en rojo
-- Click en fila o botón "Abrir" navega a `detalle-expediente.html`
-- Paginación (decorativa en prototipo — muestra 1/2 páginas)
+- Click en fila de causa → expande/colapsa hijos; click en fila de expediente → navega a `detalle-expediente.html`
+- **"Ver todo" en causa** → navega a `causa-detalle.html?causa=<numeroCausa>`
+- **"Agrupar a causa"** en sueltos → modal `abrirModalAgrupar(expId)` → `confirmarAgrupar()` — asigna `numero_causa` en runtime
+- **"Desagrupar"** en hijos → modal `desagrupar(expId)` → `confirmarDesagrupar()` — pone `numero_causa = null` en runtime
+- `construirItemsBandeja()` agrupa los datos; `expandedCausas` Set controla filas abiertas; `SHOW_ABOGADO` flag (false en bandeja propia)
+- `poblarFiltroTipo()` y `poblarFiltroEstado()` cargan selects dinámicamente; `renderChipsFiltros()` gestiona chips activos
+
+**Estado que modifica:** `exp.numero_causa` (agrupar/desagrupar — en runtime)
+
+### `causa-detalle.html` — Detalle de Causa
+**Rol:** Abogado (cualquier área)
+**Acceso:** desde bandeja-abogado.html → "Ver todo" en fila de causa
+**Query param:** `?causa=<numeroCausa>` (ej. `?causa=FSM-11802/2023`)
+**Funcionalidades:**
+- Header con N° causa y breadcrumb; botón "Volver" (`history.back()`)
+- Grilla de tarjetas por expediente — cada card muestra área (pill color), estado, N° interno, carátula, tipo, fecha, abogado y alerta si `tiene_alerta`; click en card → `window.SACO.abrirExpediente(id)`
+- **Timeline unificado:** todas las entradas `timeline[]` de los expedientes agrupados, etiquetadas con `_expId`, `_expArea`, `_expCaratula`, ordenadas (activos primero, luego por fecha desc)
+- Select `#filtro-exp` para filtrar el timeline por expediente individual
+- Estado vacío si la causa no existe o no tiene expedientes asociados
+- Sidebar key: `'bandeja-abogado'`
 
 **Estado que modifica:** ninguno (solo lectura)
 
@@ -805,6 +823,7 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 | v1.3 | Abr 2026 | mock.js: ESTADOS_POR_TIPO (catálogo completo por tipo de gestión) + getEstadosPorTipo(); shared.js: estadoBadgeCustom(); detalle: modal cambio de estado filtrado por tipo; alta: campo estado inicial dinámico; labels TIPOS_GESTION actualizados |
 | v1.4 | Abr 2026 | N° causa opcional + detección de duplicado con vinculación bidireccional: mock.js (buscarPorNumeroCausa, getExpedienteById, abrirExpediente, intervinientes[] y vinculos[] bidireccionales en los 3 expedientes demo); alta: alerta duplicado con selección de vínculo + vinculación automática al crear; detalle: N° causa editable inline (#causa-editable-wrap) con alerta de duplicado y vinculación bidireccional; tab Intervinientes con CRUD + badge "Mismo siniestro" + navegación entre expedientes vinculados |
 | v1.5 | Abr 2026 | Matriz_Actualizada.xlsx: TIPOS_GESTION redefinido (CIVIL 12, LABORAL 8, PENAL 7); campo canal[] + canales[]; ESTADOS_POR_TIPO ampliado (BENEFICIO_LITIGAR, LANZAMIENTO, DEMANDA_CIVIL, DEMANDA_LABORAL, PEDIDO_CAUSA_PENAL); alta-expediente: tipos sin filtro por canal, auto-set canal al seleccionar tipo, estado-inicial-wrap, compatibilidad canal toast |
+| v1.6 | Abr 2026 | mock.js: EXPEDIENTES_ABOGADO reemplazado por 6 expedientes demo (2 causas + 1 suelto); bandeja-abogado: filtros horizontales + chips, tabs Activos/Urgentes, agrupar/desagrupar causa en runtime, "Ver todo" navega a causa-detalle; causa-detalle.html: nueva página timeline unificado por causa; CLAUDE.md actualizado |
 
 ---
 

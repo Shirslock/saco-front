@@ -50,32 +50,6 @@ tailwind.config = {
     to   { opacity:1; transform:translateY(0); }
   }
   .child-row { animation: slideDown 0.15s ease-out both; }
-
-  /* Conector visual hijo */
-  .child-connector {
-    position: relative;
-  }
-  .child-connector::before {
-    content:'';
-    position:absolute;
-    left:28px;
-    top:0;
-    bottom:50%;
-    width:2px;
-    background:#bcc0c9;
-  }
-  .child-connector::after {
-    content:'';
-    position:absolute;
-    left:28px;
-    top:50%;
-    width:14px;
-    height:2px;
-    background:#bcc0c9;
-  }
-  .child-connector-last::before {
-    bottom:50%;
-  }
 </style>
 </head>
 <body class="bg-[#f0f7f8] text-[#1b3a5c]">
@@ -86,165 +60,140 @@ tailwind.config = {
 <main id="main-content" class="min-h-screen transition-all duration-200" style="padding-top:64px;margin-left:256px">
 <div class="p-8">
 
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+  <!-- ── Header + Tabs ──────────────────────────────────────────────── -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-5 gap-4">
     <div>
       <h2 class="font-headline text-3xl font-extrabold tracking-tight text-[#1b3a5c] mb-1">Mi Bandeja</h2>
       <p class="text-[#4f6080] text-sm" id="subtitle">Gestionando <strong id="total-count">0</strong> expedientes activos.</p>
     </div>
     <div class="flex bg-[#f0f7f8] p-1 rounded-xl shadow-inner gap-1">
-      <button onclick="setTab('activos')"   id="tab-activos"   class="tab-btn px-5 py-2 bg-surface-container-lowest text-[#256386] font-bold rounded-lg shadow-sm text-sm">Activos</button>
-      <button onclick="setTab('cumplidos')" id="tab-cumplidos" class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors">Cumplidos</button>
-      <button onclick="setTab('urgentes')"  id="tab-urgentes"  class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors flex items-center gap-1">
+      <button onclick="setTab('activos')"  id="tab-activos"  class="tab-btn px-5 py-2 bg-surface-container-lowest text-[#256386] font-bold rounded-lg shadow-sm text-sm">Activos</button>
+      <button onclick="setTab('urgentes')" id="tab-urgentes" class="tab-btn px-5 py-2 text-[#4f6080] hover:text-on-surface font-medium text-sm transition-colors flex items-center gap-1">
         Urgentes
         <span id="urgentes-badge" class="w-4 h-4 bg-[#cd5055] text-white text-[9px] font-black rounded-full flex items-center justify-center">0</span>
       </button>
     </div>
   </div>
 
-  <div class="grid grid-cols-12 gap-6">
+  <!-- ── Barra de filtros horizontal ───────────────────────────────── -->
+  <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] px-5 py-4 mb-5">
 
-    <!-- ── Filtros ──────────────────────────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-3 space-y-5">
+    <div class="flex flex-wrap items-center gap-3">
 
-      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
-        <div class="relative mb-4">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
-          <input id="search-input" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Carátula, N° causa..."/>
-        </div>
+      <!-- Búsqueda -->
+      <div class="relative flex-1 min-w-[200px]">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
+        <input id="search-input" oninput="applyFilters()"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          placeholder="Buscar por carátula, N° causa..."/>
+      </div>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mt-5 mb-3">Tipo de Gestión</h3>
+      <!-- Tipo de gestión -->
+      <div class="relative">
         <select id="f-tipo" onchange="applyFilters()"
-          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
-          <option value="">Todos</option>
-          <option value="DEMANDA">Demanda</option>
-          <option value="CARTA_SUCESSO">Carta Suceso</option>
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[140px]">
+          <option value="">Tipo: Todos</option>
         </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mt-5 mb-3">Estado</h3>
+      <!-- Estado -->
+      <div class="relative">
         <select id="f-estado" onchange="applyFilters()"
-          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
-          <option value="">Todos</option>
-          <option value="EN_PRUEBA">En prueba</option>
-          <option value="EN_PLAZO_CONTESTAR">En plazo contestar</option>
-          <option value="GDE_VINCULADO">GDE vinculado</option>
-          <option value="CUMPLIDO">Cumplido</option>
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[140px]">
+          <option value="">Estado: Todos</option>
         </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
 
-        <!-- Recepción -->
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mt-5 mb-3">Recepción</h3>
+      <!-- Fecha desde/hasta -->
+      <div class="flex items-center gap-2">
+        <input id="f-fecha-desde" oninput="applyFilters()" type="date"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          title="Fecha desde"/>
+        <span class="text-[#4f6080] text-xs">—</span>
+        <input id="f-fecha-hasta" oninput="applyFilters()" type="date"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          title="Fecha hasta"/>
+      </div>
 
-        <div class="space-y-3">
-          <div>
-            <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">Desde</label>
-            <input id="f-fecha-desde" oninput="applyFilters()" type="date"
-              class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
-          </div>
+      <!-- Toggle alertas -->
+      <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-[#f0f7f8] transition-colors border border-transparent hover:border-[#bcc0c9]">
+        <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-[#cd5055] focus:ring-[#cd5055]"/>
+        <span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
+        <span class="text-sm text-[#4f6080] whitespace-nowrap">Con alerta</span>
+      </label>
 
-          <div>
-            <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1">Hasta</label>
-            <input id="f-fecha-hasta" oninput="applyFilters()" type="date"
-              class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"/>
-          </div>
-        </div>
+      <!-- Letrado (solo en bandejas globales) -->
+      <div id="filter-letrado-wrap" class="hidden relative">
+        <select id="f-letrado" onchange="applyFilters()"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[160px]">
+          <option value="">Letrado: Todos</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
 
-        <div class="mt-5 pt-4 border-t border-[#bcc0c9]/30"></div>
+      <!-- Limpiar -->
+      <button onclick="limpiarFiltros()"
+        class="ml-auto text-[10px] font-bold text-[#4f6080] hover:text-[#256386] flex items-center gap-1 transition-colors whitespace-nowrap">
+        <span class="material-symbols-outlined text-[14px]">close</span>
+        Limpiar
+      </button>
 
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Vencimientos</h3>
-        <div class="space-y-1">
-          <label class="flex items-center gap-3 p-2 hover:bg-surface-container-low rounded-lg cursor-pointer">
-            <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-[#cd5055] focus:ring-error"/>
-            <span class="text-sm text-[#4f6080] flex items-center gap-2">
-              <span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
-              Con alerta activa
-            </span>
-          </label>
-        </div>
+    </div>
 
-        <!-- Filtro Letrado: oculto en bandeja propia, visible en bandejas globales -->
-        <div id="filter-letrado-wrap" class="hidden mt-5">
-          <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Letrado</h3>
-          <select id="f-letrado" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
-            <option value="">Todos</option>
-          </select>
-        </div>
+    <!-- Chips de filtros activos -->
+    <div id="chips-filtros" class="hidden flex-wrap gap-2 mt-3 pt-3 border-t border-[#bcc0c9]/30"></div>
 
-        <div class="mt-4 pt-3">
-          <button onclick="limpiarFiltros()"
-            class="w-full py-2 border-2 border-dashed border-[#bcc0c9] rounded-xl text-xs font-bold text-[#4f6080] hover:border-[#256386]/50 hover:text-[#256386] transition-all">
-            Limpiar filtros
+  </div>
+
+  <!-- ── Tabla ──────────────────────────────────────────────────────── -->
+  <div class="col-span-12">
+
+    <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
+      <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
+        <p class="text-xs text-[#4f6080]"><span id="showing-count">0</span> elementos</p>
+        <div class="flex gap-3">
+          <button onclick="expandAll()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">unfold_more</span>Expandir todo
+          </button>
+          <button onclick="collapseAll()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">unfold_less</span>Colapsar
           </button>
         </div>
       </div>
 
-      <!-- Docs rápidos -->
-      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-[#4f6080] mb-3">Documentos GDE recientes</h3>
-        <div class="space-y-2">
-          <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
-            <p class="font-mono text-[10px] text-[#256386] font-bold">EX-2023-08842</p>
-            <p class="text-[11px] text-[#4f6080]">Martínez - Pericial</p>
-          </div>
-          <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
-            <p class="font-mono text-[10px] text-[#256386] font-bold">ME-2026-00441</p>
-            <p class="text-[11px] text-[#4f6080]">Recupero - SGSySL</p>
-          </div>
-          <div class="p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container cursor-pointer transition-colors group">
-            <p class="font-mono text-[10px] text-[#256386] font-bold">EX-2026-00449</p>
-            <p class="text-[11px] text-[#4f6080]">García - Laboral</p>
-          </div>
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-[#f0f7f8]">
+            <th class="px-4 py-3.5 w-10"></th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° / Causa</th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
+            <th id="th-letrado" class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
+            <th class="px-4 py-3.5"></th>
+          </tr>
+        </thead>
+        <tbody id="exp-tbody" class="divide-y divide-[#bcc0c9]/20"></tbody>
+      </table>
+
+      <!-- Paginación -->
+      <div class="px-6 py-4 border-t border-[#bcc0c9]/40 flex justify-between items-center">
+        <p class="text-xs text-[#4f6080]">Página 1 de 1</p>
+        <div class="flex gap-1">
+          <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container disabled:opacity-30 transition-colors" disabled>
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+          </button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#256386] text-white font-bold text-xs">1</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- ── Tabla ──────────────────────────────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-9">
-
-      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
-        <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
-          <p class="text-xs text-[#4f6080]"><span id="showing-count">0</span> elementos</p>
-          <div class="flex gap-3">
-            <button onclick="expandAll()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
-              <span class="material-symbols-outlined text-[14px]">unfold_more</span>Expandir todo
-            </button>
-            <button onclick="collapseAll()" class="text-[10px] font-bold text-[#4f6080] hover:text-[#256386] transition-colors flex items-center gap-1">
-              <span class="material-symbols-outlined text-[14px]">unfold_less</span>Colapsar
-            </button>
-          </div>
-        </div>
-
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-[#f0f7f8]">
-              <th class="px-4 py-3.5 w-10"></th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° / Causa</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
-              <th id="th-letrado" class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
-              <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Recepción</th>
-              <th class="px-4 py-3.5"></th>
-            </tr>
-          </thead>
-          <tbody id="exp-tbody" class="divide-y divide-[#bcc0c9]/20"></tbody>
-        </table>
-
-        <!-- Paginación -->
-        <div class="px-6 py-4 border-t border-[#bcc0c9]/40 flex justify-between items-center">
-          <p class="text-xs text-[#4f6080]">Página 1 de 1</p>
-          <div class="flex gap-1">
-            <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container disabled:opacity-30 transition-colors" disabled>
-              <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-            </button>
-            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#256386] text-white font-bold text-xs">1</button>
-            <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors">
-              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 </div>
 </main>
@@ -310,9 +259,9 @@ function construirItemsBandeja(expedientes) {
 // ─────────────────────────────────────────────────────────────────────────────
 // ESTADO
 // ─────────────────────────────────────────────────────────────────────────────
-let currentTab   = 'activos';
+let currentTab     = 'activos';
 let expandedCausas = new Set(); // set de numeroCausa expandidas
-let allItems     = [];
+let allItems       = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // COLORES
@@ -336,6 +285,77 @@ function setTab(tab) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// POBLAR FILTROS DINÁMICOS
+// ─────────────────────────────────────────────────────────────────────────────
+function poblarFiltroTipo() {
+  const tipos = [...new Set(
+    window.SACO.EXPEDIENTES_ABOGADO.map(e => e.tipo)
+  )].sort();
+  const sel = document.getElementById('f-tipo');
+  tipos.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t.replace(/_/g,' ');
+    sel.appendChild(opt);
+  });
+}
+
+function poblarFiltroEstado() {
+  const estados = [...new Set(
+    window.SACO.EXPEDIENTES_ABOGADO.map(e => e.estado)
+  )].sort();
+  const sel = document.getElementById('f-estado');
+  estados.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s.replace(/_/g,' ');
+    sel.appendChild(opt);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHIPS DE FILTROS ACTIVOS
+// ─────────────────────────────────────────────────────────────────────────────
+function renderChipsFiltros() {
+  const chips  = [];
+  const tipo   = document.getElementById('f-tipo').value;
+  const estado = document.getElementById('f-estado').value;
+  const search = document.getElementById('search-input').value;
+  const desde  = document.getElementById('f-fecha-desde').value;
+  const hasta  = document.getElementById('f-fecha-hasta').value;
+  const alerta = document.getElementById('f-urgente').checked;
+
+  if (tipo)   chips.push({ label: tipo.replace(/_/g,' '),   clear: () => { document.getElementById('f-tipo').value=''; applyFilters(); } });
+  if (estado) chips.push({ label: estado.replace(/_/g,' '), clear: () => { document.getElementById('f-estado').value=''; applyFilters(); } });
+  if (search) chips.push({ label: `"${search}"`,            clear: () => { document.getElementById('search-input').value=''; applyFilters(); } });
+  if (desde)  chips.push({ label: `Desde ${desde}`,         clear: () => { document.getElementById('f-fecha-desde').value=''; applyFilters(); } });
+  if (hasta)  chips.push({ label: `Hasta ${hasta}`,         clear: () => { document.getElementById('f-fecha-hasta').value=''; applyFilters(); } });
+  if (alerta) chips.push({ label: 'Con alerta',             clear: () => { document.getElementById('f-urgente').checked=false; applyFilters(); } });
+
+  const container = document.getElementById('chips-filtros');
+  if (!chips.length) {
+    container.classList.add('hidden');
+    container.classList.remove('flex');
+    return;
+  }
+  container.classList.remove('hidden');
+  container.classList.add('flex');
+  container.innerHTML = chips.map((c, i) => `
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#c5e0ea] text-[#1b3a5c] text-[10px] font-bold rounded-full">
+      ${c.label}
+      <button onclick="clearChip(${i})" class="hover:text-[#cd5055] transition-colors">
+        <span class="material-symbols-outlined text-[12px]">close</span>
+      </button>
+    </span>`).join('');
+
+  window._chipClears = chips.map(c => c.clear);
+}
+
+function clearChip(i) {
+  if (window._chipClears && window._chipClears[i]) window._chipClears[i]();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // FILTROS Y RENDER
 // ─────────────────────────────────────────────────────────────────────────────
 function applyFilters() {
@@ -343,54 +363,44 @@ function applyFilters() {
   const estado     = document.getElementById('f-estado')?.value || '';
   const fechaDesde = document.getElementById('f-fecha-desde')?.value;
   const fechaHasta = document.getElementById('f-fecha-hasta')?.value;
-  const search  = document.getElementById('search-input').value.toLowerCase();
-  const area    = document.querySelector('input[name="f-area"]:checked')?.value || '';
-  const urgente = document.getElementById('f-urgente').checked;
-  const letrado = document.getElementById('f-letrado')?.value || '';
-  const exps    = getExpedientesDelUsuario();
+  const search     = document.getElementById('search-input').value.toLowerCase();
+  const urgente    = document.getElementById('f-urgente').checked;
+  const letrado    = document.getElementById('f-letrado')?.value || '';
+  const exps       = getExpedientesDelUsuario();
 
-  // Filtrar expedientes individuales
   const filtrados = exps.filter(e => {
-    if (currentTab === 'cumplidos' && e.estado !== 'CUMPLIDO')           return false;
-    if (currentTab === 'urgentes'  && e.prioridad !== 'ALTA')            return false;
-    if (currentTab === 'activos'   && e.estado === 'CUMPLIDO')           return false;
-    if (area && e.area !== area)                                          return false;
-    if (urgente && !e.tiene_alerta)                                       return false;
-    if (letrado && e.abogado !== letrado)                                 return false;
-    if (tipo && e.tipo !== tipo) return false;
+    if (currentTab === 'urgentes' && e.prioridad !== 'ALTA') return false;
+    if (currentTab === 'activos'  && e.estado === 'CUMPLIDO') return false;
+    if (urgente && !e.tiene_alerta) return false;
+    if (letrado && e.abogado !== letrado) return false;
+    if (tipo   && e.tipo   !== tipo)   return false;
     if (estado && e.estado !== estado) return false;
-    if (fechaDesde) {
-      if (e.fecha_recepcion < fechaDesde) return false;
-    }
-    if (fechaHasta) {
-      if (e.fecha_recepcion > fechaHasta) return false;
-    }
+    if (fechaDesde && e.fecha_recepcion < fechaDesde) return false;
+    if (fechaHasta && e.fecha_recepcion > fechaHasta) return false;
     if (search && !e.caratula.toLowerCase().includes(search) &&
         !e.id.toLowerCase().includes(search) &&
-        !(e.numero_causa||'').toLowerCase().includes(search))             return false;
+        !(e.numero_causa||'').toLowerCase().includes(search)) return false;
     return true;
   });
 
   allItems = construirItemsBandeja(filtrados);
 
-  // Contar urgentes para badge
   const urgentes = exps.filter(e => e.tiene_alerta && e.estado !== 'CUMPLIDO');
   document.getElementById('urgentes-badge').textContent = urgentes.length;
 
   renderTabla(allItems);
   updateSubtitle(filtrados);
+  renderChipsFiltros();
 }
 
 function limpiarFiltros() {
   document.getElementById('search-input').value = '';
-  document.getElementById('f-urgente').checked = false;
-  document.getElementById('f-tipo').value = '';
-  document.getElementById('f-estado').value = '';
+  document.getElementById('f-urgente').checked  = false;
+  document.getElementById('f-tipo').value        = '';
+  document.getElementById('f-estado').value      = '';
   document.getElementById('f-fecha-desde').value = '';
   document.getElementById('f-fecha-hasta').value = '';
-  if (document.getElementById('f-letrado')) {
-    document.getElementById('f-letrado').value = '';
-  }
+  if (document.getElementById('f-letrado')) document.getElementById('f-letrado').value = '';
   applyFilters();
 }
 
@@ -398,7 +408,7 @@ function updateSubtitle(filtrados) {
   const total = filtrados.length;
   document.getElementById('total-count').textContent = total;
   document.getElementById('subtitle').innerHTML =
-    `Gestionando <strong>${total}</strong> expediente${total !== 1 ? "s" : ""} activo${total !== 1 ? "s" : ""}.`;
+    `Gestionando <strong>${total}</strong> expediente${total !== 1 ? 's' : ''} activo${total !== 1 ? 's' : ''}.`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -431,13 +441,13 @@ function renderTabla(items) {
 
 // ── Fila de causa agrupadora ──────────────────────────────────────────────
 function renderCausaRow(item, showAbogado = false) {
-  const nc        = item.numeroCausa;
-  const exps      = item.expedientes;
-  const expanded  = expandedCausas.has(nc);
-  const hasAlerta = exps.some(e => e.tiene_alerta);
-  const areas     = [...new Set(exps.map(e => e.area))];
-  // En bandeja global podría haber distintos abogados en la misma causa
-  const abogados  = [...new Set(exps.map(e => e.abogado))];
+  const nc           = item.numeroCausa;
+  const exps         = item.expedientes;
+  const expanded     = expandedCausas.has(nc);
+  const hasAlerta    = exps.some(e => e.tiene_alerta);
+  const areas        = [...new Set(exps.map(e => e.area))];
+  const abogados     = [...new Set(exps.map(e => e.abogado))];
+  const expPrincipal = exps.find(e => e.es_principal) || exps[0];
 
   let html = `
     <tr class="causa-row bg-[#f0f7f8] border-l-4 border-[#256386]/30 hover:border-[#256386]/60 transition-all" onclick="toggleCausa('${nc.replace(/'/g, "\\'")}')">
@@ -477,10 +487,15 @@ function renderCausaRow(item, showAbogado = false) {
           : abogados.map(a => `<p class="text-[10px] text-[#4f6080]">${a.replace(/^Dr\. |^Dra\. /,'')}</p>`).join('')
         }
       </td>` : ''}
-      <td class="px-4 py-3.5"></td>
-      <td class="px-4 py-3.5"></td>
+      <td class="px-4 py-3.5">
+        ${SACO_UI.estadoBadge(expPrincipal.estado, expPrincipal.estadoLabel || expPrincipal.estado.replace(/_/g,' '))}
+      </td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${expPrincipal.fecha_recepcion || ''}</td>
       <td class="px-4 py-3.5 text-right">
-        <button onclick="event.stopPropagation()" class="text-[11px] font-bold text-[#256386] hover:underline">Ver todo</button>
+        <button onclick="event.stopPropagation();verTodoCausa('${nc.replace(/'/g, "\\'")}')"
+          class="text-[11px] font-bold text-[#256386] hover:underline">
+          Ver todo
+        </button>
       </td>
     </tr>`;
 
@@ -495,12 +510,22 @@ function renderCausaRow(item, showAbogado = false) {
 
 // ── Fila de expediente (suelto o hijo de causa) ────────────────────────────
 function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = false) {
-  const sinCausa = !e.numero_causa || e.numero_causa.trim() === '' || e.numero_causa.trim().toUpperCase() === 'SS SOFSE';
+  const sinCausa    = !e.numero_causa || e.numero_causa === null || e.numero_causa.trim() === '' || e.numero_causa.trim().toUpperCase() === 'SS SOFSE';
   const nombreCorto = (e.abogado || '').replace(/^Dr\. |^Dra\. /, '');
+  const esPrincipal = isChild && e.es_principal === true;
+
+  const trClass = isChild
+    ? `child-row cursor-pointer border-l-4 ${esPrincipal ? 'border-emerald-400/60' : 'border-[#256386]/10'}`
+    : 'exp-row cursor-pointer';
+
+  // Degradé aplicado td por td (el background del tr no se propaga en todos los browsers)
+  const tdGs = esPrincipal
+    ? 'style="background: linear-gradient(to right, rgba(209,250,229,0.5), rgba(236,253,245,0.35));"'
+    : '';
 
   return `
-    <tr class="${isChild ? 'child-row' : 'exp-row'} cursor-pointer ${isChild ? 'border-l-4 border-[#256386]/10' : ''}" onclick="verDetalle('${e.id}')">
-      <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}">
+    <tr class="${trClass}" onclick="verDetalle('${e.id}')">
+      <td class="px-4 py-3.5 relative ${isChild ? 'pl-8' : ''}" ${tdGs}>
         ${isChild ? `
           <div class="absolute left-4 top-0 bottom-0 w-px bg-[#bcc0c9]" ${isLast ? 'style="bottom:50%"' : ''}></div>
           <div class="absolute left-4 top-1/2 w-3.5 h-px bg-[#bcc0c9]"></div>
@@ -510,46 +535,66 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
               : `<span class="material-symbols-outlined text-[#4f6080] text-[16px]">description</span>`
             }
           </div>` : `
-          <div class="w-8 h-8 flex items-center justify-center rounded-lg ${e.tiene_alerta ? 'bg-[#fee2e2]' : 'bg-[#f0f7f8]'}">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg ${e.tiene_alerta ? 'bg-[#fee2e2]' : esPrincipal ? 'bg-emerald-100/80' : 'bg-[#f0f7f8]'}">
             ${e.tiene_alerta
               ? `<span class="material-symbols-outlined text-[#cd5055] text-[18px]" style="font-variation-settings:'FILL' 1;">warning</span>`
-              : `<span class="material-symbols-outlined text-[#4f6080] text-[18px]">description</span>`
+              : esPrincipal
+                ? `<span class="material-symbols-outlined text-emerald-600 text-[18px]" style="font-variation-settings:'FILL' 1;">hub</span>`
+                : `<span class="material-symbols-outlined text-[#4f6080] text-[18px]">description</span>`
             }
           </div>`}
       </td>
-      <td class="px-4 py-3.5">
+      <td class="px-4 py-3.5" ${tdGs}>
         <div class="flex flex-col gap-0.5">
           <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
           <span class="text-[10px] px-1.5 py-0.5 rounded font-bold w-fit ${areaColors[e.area]||''}">${e.area}</span>
-          ${sinCausa ? `
-            <button onclick="event.stopPropagation();abrirModalVincularCausa('${e.id}')"
-              class="mt-0.5 text-[9px] font-bold text-[#3a70a9] flex items-center gap-0.5 hover:underline">
-              <span class="material-symbols-outlined text-[11px]">link_off</span>Sin causa · Vincular
+          ${esPrincipal ? `
+            <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 w-fit bg-emerald-100 text-emerald-700 border border-emerald-200/60">
+              <span class="material-symbols-outlined text-[10px]">hub</span>
+              Principal · PJN
+            </span>` : ''}
+          ${sinCausa && !isChild ? `
+            <button onclick="event.stopPropagation();abrirModalAgrupar('${e.id}')"
+              class="mt-0.5 text-[9px] font-bold text-[#4f6080] flex items-center gap-0.5 hover:text-[#256386] hover:underline transition-colors">
+              <span class="material-symbols-outlined text-[11px]">folder_off</span>
+              Sin causa · Agrupar
             </button>` : ''}
         </div>
       </td>
-      <td class="px-4 py-3.5 max-w-xs">
+      <td class="px-4 py-3.5 max-w-xs" ${tdGs}>
         <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
         <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa||''}</p>
         ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-1">${e.alerta_msg}</p>` : ''}
       </td>
-      <td class="px-4 py-3.5 text-xs text-[#4f6080] font-medium">${(e.tipo||'').replace(/_/g,' ')}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080] font-medium" ${tdGs}>${(e.tipo||'').replace(/_/g,' ')}</td>
       ${showAbogado ? `
-      <td class="px-4 py-3.5">
+      <td class="px-4 py-3.5" ${tdGs}>
         <span class="text-xs text-[#1b3a5c]">${nombreCorto}</span>
       </td>` : ''}
-      <td class="px-4 py-3.5">${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
-      <td class="px-4 py-3.5 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
-      <td class="px-4 py-3.5">
-        <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-[#256386] hover:text-primary-dim font-bold text-xs uppercase tracking-tight transition-colors">
-          Abrir
-        </button>
+      <td class="px-4 py-3.5" ${tdGs}>${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
+      <td class="px-4 py-3.5 text-xs text-[#4f6080]" ${tdGs}>${e.fecha_recepcion}</td>
+      <td class="px-4 py-3.5 text-right" ${tdGs}>
+        <div class="flex items-center gap-3 justify-end">
+          ${isChild ? `
+          <button onclick="event.stopPropagation();desagrupar('${e.id}')"
+            class="text-[9px] font-bold text-[#4f6080] hover:text-[#cd5055] flex items-center gap-0.5 hover:underline transition-colors">
+            <span class="material-symbols-outlined text-[11px]">link_off</span>
+            Desagrupar
+          </button>` : ''}
+          <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-[#256386] hover:text-primary-dim font-bold text-xs uppercase tracking-tight transition-colors">
+            Abrir
+          </button>
+        </div>
       </td>
     </tr>`;
 }
 
 function verDetalle(id) {
   window.location.href = `detalle-expediente.html?id=${id}`;
+}
+
+function verTodoCausa(nc) {
+  window.location.href = `causa-detalle.html?causa=${encodeURIComponent(nc)}`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -574,20 +619,19 @@ function collapseAll() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MODAL: VINCULAR CAUSA (expediente suelto → asignar número de causa)
+// MODAL: AGRUPAR (expediente suelto → asignar número de causa)
 // ─────────────────────────────────────────────────────────────────────────────
-function abrirModalVincularCausa(expId) {
+function abrirModalAgrupar(expId) {
   const exp = window.SACO.getExpedienteById(expId);
   if (!exp) return;
 
-  // Causas existentes en la bandeja del usuario
-  const exps       = getExpedientesDelUsuario();
-  const causasExistentes = [...new Set(
-    exps.filter(e => e.numero_causa && e.numero_causa.trim() && e.numero_causa.toUpperCase() !== 'SS SOFSE')
-        .map(e => e.numero_causa.trim())
-  )];
+  const todasLasCausas = [...new Set(
+    window.SACO.EXPEDIENTES_ABOGADO
+      .filter(e => e.numero_causa && e.numero_causa.trim() && e.id !== expId)
+      .map(e => e.numero_causa.trim())
+  )].sort();
 
-  SACO_UI.showModal('Asignar N° de Causa', `
+  SACO_UI.showModal('Agrupar a Causa', `
     <div class="space-y-4">
       <div class="p-3 bg-[#f0f7f8] rounded-xl">
         <p class="text-xs font-bold text-[#1b3a5c]">${exp.id}</p>
@@ -599,46 +643,129 @@ function abrirModalVincularCausa(expId) {
         <input id="modal-causa-input" oninput="onModalCausaInput(this.value)"
           class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
           placeholder="FSM-XXXXX/2026"/>
-        <p class="text-[10px] text-[#4f6080] mt-1">Ingresá el número tal como figura en el expediente judicial.</p>
+        <p class="text-[10px] text-[#4f6080] mt-1">Ingresá el número o seleccioná una causa existente.</p>
       </div>
 
-      ${causasExistentes.length ? `
+      ${todasLasCausas.length ? `
         <div>
-          <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">O seleccioná una causa existente en tu bandeja</p>
-          <div class="space-y-1.5 max-h-36 overflow-y-auto">
-            ${causasExistentes.map(nc => `
-              <button onclick="document.getElementById('modal-causa-input').value='${nc}';onModalCausaInput('${nc}')"
-                class="w-full text-left p-2.5 bg-[#f0f7f8] rounded-lg hover:bg-surface-container transition-colors flex items-center gap-2">
-                <span class="material-symbols-outlined text-[#256386] text-[14px]">folder</span>
-                <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
-              </button>`).join('')}
+          <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Causas existentes en el sistema</p>
+          <div class="space-y-1.5 max-h-40 overflow-y-auto">
+            ${todasLasCausas.map(nc => {
+              const expsGrupo = window.SACO.EXPEDIENTES_ABOGADO.filter(e => (e.numero_causa||'').trim() === nc);
+              const areas = [...new Set(expsGrupo.map(e => e.area))].join(' · ');
+              return `
+                <button onclick="document.getElementById('modal-causa-input').value='${nc}';onModalCausaInput('${nc}')"
+                  class="w-full text-left p-3 bg-[#f0f7f8] rounded-lg hover:bg-[#e2eff5] transition-colors">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-[#256386] text-[14px]" style="font-variation-settings:'FILL' 1;">folder</span>
+                      <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-[#4f6080]">${expsGrupo.length} exp.</span>
+                      <span class="text-[10px] text-[#4f6080]">${areas}</span>
+                    </div>
+                  </div>
+                </button>`;
+            }).join('')}
           </div>
-        </div>` : ''}
+        </div>` : `
+        <div class="p-3 bg-[#f0f7f8] rounded-xl text-center">
+          <p class="text-xs text-[#4f6080]">No hay causas existentes en el sistema. Ingresá un número nuevo para crear la primera causa.</p>
+        </div>`}
+
     </div>`,
     `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg">Cancelar</button>
-     <button onclick="confirmarVincularCausa('${expId}')" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Asignar Causa</button>`
+     <button onclick="confirmarAgrupar('${expId}')" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Agrupar</button>`
   );
 }
 
-function confirmarVincularCausa(expId) {
-  const nc  = (document.getElementById('modal-causa-input').value || '').trim();
+function onModalCausaInput(val) {
+  // placeholder para extensión futura (autocompletado, validación)
+}
+
+function confirmarAgrupar(expId) {
+  const nc = (document.getElementById('modal-causa-input').value || '').trim();
   if (!nc) { SACO_UI.showToast('Ingresá un número de causa.', 'warn'); return; }
 
   const exp = window.SACO.getExpedienteById(expId);
   if (!exp) return;
 
-  // Chequear si ya existe esa causa con otro abogado → asignar el mismo abogado
   const exps = window.SACO.EXPEDIENTES_ABOGADO;
-  const conMismaCausa = exps.filter(e => e.id !== expId && (e.numero_causa||'').trim() === nc);
-  if (conMismaCausa.length) {
-    // En un sistema real se asignaría automáticamente al mismo letrado
-    SACO_UI.showToast(`Causa ${nc} ya existe. El expediente quedará bajo el mismo agrupador.`, 'info');
-  }
+  const yaExistePrincipal = exps.some(e =>
+    e.id !== expId &&
+    (e.numero_causa||'').trim() === nc &&
+    e.es_principal === true
+  );
 
   exp.numero_causa = nc;
+  exp.es_principal = !yaExistePrincipal;
+
   SACO_UI.closeModal();
   applyFilters();
-  SACO_UI.showToast(`N° de causa ${nc} asignado a ${expId}.`, 'success');
+  if (!yaExistePrincipal) {
+    SACO_UI.showToast(`${expId} agrupado como expediente principal de ${nc}.`, 'success');
+  } else {
+    SACO_UI.showToast(`${expId} agrupado a causa ${nc}.`, 'success');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DESAGRUPAR
+// ─────────────────────────────────────────────────────────────────────────────
+function desagrupar(expId) {
+  const exp = window.SACO.getExpedienteById(expId);
+  if (!exp) return;
+  SACO_UI.showModal('Desagrupar expediente', `
+    <div class="space-y-3">
+      <div class="p-3 bg-[#f0f7f8] rounded-xl">
+        <p class="text-xs font-bold text-[#1b3a5c]">${exp.id}</p>
+        <p class="text-xs text-[#4f6080] mt-0.5 line-clamp-2">${exp.caratula}</p>
+      </div>
+      <p class="text-sm text-[#4f6080]">
+        Este expediente quedará suelto y podrá reagruparse a otra causa.
+      </p>
+      <p class="text-xs font-bold text-[#cd5055]">
+        N° de causa actual: ${exp.numero_causa}
+      </p>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()"
+      class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg">
+      Cancelar
+    </button>
+    <button onclick="confirmarDesagrupar('${expId}')"
+      class="px-6 py-2 bg-[#cd5055] hover:bg-red-700 text-white text-sm font-bold rounded-lg">
+      Desagrupar
+    </button>`
+  );
+}
+
+function confirmarDesagrupar(expId) {
+  const exp = window.SACO.getExpedienteById(expId);
+  if (!exp) return;
+  const causaAnterior = exp.numero_causa;
+  const eraPrincipal  = exp.es_principal;
+
+  exp.numero_causa = null;
+  exp.es_principal = false;
+
+  if (eraPrincipal) {
+    const siguiente = window.SACO.EXPEDIENTES_ABOGADO.find(e =>
+      e.id !== expId &&
+      (e.numero_causa||'').trim() === causaAnterior
+    );
+    if (siguiente) {
+      siguiente.es_principal = true;
+      SACO_UI.closeModal();
+      applyFilters();
+      SACO_UI.showToast(`${expId} desagrupado. ${siguiente.id} es ahora el expediente principal.`, 'info');
+      return;
+    }
+  }
+
+  SACO_UI.closeModal();
+  applyFilters();
+  SACO_UI.showToast(`${expId} desagrupado de ${causaAnterior}.`, 'info');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -668,10 +795,8 @@ SACO_SYNC.syncListen(({ type, payload }) => {
   const letradoSelect = document.getElementById('f-letrado');
 
   if (SHOW_ABOGADO) {
-    // Bandejas globales: mostrar columna + filtro poblado
     if (thLetrado)  thLetrado.classList.remove('hidden');
     if (filterWrap) filterWrap.classList.remove('hidden');
-    // Poblar select con los abogados presentes en los datos
     const abogados = [...new Set(window.SACO.EXPEDIENTES_ABOGADO.map(e => e.abogado))].sort();
     abogados.forEach(a => {
       const opt = document.createElement('option');
@@ -680,12 +805,13 @@ SACO_SYNC.syncListen(({ type, payload }) => {
       letradoSelect.appendChild(opt);
     });
   } else {
-    // Bandeja propia: ocultar columna y filtro
     if (thLetrado)  thLetrado.classList.add('hidden');
     if (filterWrap) filterWrap.classList.add('hidden');
   }
 })();
 
+poblarFiltroTipo();
+poblarFiltroEstado();
 applyFilters();
 
 // Aplicar offset sidebar
