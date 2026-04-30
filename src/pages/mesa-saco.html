@@ -238,7 +238,7 @@ function renderTabla(datos) {
       </td>
       <td class="px-4 py-4 text-xs text-[#4f6080]">${e.tipo.replace(/_/g, ' ')}</td>
       <td class="px-4 py-4">
-        <span class="font-mono text-[10px] text-[#4f6080]">${e.ref || e.gde || '—'}</span>
+        <span class="font-mono text-[10px] text-[#4f6080]">${e.gde || (e.timeline && e.timeline.find(t => t.doc && (t.doc.startsWith('EX-') || t.doc.startsWith('ME-') || t.doc.startsWith('MAIL-'))))?.doc || '—'}</span>
       </td>
       <td class="px-4 py-4 text-xs text-[#1b3a5c]">${(e.abogado||'').replace(/^Dr\. |^Dra\. /,'')}</td>
       <td class="px-4 py-4">
@@ -270,7 +270,7 @@ function applyFilters() {
         !e.id.toLowerCase().includes(search) &&
         !(e.numero_causa || '').toLowerCase().includes(search)) return false;
     if (tipo    && e.tipo !== tipo)               return false;
-    if (gde     && !(e.ref_gde || e.gde || '').toLowerCase().includes(gde)) return false;
+    if (gde     && !(e.gde || (e.timeline && e.timeline.find(t => t.doc && (t.doc.startsWith('EX-') || t.doc.startsWith('ME-') || t.doc.startsWith('MAIL-'))))?.doc || '').toLowerCase().includes(gde)) return false;
     if (abogado && e.abogado !== abogado)         return false;
     if (fechaDesde && e.fecha_recepcion < fechaDesde) return false;
     if (fechaHasta && e.fecha_recepcion > fechaHasta) return false;
