@@ -317,27 +317,63 @@ Toda la data vive en `window.SACO`. Claude Code **modifica `mock.js`** cuando ne
 window.SACO = {
   TIPOS_GESTION,          // { CIVIL: [...], LABORAL: [...], PENAL: [...] }
   LINEAS_FERROVIARIAS,    // [{ code, label, abogado }]
-  ABOGADOS,               // { CIVIL: [...], LABORAL: [...], PENAL: [...] }
+  ABOGADOS,               // { CIVIL: [4], LABORAL: [3], PENAL: [5] }
   ESTADOS,                // [{ code, label, color }]
   ESTADOS_POR_TIPO,       // { DEMANDA: [...], QUERELLA: [...], OFICIO: [...], ... } — catálogo completo
-  QUEUE_MESA,             // expedientes pendientes en Mesa SACO
-  EXPEDIENTES_ABOGADO,    // expedientes asignados al letrado
+  QUEUE_MESA,             // expedientes pendientes en Mesa SACO (recepción)
+  EXPEDIENTES_ABOGADO,    // expedientes asignados — ver estructura abajo
   EXPEDIENTE_DETALLE,     // objeto único del expediente abierto (incluye vinculos:[], intervinientes:[], estadoExpediente en cada mov., estadoLabel para estado custom)
   CARTA_SUCESO_QUEUE,     // cartas SAE pendientes (penal)
   CAUSAS_PENALES,         // causas activas del área penal
-  JUZGADOS,               // [{ code, label }]
+  JUZGADOS,               // [{ code, label }] — 40+ juzgados catalogados
+  USUARIOS,               // [{ nombre, rol, area }] — 8 perfiles demo
+  ROL_ACCESOS,            // { REFERENTE: {...}, COORDINADOR: {...}, ABOGADO: {...}, ... }
+  CURRENT_USER,           // usuario activo (null hasta login; páginas lo leen para filtrar)
+  FORMULARIOS,            // { [tipo]: { label, mesa: [...campos], abogado: [...campos] } }
+  getAccesos,             // helper: getAccesos(usuario) → ROL_ACCESOS[rol][area]
   getEstadosPorTipo,      // helper: getEstadosPorTipo(tipoGestion) → string[] — fallback genérico si tipo no existe
+  getCamposFormulario,    // helper: getCamposFormulario(tipo, etapa, area) → campos[] filtrados por etapa
   buscarPorNumeroCausa,   // helper: buscarPorNumeroCausa(str) → expediente[] — busca en EXPEDIENTES_ABOGADO + QUEUE_MESA
   getExpedienteById,      // helper: getExpedienteById(id) → expediente|null (busca en EXPEDIENTE_DETALLE y EXPEDIENTES_ABOGADO)
   abrirExpediente,        // helper: abrirExpediente(id) → navega a detalle-expediente.html?id=X
 }
 ```
 
+### Estructura de cada objeto en `EXPEDIENTES_ABOGADO`
+```javascript
+{
+  id: 'C-0023/2026',           // N° interno (prefijo por área + secuencia + año)
+  area: 'CIVIL',               // 'CIVIL' | 'LABORAL' | 'PENAL'
+  tipo: 'DEMANDA_CIVIL',       // código de TIPOS_GESTION
+  caratula: '...',
+  numero_causa: 'FSM-11802/2023',   // opcional — null hasta que abogado lo cargue
+  juzgado: '...',
+  estado: 'EN_PRUEBA',         // código legacy para compatibilidad
+  estadoLabel: 'Prueba',       // texto libre del catálogo ESTADOS_POR_TIPO
+  fecha_recepcion: '2023-10-20',
+  abogado: 'Dr. Alejandro Rossi',
+  linea: 'LM',                 // línea ferroviaria — solo Penal usa para asignación
+  tiene_alerta: true,
+  alerta_msg: '...',
+  prioridad: 'ALTA',           // 'ALTA' | 'NORMAL'
+  es_principal: true,          // true = expediente cabecera de una causa agrupada
+  vinculos: [],                // [{ id, area, tipo, caratula, estado, tipo_relacion }]
+  intervinientes: [],          // [{ id, nombre, rol_procesal, ... }]
+  campos_mesa: {},             // valores cargados por Mesa SACO en alta-expediente
+  campos_abogado: {},          // valores cargados por el letrado en detalle-expediente
+  timeline: [],                // [{ fecha, tipo, titulo, desc, doc, activo, estadoExpediente, subMovimientos }]
+  documentos: [],              // [{ nombre, tipo, fecha, size, icon, color }]
+}
+```
+
 ### Reglas de los datos
-- Los tipos de gestión están en `TIPOS_GESTION` separados por área (CIVIL 12, LABORAL 8, PENAL 7 — ver sección 8.1)
+- Los tipos de gestión están en `TIPOS_GESTION` separados por área (CIVIL 14, LABORAL 8, PENAL 7 — ver sección 8.1)
 - `ESTADOS_POR_TIPO` define los estados válidos para cada `tipo_gestion`; usar siempre `getEstadosPorTipo(tipo)` para obtenerlos
+- `FORMULARIOS` define los campos del formulario de alta por tipo y etapa: `mesa` (completa la Mesa SACO) y `abogado` (completa el letrado). Usar `getCamposFormulario(tipo, etapa)` para obtenerlos.
 - `EXPEDIENTE_DETALLE` contiene los arrays `timeline[]`, `documentos[]`, `vinculos[]` e `intervinientes[]` que se modifican en runtime
 - `exp.estadoLabel` guarda el estado como texto libre del catálogo (e.g. "Etapa de instrucción"); `exp.estado` conserva el código legacy para compatibilidad
+- `exp.es_principal` distingue el expediente cabecera de los derivados dentro de una causa agrupada
+- `exp.campos_mesa` y `exp.campos_abogado` almacenan los valores dinámicos del formulario por etapa
 - El estado se pierde al recargar la página — es intencional para el prototipo
 
 ---
@@ -357,12 +393,14 @@ Estas reglas vienen del análisis funcional y **no son negociables**. Claude Cod
 
 | Área | Cantidad | Códigos |
 |------|----------|---------|
-| CIVIL | 12 tipos | OFICIO, CARTA_DOC, MEDIACION, BENEFICIO_LITIGAR, DEMANDA_CIVIL, COBRO_CANON, RECLAMO_CONTRAT, LANZAMIENTO, RECUPERO, EJECUCION_GAR, DEFENSA_CIVIL, PEDIDO_CAUSA_PENAL |
-| LABORAL | 8 tipos | OFICIO, CARTA_DOC, MEDIACION, DEMANDA_CIVIL, DEMANDA_LABORAL, CONSIGNACION, DESAFUERO, PEDIDO_CAUSA_PENAL |
-| PENAL | 7 tipos | OFICIO, MEDIACION, QUERELLA, DEFENSA_PENAL, CARTA_SUCESO, PEDIDO_CAUSA_PENAL, OTROS |
+| CIVIL | 14 tipos | OFICIO, CARTA_DOC, MEDIACION, BENEFICIO_LITIGAR, COBRO_CANON, RECLAMO_CONTRAT, LANZAMIENTO, RECUPERO, EJECUCION_GAR, DEMANDA_CIVIL, DEMANDA_LABORAL, DEFENSA_CIVIL, PEDIDO_CAUSA_PENAL, OTRAS |
+| LABORAL | 8 tipos | OFICIO, CARTA_DOC, SECLOS, DEMANDA_LABORAL, CONSIGNACION, DESAFUERO, PEDIDO_CAUSA_PENAL, OTRAS |
+| PENAL | 7 tipos | OFICIO, MEDIACION, QUERELLA, DEFENSA_PENAL, CARTA_SUCESO, PEDIDO_CAUSA_PENAL, OTRAS |
 
-- `OTROS` solo aplica al área PENAL
+- `OTRAS` (Otras presentaciones / gestiones) aplica a las tres áreas como tipo residual
+- `SECLOS` aplica solo al área LABORAL (mediaciones de la SECLO laboral)
 - `DEMANDA_CIVIL` y `DEMANDA_LABORAL` reemplazan el código genérico `DEMANDA`; en los datos históricos puede aparecer `DEMANDA` como código legacy
+- `PEDIDO_CAUSA_PENAL` aplica a las tres áreas; sin campos en Mesa SACO, solo en etapa abogado
 
 ### 8.2 Numeración automática
 ```
@@ -467,88 +505,118 @@ Para expedientes del área PENAL:
 **Funcionalidades:**
 
 - Botón principal: **"Nuevo Expediente"** (redirige a `alta-expediente.html`)
-  
-- Bandeja principal:
-  - Lista de expedientes **ya asignados**
-  - Fuente de datos: `SACO.EXPEDIENTES_ABOGADO` (vista global)
 
-- Grilla de expedientes:
+- Bandeja principal:
+  - Lista de expedientes **ya asignados** — fuente: `SACO.EXPEDIENTES_ABOGADO`
+  - Vista **solo lectura** — no modifica estados ni asignaciones
+
+- Columnas de la grilla:
+  - N° Interno (id + badge área)
+  - N° Causa (numero_causa judicial)
+  - Carátula (truncada a 220px)
   - Tipo de Gestión
-  - Referencia GDE (N° de MEMO / EE)
-  - Origen (canal de ingreso)
-  - Estado → siempre `ASIGNADO`
-  - Abogado (letrado asignado)
-  - Fecha (fecha de recepción o asignación)
+  - Referencia GDE (campo `gde` o primer doc del timeline que empiece con EX-/ME-/MAIL-)
+  - Letrado (abogado asignado)
+  - Línea ferroviaria (si aplica)
+  - Recepción (fecha_recepcion)
+  - Acciones
+
+- Filtros disponibles:
+  - Búsqueda libre (carátula, N° interno, N° causa)
+  - Tipo de Gestión (dropdown dinámico)
+  - Referencia GDE (texto)
+  - Letrado (dropdown dinámico)
+  - Recepción Desde / Hasta (rango de fechas)
+  - Botón Limpiar
 
 - Acciones:
-  - Botón **visualizar expediente** (ícono de ojo)
-  - Navega a `detalle-expediente.html`
-  - No hay edición ni asignación desde esta vista
-
-- Filtros:
-  - Tipo de Gestión
-  - Referencia GDE
-  - Origen
-  - Abogado
-  - Fecha
-  - ❌ No incluye filtro por estado (ya que todos están en `ASIGNADO`)
-
-- Comportamiento:
-  - Vista **solo lectura**
-  - No modifica estado ni asignaciones
-  - Permite trazabilidad y consulta de expedientes cargados
+  - Click en fila → `detalle-expediente.html?id={id}`
+  - Escucha sync `EXPEDIENTE_ASIGNADO` para actualizar bandeja en tiempo real
 
 **Estado que modifica:** ninguno (solo lectura)
-> ⚠️ Nota:
-> La Mesa SACO deja de ser una cola de asignación y pasa a ser una bandeja de consulta de expedientes ya asignados.
-> La asignación se realiza únicamente en el flujo de alta de expediente.
+
+> ⚠️ La Mesa SACO es una bandeja de **consulta** de expedientes ya asignados.
+> La asignación ocurre únicamente durante el alta en `alta-expediente.html`.
 
 ### `alta-expediente.html` — Nuevo Expediente
 **Rol:** Administrativo de Mesa SACO
-**Funcionalidades:**
-- Sección 1: Canal (EE_GDE / MEMO_GDE / MAIL) + N° de referencia + Área + Tipo de gestión
-- Sección 2: Carátula, N° Causa **(opcional)**, Juzgado (desplegable), Fecha hecho, Fecha recepción, Línea ferroviaria
-- Campos condicionales:
-  - DEMANDA: variante A/B, monto, Ley 25.344
-  - PENAL: N° de Sumario y Comisaría
-- Sección 3: Asignación de letrado (regla según área)
-- Sección 4: Upload de documentos (drag & drop decorativo)
-- Sidebar derecho: flujo de proceso + resumen en tiempo real (se actualiza con cada cambio)
-- Alerta de duplicado cuando N° Causa ya existe (usa `buscarPorNumeroCausa`): permite vincular el nuevo con el existente (bidireccional, tipo MISMA_CAUSA)
-- N° Causa es **opcional** — el abogado puede cargarlo luego desde el detalle
-- Validación antes de crear: área, tipo, carátula y línea (si Penal) son obligatorios
 
-**Estado que modifica:** incrementa `state.numerosActivos[area]`; redirige a bandeja tras crear
+**Estructura de 4 secciones:**
+
+1. **Origen y Tipo de Gestión** _(siempre visible)_
+   - Canal: botones toggle (EE_GDE / MEMO_GDE / MAIL) — auto-sugerido por tipo
+   - Referencia GDE / Memo / Mail: texto mono, requerido
+   - Área: botones toggle (CIVIL / LABORAL / PENAL)
+   - Tipo de Gestión: select dinámico filtrado por área + canal
+
+2. **Detalles del Expediente** _(aparece al seleccionar tipo)_
+   - Campos dinámicos desde `FORMULARIOS[tipo].mesa[]` — **solo etapa mesa**
+   - Tipos de campo soportados: `text`, `date`, `money`, `textarea`, `boolean`, `causa`, `linea`, `juzgado`, `select`
+   - Campos con `dependsOn`: se ocultan/muestran según valor de otro campo del form
+   - Campo tipo `causa`: dispara `onNumeroCausaChange()` → alerta de duplicado con opción de vincular
+   - Campo tipo `linea` (Penal): dispara `onLineaChange()` → actualiza letrado automáticamente
+
+3. **Asignación de Letrado** _(aparece al seleccionar tipo)_
+   - CIVIL / LABORAL: FIFO secuencial — se sugiere el siguiente en rotación
+   - PENAL: por línea ferroviaria — letrado pre-seleccionado según línea elegida
+   - Si N° causa duplicada: alerta sugiere mismo letrado del expediente anterior (reincidencia)
+
+4. **Documento GDE** _(siempre visible)_
+   - Drop zone (drag & drop + click) — solo PDF, máximo 10 MB
+   - Obligatorio antes de crear el expediente
+
+**Acciones:**
+- "Revisar y Derivar" → valida campos y abre modal de confirmación con resumen completo
+- Confirmar → genera N° interno (ej: C-0089/2026), emite sync `EXPEDIENTE_ASIGNADO`, redirige a `mesa-saco.html`
+
+**Separación Mesa SACO / Abogado:**
+- En el alta, solo se completan los campos `FORMULARIOS[tipo].mesa[]` (etapa Mesa)
+- Los campos `FORMULARIOS[tipo].abogado[]` los completa el letrado desde `detalle-expediente.html`
+- Los valores se guardan en `exp.campos_mesa` y `exp.campos_abogado` respectivamente
+
+**Estado que modifica:** incrementa `state.numerosActivos[area]`; agrega a `EXPEDIENTES_ABOGADO`; redirige a `mesa-saco.html` tras crear
 
 ### `bandeja-abogado.html` — Bandeja del Letrado
 **Rol:** Abogado (cualquier área)
 **Funcionalidades:**
-- Tabs: **Activos** / **Urgentes** (filtros sobre `SACO.EXPEDIENTES_ABOGADO` — tab Cumplidos eliminado)
-- **Barra de filtros horizontal:** búsqueda libre, tipo de gestión, estado, rango de fechas, toggle alerta; chips de filtros activos con botón X por chip
-- Tabla agrupada por causa: expedientes con `numero_causa` igual se agrupan bajo una fila "causa" expandible; expedientes sin causa son filas sueltas
-- Filas con alerta (`tiene_alerta = true`) muestran ícono de warning en rojo
-- Click en fila de causa → expande/colapsa hijos; click en fila de expediente → navega a `detalle-expediente.html`
-- **"Ver todo" en causa** → navega a `causa-detalle.html?causa=<numeroCausa>`
-- **"Agrupar a causa"** en sueltos → modal `abrirModalAgrupar(expId)` → `confirmarAgrupar()` — asigna `numero_causa` en runtime
-- **"Desagrupar"** en hijos → modal `desagrupar(expId)` → `confirmarDesagrupar()` — pone `numero_causa = null` en runtime
-- `construirItemsBandeja()` agrupa los datos; `expandedCausas` Set controla filas abiertas; `SHOW_ABOGADO` flag (false en bandeja propia)
-- `poblarFiltroTipo()` y `poblarFiltroEstado()` cargan selects dinámicamente; `renderChipsFiltros()` gestiona chips activos
+- Fuente: `SACO.EXPEDIENTES_ABOGADO` filtrado por `CURRENT_USER.nombre`
+- **Tabs:** Activos (estado ≠ CUMPLIDO) | Urgentes (prioridad ALTA + tiene_alerta)
+- **Filtros horizontales:** búsqueda libre, tipo de gestión, estado, fecha desde/hasta, toggle "con alerta"; chips de filtros activos con botón X por chip
 
-**Estado que modifica:** `exp.numero_causa` (agrupar/desagrupar — en runtime)
+**Tabla agrupada por causa:**
+- `construirItemsBandeja()`: expedientes con `numero_causa` válido → fila `kind:'causa'` expandible con hijos; expedientes sin causa → fila `kind:'suelto'`
+- Expediente `es_principal: true` → destacado con ícono hub y highlight verde en la fila causa
+- Click en fila causa → expande/colapsa hijos; click en expediente → `detalle-expediente.html?id={id}`
+- **"Ver todo"** en causa → `causa-detalle.html?causa={encodedNumeroCausa}`
+
+**Acciones sobre agrupación (runtime):**
+- Suelto → **"Agrupar"**: `abrirModalAgrupar(expId)` → `confirmarAgrupar()` — asigna `numero_causa`
+- Hijo → **"Desagrupar"**: `desagrupar(expId)` → `confirmarDesagrupar()` — pone `numero_causa = null`
+
+**Estado que modifica:** `exp.numero_causa` (agrupar/desagrupar — en runtime, se pierde al recargar)
 
 ### `causa-detalle.html` — Detalle de Causa
 **Rol:** Abogado (cualquier área)
-**Acceso:** desde bandeja-abogado.html → "Ver todo" en fila de causa
+**Acceso:** desde `bandeja-abogado.html` → "Ver todo" en fila de causa
 **Query param:** `?causa=<numeroCausa>` (ej. `?causa=FSM-11802/2023`)
-**Funcionalidades:**
-- Header con N° causa y breadcrumb; botón "Volver" (`history.back()`)
-- Grilla de tarjetas por expediente — cada card muestra área (pill color), estado, N° interno, carátula, tipo, fecha, abogado y alerta si `tiene_alerta`; click en card → `window.SACO.abrirExpediente(id)`
-- **Timeline unificado:** todas las entradas `timeline[]` de los expedientes agrupados, etiquetadas con `_expId`, `_expArea`, `_expCaratula`, ordenadas (activos primero, luego por fecha desc)
-- Select `#filtro-exp` para filtrar el timeline por expediente individual
-- Estado vacío si la causa no existe o no tiene expedientes asociados
-- Sidebar key: `'bandeja-abogado'`
+**Sidebar key:** `'bandeja-abogado'`
 
-**Estado que modifica:** ninguno (solo lectura)
+**Funcionalidades:**
+
+- **Header:** N° causa + cantidad de expedientes activos + áreas involucradas; botón "Volver" (`history.back()`)
+- **Grilla de tarjetas:** una card por expediente vinculado — badge área, estado, N° interno, carátula, tipo, fecha, abogado, icono alerta si `tiene_alerta`; click → `SACO.abrirExpediente(id)`
+- **Timeline unificado:** combina `timeline[]` de todos los expedientes de la causa; cada entrada etiquetada con `_expId`, `_expArea`, `_expCaratula`; ordenadas (activos primero, luego desc por fecha)
+- **Modal "Nueva Actividad":** agrega movimiento al timeline de un expediente de la causa
+  - Campos: expediente destino (requerido), tipo de movimiento, fecha (hoy por defecto), descripción, N° GDE (opcional), archivo adjunto PDF/DOCX hasta 25 MB (opcional)
+  - Confirmar → agrega a `timeline[]`, marca previos como inactivos, emite sync `MOVIMIENTO_AGREGADO`
+- **Filtros de timeline:**
+  - Expediente (select por expediente individual)
+  - Tipo de movimiento (RECEPCION / NOTA_RESPUESTA / MOVIMIENTO / DERIVACION / CIERRE / OTRO)
+  - Búsqueda por título (texto libre)
+  - Botón Limpiar
+- Estado vacío si la causa no existe o no tiene expedientes asociados
+
+**Estado que modifica:** `exp.timeline[]` (al agregar nueva actividad — en runtime)
 
 ### `detalle-expediente.html` — Detalle del Expediente
 **Rol:** Abogado / Coordinador
@@ -704,7 +772,7 @@ Las siguientes páginas están diseñadas funcionalmente pero no codificadas aú
 | Mesa SACO | — | Área administrativa que recibe y asigna |
 | Letrado / Abogado | `abogado` | Profesional asignado al caso |
 | Área | `area` | CIVIL / LABORAL / PENAL |
-| Tipo de Gestión | `tipo_gestion` | 27 subtipos en total (CIVIL 12, LABORAL 8, PENAL 7) |
+| Tipo de Gestión | `tipo_gestion` | 29 subtipos en total (CIVIL 14, LABORAL 8, PENAL 7) |
 | Canal | `canal_ingreso` | EE_GDE / MEMO_GDE / MAIL |
 | GDE | — | Gestión Documental Electrónica (plataforma Estado) |
 | IFGRA | — | Informe Gráfico (tipo doc GDE con firma digital) |
@@ -824,6 +892,9 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 | v1.4 | Abr 2026 | N° causa opcional + detección de duplicado con vinculación bidireccional: mock.js (buscarPorNumeroCausa, getExpedienteById, abrirExpediente, intervinientes[] y vinculos[] bidireccionales en los 3 expedientes demo); alta: alerta duplicado con selección de vínculo + vinculación automática al crear; detalle: N° causa editable inline (#causa-editable-wrap) con alerta de duplicado y vinculación bidireccional; tab Intervinientes con CRUD + badge "Mismo siniestro" + navegación entre expedientes vinculados |
 | v1.5 | Abr 2026 | Matriz_Actualizada.xlsx: TIPOS_GESTION redefinido (CIVIL 12, LABORAL 8, PENAL 7); campo canal[] + canales[]; ESTADOS_POR_TIPO ampliado (BENEFICIO_LITIGAR, LANZAMIENTO, DEMANDA_CIVIL, DEMANDA_LABORAL, PEDIDO_CAUSA_PENAL); alta-expediente: tipos sin filtro por canal, auto-set canal al seleccionar tipo, estado-inicial-wrap, compatibilidad canal toast |
 | v1.6 | Abr 2026 | mock.js: EXPEDIENTES_ABOGADO reemplazado por 6 expedientes demo (2 causas + 1 suelto); bandeja-abogado: filtros horizontales + chips, tabs Activos/Urgentes, agrupar/desagrupar causa en runtime, "Ver todo" navega a causa-detalle; causa-detalle.html: nueva página timeline unificado por causa; CLAUDE.md actualizado |
+| v1.7 | Abr 2026 | alta-expediente: formulario por etapas con campos dinámicos desde FORMULARIOS[tipo].mesa[] (tipos: text, date, money, textarea, boolean, causa, linea, juzgado, select; dependsOn condicional); modal de confirmación antes de crear; separación explícita campos_mesa/campos_abogado; PDF GDE obligatorio. mesa-saco: refactor columnas (N° Causa, Carátula, Línea) + filtros (fecha desde/hasta, referencia GDE mejorada). mock.js: FORMULARIOS con todas las definiciones de campos por tipo y etapa; TIPOS_GESTION ajustado (CIVIL +DEMANDA_LABORAL +OTRAS; LABORAL MEDIACION→SECLOS +OTRAS; PENAL +OTRAS) |
+| v1.8 | Abr 2026 | bandeja-abogado: expediente principal con degradé verde, modal agrupar con causas existentes, estado causa desde principal; causa-detalle: modal "Nueva Actividad" con expediente destino + tres filtros combinables en timeline (expediente, tipo, texto); mock.js: EXPEDIENTES_ABOGADO con campos es_principal, campos_mesa, campos_abogado, vinculos, timeline, documentos por expediente |
+| v1.9 | Abr 2026 | Integración feature/mesa-saco-alta-expte + feature/bandeja-refactor-v2 en rama feature/integracion-bandeja-alta; PEDIDO_CAUSA_PENAL restituido en TIPOS_GESTION (CIVIL/LABORAL/PENAL) y FORMULARIOS tras auto-merge; rama promovida a master |
 
 ---
 
