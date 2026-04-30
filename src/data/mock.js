@@ -15,8 +15,9 @@ const TIPOS_GESTION = {
     { code: 'EJECUCION_GAR',     label: 'Ejecución de Pólizas',             canal: 'EE_GDE',   canales: ['EE_GDE'] },
     { code: 'DEMANDA_CIVIL',     label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
     { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEFENSA_CIVIL',     label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
+    { code: 'DEFENSA_CIVIL',      label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',              label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
   LABORAL: [
     { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
@@ -24,16 +25,18 @@ const TIPOS_GESTION = {
     { code: 'SECLOS',            label: 'SECLO',                            canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
     { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
     { code: 'CONSIGNACION',      label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'DESAFUERO',         label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
+    { code: 'DESAFUERO',          label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',              label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
   PENAL: [
     { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
     { code: 'MEDIACION',         label: 'Mediaciones',                      canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
     { code: 'QUERELLA',          label: 'Querellas',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
     { code: 'DEFENSA_PENAL',     label: 'Defensas Penales',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'CARTA_SUCESO',      label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
-    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
+    { code: 'CARTA_SUCESO',       label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
+    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',              label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
 };
 
@@ -919,6 +922,23 @@ const FORMULARIOS = {
       { id: 'mesa_linea',           label: 'Línea Ferroviaria',                type: 'linea' },
     ],
     abogado: [],
+  },
+
+  // ── PEDIDO_CAUSA_PENAL ─────────────────────────────────────────────────────
+  PEDIDO_CAUSA_PENAL: {
+    label: 'Pedido de Causa Penal',
+    mesa: [],
+    abogado: [
+      { id: 'abg_linea',          label: 'Línea Ferroviaria',              type: 'linea' },
+      { id: 'abg_num_causa',      label: 'N° de Causa',                    type: 'causa',   placeholder: 'IPP-XXXX/2026', mono: true },
+      { id: 'abg_num_sumario',    label: 'N° de Sumario',                  type: 'text',    mono: true },
+      { id: 'abg_comisaria',      label: 'Comisaría',                      type: 'text' },
+      { id: 'abg_requirente',     label: 'Requirente',                     type: 'text' },
+      { id: 'abg_tipo_solicitud', label: 'Tipo de solicitud',              type: 'text' },
+      { id: 'abg_fecha_hecho',    label: 'Fecha del Hecho',                type: 'date' },
+      { id: 'abg_obs',            label: 'Observaciones',                  type: 'textarea', full: true },
+    ],
+    nota: 'Sin campos en Mesa SACO. Asignación automática: Civil/Laboral por orden FIFO, Penal por línea ferroviaria.',
   },
 
   // ── CARTA_SUCESO ───────────────────────────────────────────────────────────
