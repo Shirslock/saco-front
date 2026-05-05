@@ -4,43 +4,36 @@
 // canal: sugerido por defecto | canales: todos los canales válidos para el tipo
 const TIPOS_GESTION = {
   CIVIL: [
-    // Externos
-    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'CARTA_DOC',          label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'BENEFICIO_LITIGAR',  label: 'Beneficios de litigar sin gastos', canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEMANDA_CIVIL',      label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    // Internos
-    { code: 'COBRO_CANON',        label: 'Cobro de Cánones',                 canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'RECLAMO_CONTRAT',    label: 'Reclamo a Contratistas',           canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'LANZAMIENTO',        label: 'Lanzamientos',                     canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'RECUPERO',           label: 'Recuperos',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'EJECUCION_GAR',      label: 'Ejecución de Pólizas',             canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEFENSA_CIVIL',      label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'CARTA_DOC',         label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'MEDIACION',         label: 'Mediaciones',                      canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'BENEFICIO_LITIGAR', label: 'Beneficios de litigar sin gastos', canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'COBRO_CANON',       label: 'Cobro de Cánones',                 canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'RECLAMO_CONTRAT',   label: 'Reclamo a Contratista / Proveedor',canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'LANZAMIENTO',       label: 'Lanzamientos',                     canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'RECUPERO',          label: 'Recuperos',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'EJECUCION_GAR',     label: 'Ejecución de Pólizas',             canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEMANDA_CIVIL',     label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'DEFENSA_CIVIL',     label: 'Defensas Civiles',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
   LABORAL: [
-    // Externos
-    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'CARTA_DOC',          label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'DEMANDA_CIVIL',      label: 'Demanda Civil',                    canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'DEMANDA_LABORAL',    label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    // Internos
-    { code: 'CONSIGNACION',       label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'DESAFUERO',          label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'CARTA_DOC',         label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'SECLOS',            label: 'SECLO',                            canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'CONSIGNACION',      label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'DESAFUERO',         label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
   PENAL: [
-    // Externos
-    { code: 'OFICIO',             label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    { code: 'MEDIACION',          label: 'Mediaciones / SECLOS',             canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
-    // Internos
-    { code: 'QUERELLA',           label: 'Querellas',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'DEFENSA_PENAL',      label: 'Defensas Penales',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'CARTA_SUCESO',       label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
-    { code: 'PEDIDO_CAUSA_PENAL', label: 'Pedido de Causa Penal',            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
-    { code: 'OTROS',              label: 'Otros',                            canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'MEDIACION',         label: 'Mediaciones',                      canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
+    { code: 'QUERELLA',          label: 'Querellas',                        canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'DEFENSA_PENAL',     label: 'Defensas Penales',                 canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
+    { code: 'CARTA_SUCESO',      label: 'Carta Suceso (SAE)',               canal: 'MAIL',     canales: ['MAIL'] },
+    { code: 'OTRAS',             label: 'Otras presentaciones / gestiones', canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE','MAIL'] },
   ],
 };
 
