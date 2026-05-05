@@ -61,10 +61,82 @@ tailwind.config = {
       <h1 class="text-2xl font-headline font-bold text-[#1b3a5c]">Coordinación Laboral</h1>
       <p class="text-[#4f6080] text-sm mt-0.5">Demandas laborales, mediaciones y desafueros activos.</p>
     </div>
-    <a href="alta-expediente.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#256386] hover:bg-[#1d4e6b] text-white font-bold text-sm rounded-xl shadow-md hover:brightness-105 active:scale-[0.98] transition-all">
+    <!-- <a href="alta-expediente.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#256386] hover:bg-[#1d4e6b] text-white font-bold text-sm rounded-xl shadow-md hover:brightness-105 active:scale-[0.98] transition-all">
       <span class="material-symbols-outlined">add_circle</span>
       Nuevo Expediente Laboral
-    </a>
+    </a> -->
+  </div>
+
+  <!-- ── Barra de filtros horizontal ───────────────────────────────── -->
+  <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] px-5 py-4 mb-5">
+
+    <div class="flex flex-wrap items-center gap-3">
+
+      <!-- Búsqueda -->
+      <div class="relative flex-1 min-w-[200px]">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4f6080] text-[18px]">search</span>
+        <input id="search-input" oninput="applyFilters()"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          placeholder="Buscar por carátula, N° causa..."/>
+      </div>
+
+      <!-- Tipo de gestión -->
+      <div class="relative">
+        <select id="f-tipo" onchange="applyFilters()"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[140px]">
+          <option value="">Tipo: Todos</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
+
+      <!-- Estado -->
+      <div class="relative">
+        <select id="f-estado" onchange="applyFilters()"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[140px]">
+          <option value="">Estado: Todos</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
+
+      <!-- Fecha desde/hasta -->
+      <div class="flex items-center gap-2">
+        <input id="f-fecha-desde" oninput="applyFilters()" type="date"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          title="Fecha desde"/>
+        <span class="text-[#4f6080] text-xs">—</span>
+        <input id="f-fecha-hasta" oninput="applyFilters()" type="date"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          title="Fecha hasta"/>
+      </div>
+
+      <!-- Toggle alertas -->
+      <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-[#f0f7f8] transition-colors border border-transparent hover:border-[#bcc0c9]">
+        <input type="checkbox" id="f-urgente" onchange="applyFilters()" class="rounded text-[#cd5055] focus:ring-[#cd5055]"/>
+        <span class="material-symbols-outlined text-[#cd5055] text-[16px]" style="font-variation-settings:'FILL' 1;">warning</span>
+        <span class="text-sm text-[#4f6080] whitespace-nowrap">Con alerta</span>
+      </label>
+
+      <!-- Letrado (solo en bandejas globales) -->
+      <div id="filter-letrado-wrap" class="hidden relative">
+        <select id="f-letrado" onchange="applyFilters()"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[160px]">
+          <option value="">Letrado: Todos</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
+
+      <!-- Limpiar -->
+      <button onclick="limpiarFiltros()"
+        class="ml-auto text-[10px] font-bold text-[#4f6080] hover:text-[#256386] flex items-center gap-1 transition-colors whitespace-nowrap">
+        <span class="material-symbols-outlined text-[14px]">close</span>
+        Limpiar
+      </button>
+
+    </div>
+
+    <!-- Chips de filtros activos -->
+    <div id="chips-filtros" class="hidden flex-wrap gap-2 mt-3 pt-3 border-t border-[#bcc0c9]/30"></div>
+
   </div>
 
   <div class="grid grid-cols-12 gap-7">
@@ -161,6 +233,54 @@ function construirItems(expedientes) {
   Object.entries(causaMap).forEach(([nc, exps]) => items.push({ kind:'causa', numeroCausa:nc, expedientes:exps }));
   sueltos.forEach(e => items.push({ kind:'suelto', exp:e }));
   return items;
+}
+
+function poblarFiltroTipo() {
+  const tipos = [...new Set(window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'LABORAL').map(e => e.tipo))].sort();
+  const sel = document.getElementById('f-tipo');
+  tipos.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t.replace(/_/g,' '); sel.appendChild(o); });
+}
+
+function poblarFiltroEstado() {
+  const estados = [...new Set(window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'LABORAL').map(e => e.estado))].sort();
+  const sel = document.getElementById('f-estado');
+  estados.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s.replace(/_/g,' '); sel.appendChild(o); });
+}
+
+function applyFilters() {
+  const search     = document.getElementById('search-input').value.toLowerCase();
+  const tipo       = document.getElementById('f-tipo').value;
+  const estado     = document.getElementById('f-estado').value;
+  const desde      = document.getElementById('f-fecha-desde').value;
+  const hasta      = document.getElementById('f-fecha-hasta').value;
+  const urgente    = document.getElementById('f-urgente').checked;
+
+  const data = window.SACO.EXPEDIENTES_ABOGADO.filter(e => {
+    if (e.area !== 'LABORAL') return false;
+    if (tipo   && e.tipo   !== tipo)   return false;
+    if (estado && e.estado !== estado) return false;
+    if (urgente && !e.tiene_alerta)    return false;
+    if (desde  && e.fecha_recepcion < desde) return false;
+    if (hasta  && e.fecha_recepcion > hasta) return false;
+    if (search && !e.caratula.toLowerCase().includes(search) &&
+        !e.id.toLowerCase().includes(search) &&
+        !(e.numero_causa||'').toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  document.getElementById('laboral-count').textContent = `${data.length} expediente${data.length !== 1 ? 's' : ''}`;
+  allItems = construirItems(data);
+  renderRows();
+}
+
+function limpiarFiltros() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('f-tipo').value = '';
+  document.getElementById('f-estado').value = '';
+  document.getElementById('f-fecha-desde').value = '';
+  document.getElementById('f-fecha-hasta').value = '';
+  document.getElementById('f-urgente').checked = false;
+  applyFilters();
 }
 
 function renderTablaLaboral() {
@@ -307,6 +427,9 @@ function renderLetradosLaboral() {
 
 renderTablaLaboral();
 renderLetradosLaboral();
+poblarFiltroTipo();
+poblarFiltroEstado();
+applyFilters();
 
 SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'ESTADO_CAMBIADO' || type === 'EXPEDIENTE_ASIGNADO') {

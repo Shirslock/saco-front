@@ -389,7 +389,11 @@ function renderVinculados() {
   const seen = new Set();
   const allVinculos = [];
   expedientes.forEach(exp => {
-    (exp.vinculos || []).forEach(v => {
+    // Si hay datos en EXPEDIENTE_DETALLE para este exp, usarlos
+    const expFull = (window.SACO.EXPEDIENTE_DETALLE && window.SACO.EXPEDIENTE_DETALLE.id === exp.id)
+      ? window.SACO.EXPEDIENTE_DETALLE
+      : exp;
+    (expFull.vinculos || []).forEach(v => {
       if (!seen.has(v.id)) {
         seen.add(v.id);
         allVinculos.push(v);
