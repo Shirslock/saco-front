@@ -339,20 +339,12 @@ function setTabMain(tab) {
 // DATOS UNIFICADOS — fijos + mesa SACO + letrado en un solo card
 // ─────────────────────────────────────────────────────────────────────────────
 const editableFields = [
-  { id: 'ef_causa',     label: 'N° Causa',              key: 'numero_causa',    type: 'text', mono: true },
-  { id: 'ef_tipo',      label: 'Tipo de Gestión',       key: 'tipo',            type: 'readonly' },
-  { id: 'ef_area',      label: 'Área',                  key: 'area',            type: 'readonly' },
-  { id: 'ef_juzgado',   label: 'Juzgado / Dependencia', key: 'juzgado',         type: 'text' },
-  { id: 'ef_gde',       label: 'GDE Vinculado',         key: 'gde',             type: 'readonly', mono: true },
-  { id: 'ef_sigej_est', label: 'Estado SIGEJ',          key: 'estado_sigej',    type: 'readonly' },
-  { id: 'ef_sigej_num', label: 'N° SIGEJ',              key: 'numero_sigej',    type: 'text', mono: true },
-  { id: 'ef_abogado',   label: 'Letrado Asignado',      key: 'abogado',         type: 'readonly' },
-  { id: 'ef_linea',     label: 'Línea Ferroviaria',     key: 'linea',           type: 'text' },
-  { id: 'ef_lugar',     label: 'Lugar del Hecho',       key: 'lugar_hecho',     type: 'text' },
-  { id: 'ef_fecha',     label: 'Fecha del Hecho',       key: 'fecha_hecho',     type: 'date' },
-  { id: 'ef_recep',     label: 'Fecha Recepción',       key: 'fecha_recepcion', type: 'readonly' },
-  { id: 'ef_variante',  label: 'Variante Ingreso',      key: 'variante',        type: 'text' },
-  { id: 'ef_monto',     label: 'Monto Demanda',         key: 'monto_demanda',   type: 'currency' },
+  { key: 'id',              label: 'N° Interno',       type: 'readonly', mono: true },
+  { key: 'tipo',            label: 'Tipo de Gestión',  type: 'readonly' },
+  { key: 'area',            label: 'Área',             type: 'readonly' },
+  { key: 'estado',          label: 'Estado',           type: 'readonly' },
+  { key: 'abogado',         label: 'Letrado Asignado', type: 'readonly' },
+  { key: 'fecha_recepcion', label: 'Fecha Recepción',  type: 'readonly' },
 ];
 
 let modoEdicion = false;
@@ -392,16 +384,6 @@ function renderDatosUnificados() {
       ? `<div id="editwrap_${fieldId}" class="hidden flex-1 flex justify-end">${inputHtml}</div>`
       : '';
     return `<div class="flex items-center py-2 border-b border-outline-variant/10 w-full${cls}" id="fila_${fieldId}"><dt class="text-[11px] font-bold uppercase tracking-wider text-[#4f6080] w-[220px] flex-shrink-0">${label}</dt><dd id="read_${fieldId}" class="text-[12px] font-semibold text-[#1b3a5c] text-right flex-1">${dv}</dd>${ew}</div>`;
-  }
-
-  function buildFijoInput(f, raw) {
-    if (f.type === 'readonly') return '';
-    const mono = f.mono ? ' font-mono' : '';
-    if (f.type === 'currency') {
-      const nv = formatCurrency(raw);
-      return `<div class="flex items-center bg-[#f0f7f8] border border-[#bcc0c9]/80 rounded-md overflow-hidden max-w-[200px] w-full"><span class="px-2 text-[12px] font-semibold text-[#4f6080] select-none flex-shrink-0">$</span><input id="inp_${f.id}" type="text" inputmode="numeric" value="${nv}" oninput="onCurrencyInput(this)" class="text-[12px] text-right font-semibold bg-transparent border-0 px-2 py-1 w-full focus:outline-none focus:ring-0 min-w-0"/></div>`;
-    }
-    return `<input id="inp_${f.id}" type="${f.type === 'date' ? 'date' : 'text'}" value="${raw}" class="text-[12px] font-semibold${mono} bg-[#f0f7f8] border border-[#bcc0c9]/80 rounded-md px-2 py-1 max-w-[300px] w-full focus:outline-none focus:ring-2 focus:ring-[#256386]/20"/>`;
   }
 
   function buildFieldInput(c, val, grp) {
@@ -447,14 +429,12 @@ function renderDatosUnificados() {
 
   let html = '';
 
-  // Campos fijos
+  // Campos fijos (solo lectura)
   html += seccion('Expediente');
   editableFields.forEach(f => {
     const raw = exp[f.key] || '';
-    const dv  = f.type === 'currency'
-      ? (formatCurrency(raw) ? `$${formatCurrency(raw)}` : '—')
-      : (raw || '—');
-    html += fila(f.id, f.label, dv, buildFijoInput(f, raw));
+    const dv  = f.mono ? `<span class="font-mono">${raw || '—'}</span>` : (raw || '—');
+    html += fila(f.key, f.label, dv, '');
   });
 
   // Mesa SACO
