@@ -132,6 +132,13 @@ tailwind.config = {
       </div>
     </div><!-- /card datos expediente -->
 
+    <!-- Campos a completar por el letrado (etapa abogado) -->
+    <div id="card-campos-abogado" class="hidden bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 mb-6">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-xs font-headline font-black uppercase tracking-widest text-[#4f6080]">Campos a Completar</h3>
+      </div>
+      <div id="campos-abogado-list" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+    </div>
 
   </div><!-- /panel-datos -->
 
@@ -593,6 +600,81 @@ function guardarNumeroCausa() {
 
   cancelarEdicionCausa();
   causaVincularId = null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CAMPOS ABOGADO (etapa 2 del formulario — completa el letrado)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderCamposAbogado() {
+  const container = document.getElementById('campos-abogado-list');
+  if (!container) return;
+  const campos = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area);
+  if (!campos || campos.length === 0) {
+    container.innerHTML = '';
+    document.getElementById('card-campos-abogado').classList.add('hidden');
+    return;
+  }
+  document.getElementById('card-campos-abogado').classList.remove('hidden');
+  const valores = exp.campos_abogado || {};
+  container.innerHTML = campos.map(c => {
+    const val = valores[c.id] || '';
+    const mono = c.mono ? ' font-mono' : '';
+    const hiddenCls = c.dependsOn ? ' hidden' : '';
+    let inputHtml = '';
+    if (c.type === 'select') {
+      const onchangeAttr = c.onchange === 'onSancionChange' ? ` onchange="onSancionCambio(this.value)"` : '';
+      const opts = (c.options || []).map(o =>
+        typeof o === 'string'
+          ? `<option value="${o}"${val === o ? ' selected' : ''}>${o}</option>`
+          : `<option value="${o.value}"${val === o.value ? ' selected' : ''}>${o.label}</option>`
+      ).join('');
+      inputHtml = `<select id="abg_inp_${c.id}" class="field-input"${onchangeAttr} onchange="guardarCampoAbogado('${c.id}',this.value)"><option value="">— Seleccioná —</option>${opts}</select>`;
+    } else if (c.type === 'money') {
+      inputHtml = `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium select-none">$</span><input id="abg_inp_${c.id}" class="field-input pl-7${mono}" value="${val}" oninput="guardarCampoAbogado('${c.id}',this.value)"/></div>`;
+    } else if (c.type === 'textarea') {
+      inputHtml = `<textarea id="abg_inp_${c.id}" class="field-input resize-none" rows="3" oninput="guardarCampoAbogado('${c.id}',this.value)">${val}</textarea>`;
+    } else if (c.type === 'date') {
+      inputHtml = `<input id="abg_inp_${c.id}" type="date" class="field-input w-full rounded-lg border-[#d1d9df] bg-[#f8fafc] text-[#4f6080]" value="${val}" onchange="guardarCampoAbogado('${c.id}',this.value)"/>`;
+    } else if (c.type === 'linea') {
+      const opts = (window.SACO.LINEAS_FERROVIARIAS || []).map(l =>
+        `<option value="${l.code}"${val === l.code ? ' selected' : ''}>${l.label}</option>`
+      ).join('');
+      inputHtml = `<select id="abg_inp_${c.id}" class="field-input" onchange="guardarCampoAbogado('${c.id}',this.value)"><option value="">— Seleccioná línea —</option>${opts}</select>`;
+    } else if (c.type === 'juzgado') {
+      const opts = (window.SACO.JUZGADOS || []).map(j =>
+        `<option value="${j.code}"${val === j.code ? ' selected' : ''}>${j.label}</option>`
+      ).join('');
+      inputHtml = `<select id="abg_inp_${c.id}" class="field-input" onchange="guardarCampoAbogado('${c.id}',this.value)"><option value="">— Seleccioná juzgado —</option>${opts}</select>`;
+    } else if (c.type === 'causa') {
+      inputHtml = `<input id="abg_inp_${c.id}" class="field-input${mono}" value="${val}" oninput="guardarCampoAbogado('${c.id}',this.value)"/>`;
+    } else {
+      inputHtml = `<input id="abg_inp_${c.id}" class="field-input${mono}" value="${val}" oninput="guardarCampoAbogado('${c.id}',this.value)"/>`;
+    }
+    const fullClass = c.full ? 'md:col-span-2' : '';
+    const labelEl = `<label class="field-label" for="abg_inp_${c.id}">${c.label}</label>`;
+    const hintEl = c.hint ? `<p class="field-hint">${c.hint}</p>` : '';
+    return `<div id="wrap_abg_${c.id}" class="${fullClass}${hiddenCls}">${labelEl}${inputHtml}${hintEl}</div>`;
+  }).join('');
+
+  // Activar dependsOn
+  campos.filter(c => c.dependsOn).forEach(c => {
+    const parentEl = document.getElementById(`abg_inp_${c.dependsOn.field}`);
+    const wrapper = document.getElementById(`wrap_abg_${c.id}`);
+    if (!parentEl || !wrapper) return;
+    parentEl.addEventListener('change', () => {
+      wrapper.classList.toggle('hidden', parentEl.value !== c.dependsOn.value);
+    });
+  });
+}
+
+function guardarCampoAbogado(fieldId, valor) {
+  if (!exp.campos_abogado) exp.campos_abogado = {};
+  exp.campos_abogado[fieldId] = valor;
+}
+
+function onSancionCambio(valor) {
+  const wrap = document.getElementById('wrap_abg_abg_dias_suspension');
+  if (wrap) wrap.classList.toggle('hidden', valor !== 'Suspensión');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1357,6 +1439,7 @@ SACO_SYNC.syncListen(({ type, payload }) => {
 // RENDER INICIAL
 // ─────────────────────────────────────────────────────────────────────────────
 renderMetadataList();
+renderCamposAbogado();
 inicializarCausaEditable();
 renderTimeline();
 poblarFiltroEstados();

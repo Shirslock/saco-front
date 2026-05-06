@@ -122,6 +122,15 @@ tailwind.config = {
         </div>
       </div>
 
+      <!-- ── Sección 1b: Campos comunes (aplican a todos los tipos) ──────── -->
+      <div id="commons-section" class="hidden saco-card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="step-badge bg-[#e2eff5] text-[#4f6080]">◈</div>
+          <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Datos de Recepción</h3>
+        </div>
+        <div id="commons-form" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+      </div>
+
       <!-- ── Sección 2: Campos dinámicos (Mesa) ─────────────────────────── -->
       <div id="dynamic-section" class="hidden saco-card">
         <div class="flex items-center gap-3 mb-6">
@@ -290,8 +299,13 @@ function renderCampo(campo, colSpan2) {
         </div>`;
     }
     case 'select': {
-      const opts = (campo.options || []).map(o => `<option value="${o.value}">${o.label}</option>`).join('');
-      inputHtml = `<select id="${id}" class="field-input">${opts}</select>`;
+      const opts = (campo.options || []).map(o =>
+        typeof o === 'string'
+          ? `<option value="${o}">${o}</option>`
+          : `<option value="${o.value}">${o.label}</option>`
+      ).join('');
+      const onchangeAttr = campo.onchange ? ` onchange="${campo.onchange}(this.value)"` : '';
+      inputHtml = `<select id="${id}" class="field-input"${onchangeAttr}><option value="">— Seleccioná —</option>${opts}</select>`;
       break;
     }
     case 'abogado': {
@@ -488,10 +502,23 @@ function setArea(a) {
 
   // Limpiar form anterior y ocultar secciones
   document.getElementById('dynamic-form').innerHTML = '';
+  document.getElementById('commons-form').innerHTML = '';
+  document.getElementById('commons-section').classList.add('hidden');
   document.getElementById('dynamic-section').classList.add('hidden');
   document.getElementById('asignacion-section').classList.add('hidden');
   document.getElementById('docs-section').classList.add('hidden');
   document.getElementById('actions-row').classList.add('hidden');
+
+  // Actualizar opciones de tipo de intervención según área
+  const tipoIntervSel = document.getElementById('mesa_tipo_intervencion');
+  if (tipoIntervSel) {
+    const opts = a === 'PENAL'
+      ? window.SACO.OPCIONES.TIPO_INTERVENCION_PENAL
+      : window.SACO.OPCIONES.TIPO_INTERVENCION_CIVIL_LAB;
+    tipoIntervSel.innerHTML =
+      '<option value="">— Seleccioná —</option>' +
+      opts.map(o => `<option value="${o}">${o}</option>`).join('');
+  }
 
   updateResumen();
 }
@@ -525,6 +552,7 @@ function onTipoChange() {
   document.getElementById('tipo-label-header').textContent = label;
 
   if (!state.tipo) {
+    document.getElementById('commons-section').classList.add('hidden');
     document.getElementById('dynamic-section').classList.add('hidden');
     document.getElementById('asignacion-section').classList.add('hidden');
     document.getElementById('docs-section').classList.add('hidden');
@@ -540,10 +568,16 @@ function onTipoChange() {
     setCanal(tipoData.canal);
   }
 
+  // Render campos comunes
+  const commonsContainer = document.getElementById('commons-form');
+  const commonsHtml = (window.SACO.CAMPOS_COMUNES_MESA || []).map(c => renderCampo(c)).join('');
+  commonsContainer.innerHTML = commonsHtml;
+
   // Render formulario
   renderDynamicForm();
 
   // Mostrar secciones
+  document.getElementById('commons-section').classList.remove('hidden');
   document.getElementById('dynamic-section').classList.remove('hidden');
   document.getElementById('asignacion-section').classList.remove('hidden');
   document.getElementById('docs-section').classList.remove('hidden');
