@@ -40,83 +40,79 @@ const TIPOS_GESTION = {
   ],
 };
 
-// ── Juzgados (catálogo — completar con los datos del Excel del negocio) ────
+// ── Juzgados (catálogo — datos reales del Excel) ───────────────────────────
 const JUZGADOS = [
-  // ── Fuero Federal Civil y Comercial — CABA ──────────────────────────────
-  { code: 'FFCC_01', label: 'Juzgado Federal Civil y Comercial N°1 — CABA' },
-  { code: 'FFCC_02', label: 'Juzgado Federal Civil y Comercial N°2 — CABA' },
-  { code: 'FFCC_03', label: 'Juzgado Federal Civil y Comercial N°3 — CABA' },
-  { code: 'FFCC_04', label: 'Juzgado Federal Civil y Comercial N°4 — CABA' },
-  { code: 'FFCC_05', label: 'Juzgado Federal Civil y Comercial N°5 — CABA' },
-  { code: 'FFCC_06', label: 'Juzgado Federal Civil y Comercial N°6 — CABA' },
-  { code: 'FFCC_07', label: 'Juzgado Federal Civil y Comercial N°7 — CABA' },
-  { code: 'FFCC_08', label: 'Juzgado Federal Civil y Comercial N°8 — CABA' },
-  { code: 'FFCC_09', label: 'Juzgado Federal Civil y Comercial N°9 — CABA' },
-  { code: 'FFCC_10', label: 'Juzgado Federal Civil y Comercial N°10 — CABA' },
-  { code: 'FFCC_11', label: 'Juzgado Federal Civil y Comercial N°11 — CABA' },
-  { code: 'FFCC_12', label: 'Juzgado Federal Civil y Comercial N°12 — CABA' },
-  // ── Fuero Nacional del Trabajo — CABA ───────────────────────────────────
-  { code: 'JNT_30',  label: 'Juzgado Nacional del Trabajo N°30 — CABA' },
-  { code: 'JNT_38',  label: 'Juzgado Nacional del Trabajo N°38 — CABA' },
-  { code: 'JNT_40',  label: 'Juzgado Nacional del Trabajo N°40 — CABA' },
-  { code: 'JNT_42',  label: 'Juzgado Nacional del Trabajo N°42 — CABA' },
-  { code: 'JNT_45',  label: 'Juzgado Nacional del Trabajo N°45 — CABA' },
-  { code: 'JNT_55',  label: 'Juzgado Nacional del Trabajo N°55 — CABA' },
-  { code: 'JNT_60',  label: 'Juzgado Nacional del Trabajo N°60 — CABA' },
-  { code: 'JNT_74',  label: 'Juzgado Nacional del Trabajo N°74 — CABA' },
-  { code: 'JNT_80',  label: 'Juzgado Nacional del Trabajo N°80 — CABA' },
-  // ── Fuero Federal en lo Criminal y Correccional — CABA ──────────────────
-  { code: 'JFCC_01', label: 'Juzgado Federal en lo Criminal y Correccional N°1 — CABA' },
-  { code: 'JFCC_02', label: 'Juzgado Federal en lo Criminal y Correccional N°2 — CABA' },
-  { code: 'JFCC_03', label: 'Juzgado Federal en lo Criminal y Correccional N°3 — CABA' },
-  { code: 'JFCC_04', label: 'Juzgado Federal en lo Criminal y Correccional N°4 — CABA' },
-  { code: 'JFCC_05', label: 'Juzgado Federal en lo Criminal y Correccional N°5 — CABA' },
-  { code: 'JFCC_06', label: 'Juzgado Federal en lo Criminal y Correccional N°6 — CABA' },
-  { code: 'JFCC_07', label: 'Juzgado Federal en lo Criminal y Correccional N°7 — CABA' },
-  { code: 'JFCC_08', label: 'Juzgado Federal en lo Criminal y Correccional N°8 — CABA' },
-  { code: 'JFCC_09', label: 'Juzgado Federal en lo Criminal y Correccional N°9 — CABA' },
-  { code: 'JFCC_10', label: 'Juzgado Federal en lo Criminal y Correccional N°10 — CABA' },
-  { code: 'JFCC_11', label: 'Juzgado Federal en lo Criminal y Correccional N°11 — CABA' },
-  { code: 'JFCC_12', label: 'Juzgado Federal en lo Criminal y Correccional N°12 — CABA' },
-  // ── Fuero Federal — Interior ─────────────────────────────────────────────
-  { code: 'JFR_MZA', label: 'Juzgado Federal de Mendoza' },
-  { code: 'JFR_TUC', label: 'Juzgado Federal de Tucumán' },
-  { code: 'JFR_CBA', label: 'Juzgado Federal de Córdoba' },
-  { code: 'JFR_ROS', label: 'Juzgado Federal de Rosario' },
-  // ── Fuero Contencioso Administrativo Federal ─────────────────────────────
-  { code: 'JCAF_01', label: 'Juzgado Contencioso Administrativo Federal N°1' },
-  { code: 'JCAF_02', label: 'Juzgado Contencioso Administrativo Federal N°2' },
-  { code: 'JCAF_03', label: 'Juzgado Contencioso Administrativo Federal N°3' },
-  { code: 'JCAF_04', label: 'Juzgado Contencioso Administrativo Federal N°4' },
-  { code: 'JCAF_05', label: 'Juzgado Contencioso Administrativo Federal N°5' },
-  { code: 'JCAF_06', label: 'Juzgado Contencioso Administrativo Federal N°6' },
-  // ── Cámara ───────────────────────────────────────────────────────────────
-  { code: 'CAM_CCIV', label: 'Cámara Federal Civil y Comercial — CABA' },
-  { code: 'CAM_TRAB', label: 'Cámara Nacional del Trabajo — CABA' },
-  { code: 'CAM_CRIM', label: 'Cámara Federal Criminal y Correccional — CABA' },
-  { code: 'CAM_CAF',  label: 'Cámara Contencioso Administrativo Federal' },
-  // ── Mediación ────────────────────────────────────────────────────────────
-  { code: 'MED_CABA', label: 'Centro de Mediación Prejudicial — CABA' },
-  // ── Sin juzgado / pendiente ──────────────────────────────────────────────
-  { code: 'SIN_JDO',  label: 'Sin juzgado asignado aún' },
+  // Juzgados
+  { code: 'JUZ_001', label: 'Juzgado Federal Civil y Comercial N°1 — CABA',              tipo: 'juzgado' },
+  { code: 'JUZ_002', label: 'Juzgado Federal Civil y Comercial N°2 — CABA',              tipo: 'juzgado' },
+  { code: 'JUZ_003', label: 'Juzgado Federal en lo Criminal y Correccional N°1 — CABA', tipo: 'juzgado' },
+  { code: 'JUZ_004', label: 'Juzgado Nacional del Trabajo N°30 — CABA',                 tipo: 'juzgado' },
+  { code: 'JUZ_005', label: 'Juzgado Federal de Córdoba',                               tipo: 'juzgado' },
+  { code: 'JUZ_006', label: 'Juzgado Contencioso Administrativo Federal N°1',           tipo: 'juzgado' },
+  { code: 'JUZ_007', label: 'Juzgado Federal de Mendoza',                               tipo: 'juzgado' },
+  { code: 'JUZ_008', label: 'Juzgado Federal de Rosario',                               tipo: 'juzgado' },
+  { code: 'JUZ_009', label: 'Juzgado Federal de Tucumán',                               tipo: 'juzgado' },
+  // Fiscalías
+  { code: 'FIS_001', label: 'Fiscalía General La Plata',                                tipo: 'fiscalia' },
+  { code: 'FIS_002', label: 'Fiscalía de Instrucción Córdoba',                          tipo: 'fiscalia' },
+  { code: 'FIS_003', label: 'Fiscalía Regional Rosario',                                tipo: 'fiscalia' },
+  // UFIs
+  { code: 'UFI_001', label: 'UFI N°3 Lomas de Zamora',                                  tipo: 'ufi' },
+  { code: 'UFI_002', label: 'UFI N°1 Morón',                                            tipo: 'ufi' },
+  { code: 'UFI_003', label: 'UFI N°2 San Isidro',                                       tipo: 'ufi' },
+  // Tribunales
+  { code: 'TRI_001', label: 'Cámara Federal Civil y Comercial — CABA',                  tipo: 'tribunal' },
+  { code: 'TRI_002', label: 'Cámara Nacional del Trabajo — CABA',                       tipo: 'tribunal' },
+  { code: 'TRI_003', label: 'Cámara Contencioso Administrativo Federal',                tipo: 'tribunal' },
+  // Comisarías
+  { code: 'SEG_001', label: 'Comisaría 25 de Mayo 1°',                                  tipo: 'comisaria' },
+  { code: 'SEG_002', label: 'Gendarmería — Agrupación Aviación Campo de Mayo',          tipo: 'comisaria' },
+  { code: 'SEG_003', label: 'Comisaría Almirante Brown 7°',                             tipo: 'comisaria' },
+  { code: 'SEG_004', label: 'Comisaría 1ra La Plata',                                   tipo: 'comisaria' },
+  { code: 'SEG_005', label: 'Comisaría PFA N°1',                                        tipo: 'comisaria' },
+  { code: 'SEG_006', label: 'Gendarmería — Agrupación III Corrientes',                  tipo: 'comisaria' },
+  { code: 'SEG_007', label: 'Comisaría Rosario Centro',                                 tipo: 'comisaria' },
 ];
 
 const LINEAS_FERROVIARIAS = [
-  { code: 'LM',          label: 'Línea Mitre',         abogado: 'Dr. Marcos Gallo' },
-  { code: 'LSM',         label: 'Línea San Martín',    abogado: 'Dra. Carla Ibáñez' },
-  { code: 'LGR',         label: 'Línea General Roca',  abogado: 'Dr. Ramón Pereyra' },
-  { code: 'LBS',         label: 'Línea Belgrano Sur',  abogado: 'Dra. Sofía Mena' },
-  { code: 'LS',          label: 'Línea Sarmiento',     abogado: 'Dr. Pablo Torres' },
-  { code: 'TDC',         label: 'Tren de la Costa',    abogado: 'Dra. Carla Ibáñez' },
-  { code: 'CENTRAL',     label: 'Central',             abogado: 'Dra. Carla Ibáñez' },
-  { code: 'REGIONALES',  label: 'Regionales',          abogado: 'Dra. Carla Ibáñez' },
-  { code: 'GENERAL',     label: 'General',             abogado: 'Dr. Marcos Gallo' },
+  { code: 'LIN_001', label: 'Roca',            abogado: 'Desideri, Gustavo' },
+  { code: 'LIN_002', label: 'San Martín',      abogado: 'Biondi, Walter' },
+  { code: 'LIN_003', label: 'Sarmiento',       abogado: 'Prinotti, Maximiliano' },
+  { code: 'LIN_004', label: 'Mitre',           abogado: 'Desideri, Gustavo' },
+  { code: 'LIN_005', label: 'Belgrano Sur',    abogado: 'Biondi, Walter' },
+  { code: 'LIN_006', label: 'Regionales',      abogado: 'Prinotti, Maximiliano' },
+  { code: 'LIN_007', label: 'Larga Distancia', abogado: 'Desideri, Gustavo' },
+  { code: 'LIN_008', label: 'Central',         abogado: 'Biondi, Walter' },
 ];
 
 const ABOGADOS = {
-  CIVIL:   ['Dr. Alejandro Rossi', 'Dra. Elena Ruiz', 'Dr. Sergio Fontana', 'Dra. Laura Vidal'],
-  LABORAL: ['Dr. Hernán Blanco', 'Dra. Cecilia Mora', 'Dr. Julián Pinto'],
-  PENAL:   ['Dr. Marcos Gallo', 'Dra. Carla Ibáñez', 'Dr. Ramón Pereyra', 'Dra. Sofía Mena', 'Dr. Pablo Torres'],
+  CIVIL: [
+    'Benitez, Adriana',
+    'Casano, Felix',
+    'Crespi, Facundo',
+    'Escalante, Carolina',
+    'Ferrari, Jessica',
+    'Gonzalez, Araceli',
+    'Juarez, Pal',
+    'Perez, Fernanda',
+    'Russo, Mauricio',
+    'Sbarbati, Pablo',
+    'Santillan, Melisa',
+    'Vega, Diego',
+    'Vetrano, Magdalena',
+  ],
+  LABORAL: [
+    'Armani, Giuliana',
+    'Gonzalez, Araceli',
+    'Molinelli, Rodrigo',
+    'Pires, Daiana',
+    'Wilson, Eduardo',
+  ],
+  PENAL: [
+    'Biondi, Walter',
+    'Desideri, Gustavo',
+    'Prinotti, Maximiliano',
+  ],
 };
 
 const ESTADOS = [
@@ -605,15 +601,30 @@ function getAccesos(usuario) {
 // ── Catálogos de opciones para selects ────────────────────────────────────────
 const OPCIONES = {
 
+  TIPO_INTERVENCION_CIVIL_LAB: [
+    'Actora',
+    'Demandada',
+    'Sin intervención',
+  ],
+
+  TIPO_INTERVENCION_PENAL: [
+    'Denunciante',
+    'Sin intervención',
+  ],
+
   CARACTER_OFICIO: [
-    { value: 'Informativo',  label: 'Informativo' },
-    { value: 'Urgente',      label: 'Urgente' },
-    { value: 'Reiteratorio', label: 'Reiteratorio' },
+    'Informativo',
+    'Urgente',
+    'Reiteratorio',
+  ],
+
+  DOCUMENTAL_ESTADO: [
+    'Completo',
+    'Incompleto',
   ],
 
   TIPO_JUICIO: [
-    'Accidente',
-    'Acción Civil',
+    'Accidente - Acción Civil',
     'Amparo',
     'Beneficio de LSG',
     'Cobro de sumas de dinero',
@@ -623,22 +634,22 @@ const OPCIONES = {
     'Diferencias salariales',
     'Ejecución Fiscal',
     'Ejecutivo o preparación vía ejecutiva',
-    'Extensión de responsabilidad',
-    'Juicios sumarísimos',
-    'Lanzamiento',
-    'Prescripción adquisitiva',
-    'Desafuero',
   ],
 
   SANCION: [
-    { value: 'Suspensión', label: 'Suspensión', habilita: 'abg_dias_suspension' },
-    { value: 'Despido',    label: 'Despido' },
-    { value: 'Otras',      label: 'Otras' },
+    'Suspensión',
+    'Despidos',
+    'Otras',
+  ],
+
+  TOPE_CONVENIO: [
+    'SI',
+    'NO',
+    'VIZZOTI',
   ],
 
   TIPO_HECHO_DESAFUERO: [
-    'Hurto',
-    'Robo',
+    'Hurto - Robo',
     'Violencia',
     'Género',
     'Reorganización',
@@ -676,30 +687,40 @@ const OPCIONES = {
     'Asistencia MARC',
   ],
 
-  TIPO_INTERVENCION_CIVIL_LAB: [
-    'Parte Actora',
-    'Parte Demandada',
-    'Sin intervención',
+  TIPO_MEDIACION: [
+    'Privada',
+    'Defensa del consumidor',
+    'Otros',
   ],
 
-  TIPO_INTERVENCION_PENAL: [
-    'Denunciante',
-    'Sin intervención',
+  JURISDICCION_CARTA_SUCESO: [
+    'Morón',
+    'San Isidro',
+    'San Martín',
+    'Campana',
+    'CABA',
+    'Mercedes',
+    'Lomas de Zamora',
+    'Quilmes',
+    'La Plata',
+    'Mar del Plata',
+    'Rosario',
+    'Córdoba',
+    'San Nicolás',
   ],
 
   AREA_REQ_LANZAMIENTO: [
     'Comercial',
     'Líneas',
   ],
+
 };
 
 // ── Campos comunes a todos los tipos en el alta ────────────────────────────────
 const CAMPOS_COMUNES_MESA = [
-  { id: 'mesa_oficio_judicial',     label: 'Oficio Judicial (OJ)',                 type: 'text',     placeholder: 'N° OJ' },
-  { id: 'mesa_tipo_intervencion',   label: 'Tipo de intervención',                 type: 'select',   options: [] },
-  { id: 'mesa_fecha_requerimiento', label: 'Fecha de requerimiento',               type: 'date' },
-  { id: 'mesa_datos_contacto',      label: 'Datos de contacto del requirente',     type: 'text',     hint: 'Teléfono, Mail, Dirección, Contacto', full: true },
-  { id: 'mesa_comentarios',         label: 'Comentarios',                          type: 'textarea', full: true },
+  { id: 'mesa_oficio_judicial',   label: 'Oficio Judicial (OJ)',  type: 'text',     placeholder: 'N° OJ' },
+  { id: 'mesa_tipo_intervencion', label: 'Tipo de intervención',  type: 'select',   options: [] },
+  { id: 'mesa_comentarios',       label: 'Comentarios',           type: 'textarea', full: true },
 ];
 
 // ── Formularios por tipo de gestión ───────────────────────────────────────────
@@ -713,7 +734,6 @@ const FORMULARIOS = {
   OFICIO: {
     label: 'Oficio Civil / Laboral',
     mesa: [
-      { id: 'mesa_nro_doc_gde',      label: 'N° Documento GDE (OJ)',            type: 'text',    mono: true },
       { id: 'mesa_num_causa',        label: 'N° de Causa',                      type: 'causa',   mono: true },
       { id: 'mesa_juzgado',          label: 'Juzgado',                          type: 'juzgado' },
       { id: 'mesa_tribunal',         label: 'Tribunal',                         type: 'juzgado' },

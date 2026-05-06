@@ -573,6 +573,17 @@ function onTipoChange() {
   const commonsHtml = (window.SACO.CAMPOS_COMUNES_MESA || []).map(c => renderCampo(c)).join('');
   commonsContainer.innerHTML = commonsHtml;
 
+  // Repoblar tipo_intervencion (el innerHTML anterior borra las options)
+  const tiSel = document.getElementById('mesa_tipo_intervencion');
+  if (tiSel && window.SACO.OPCIONES) {
+    const opts = state.area === 'PENAL'
+      ? window.SACO.OPCIONES.TIPO_INTERVENCION_PENAL
+      : window.SACO.OPCIONES.TIPO_INTERVENCION_CIVIL_LAB;
+    tiSel.innerHTML =
+      '<option value="">— Seleccioná —</option>' +
+      opts.map(o => `<option value="${o}">${o}</option>`).join('');
+  }
+
   // Render formulario
   renderDynamicForm();
 
