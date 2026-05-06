@@ -386,14 +386,20 @@ function renderDatosUnificados() {
     return `<div class="flex items-center py-2 border-b border-outline-variant/10 w-full${cls}" id="fila_${fieldId}"><dt class="text-[11px] font-bold uppercase tracking-wider text-[#4f6080] w-[220px] flex-shrink-0">${label}</dt><dd id="read_${fieldId}" class="text-[12px] font-semibold text-[#1b3a5c] text-right flex-1">${dv}</dd>${ew}</div>`;
   }
 
-  function buildFieldInput(c, val, grp) {
+  function buildFieldInput(c, val) {
     const mono = c.mono ? ' font-mono' : '';
-    const ch = `onDatoChange('${c.id}',this.value,'${grp}')`;
+    const ch = `onDatoChange('${c.id}',this.value)`;
     if (c.type === 'select') {
+      let opciones = c.options || [];
+      if (c.id === 'mesa_tipo_intervencion' && window.SACO.OPCIONES) {
+        opciones = exp.area === 'PENAL'
+          ? window.SACO.OPCIONES.TIPO_INTERVENCION_PENAL
+          : window.SACO.OPCIONES.TIPO_INTERVENCION_CIVIL_LAB;
+      }
       const extra = c.onchange === 'onSancionChange'
         ? ` onchange="onSancionCambio(this.value);${ch}"`
         : ` onchange="${ch}"`;
-      const opts = (c.options||[]).map(o => typeof o==='string'
+      const opts = opciones.map(o => typeof o==='string'
         ? `<option value="${o}"${val===o?' selected':''}>${o}</option>`
         : `<option value="${o.value}"${val===o.value?' selected':''}>${o.label}</option>`).join('');
       return `<select id="inp_${c.id}" class="field-input max-w-[300px]"${extra}><option value="">— Seleccioná —</option>${opts}</select>`;
@@ -437,12 +443,22 @@ function renderDatosUnificados() {
     html += fila(f.key, f.label, dv, '');
   });
 
+  // Datos de recepción (campos comunes a todos los tipos)
+  const camposComunes = window.SACO.CAMPOS_COMUNES_MESA || [];
+  if (camposComunes.length) {
+    html += seccion('Datos de recepción');
+    camposComunes.forEach(c => {
+      const val = vmesa[c.id] || '';
+      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val));
+    });
+  }
+
   // Mesa SACO
   if (camposMesa.length) {
     html += seccion('Mesa SACO');
     camposMesa.forEach(c => {
       const val = vmesa[c.id] || '';
-      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val, 'mesa'));
+      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val));
     });
   }
 
@@ -451,7 +467,7 @@ function renderDatosUnificados() {
     html += seccion('Letrado');
     camposAbg.forEach(c => {
       const val = vabg[c.id] || '';
-      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val, 'abg'), c.dependsOn ? ' hidden' : '');
+      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val), c.dependsOn ? ' hidden' : '');
     });
   }
 
@@ -487,10 +503,11 @@ function aplicarModoEdicion() {
     if (editwrap) editwrap.classList.toggle('hidden', !modoEdicion);
   });
 
-  // Mesa SACO + letrado
+  // Datos de recepción + Mesa SACO + Letrado
+  const comunes = window.SACO.CAMPOS_COMUNES_MESA || [];
   const cm = window.SACO.getCamposFormulario(exp.tipo, 'mesa',    exp.area) || [];
   const ca = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area) || [];
-  [...cm, ...ca].forEach(c => {
+  [...comunes, ...cm, ...ca].forEach(c => {
     const readEl  = document.getElementById(`read_${c.id}`);
     const editwrap = document.getElementById(`editwrap_${c.id}`);
     if (readEl)   readEl.classList.toggle('hidden',  modoEdicion);
@@ -524,11 +541,18 @@ function guardarTodosDatos() {
   SACO_UI.showToast('Datos del expediente actualizados.', 'success');
 }
 
-function onDatoChange(fieldId, valor, grupo) {
-  if (grupo === 'mesa') {
+function onDatoChange(fieldId, valor) {
+  const defMesa    = window.SACO.getCamposFormulario(exp.tipo, 'mesa',    exp.area) || [];
+  const defAbogado = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area) || [];
+  const comunes    = window.SACO.CAMPOS_COMUNES_MESA || [];
+
+  const esMesa    = defMesa.some(c => c.id === fieldId) || comunes.some(c => c.id === fieldId);
+  const esAbogado = defAbogado.some(c => c.id === fieldId);
+
+  if (esMesa) {
     if (!exp.campos_mesa) exp.campos_mesa = {};
     exp.campos_mesa[fieldId] = valor;
-  } else if (grupo === 'abg') {
+  } else if (esAbogado) {
     if (!exp.campos_abogado) exp.campos_abogado = {};
     exp.campos_abogado[fieldId] = valor;
   }

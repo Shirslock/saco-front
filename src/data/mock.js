@@ -174,7 +174,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Casano, Felix', linea: 'LIN_004',
     tiene_alerta: true, alerta_msg: 'Vence período probatorio en 12 días',
     prioridad: 'ALTA', vinculos: [], intervinientes: [],
-    campos_mesa: { mesa_oficio_judicial: 'OJ-2023-441', mesa_tipo_intervencion: 'Demandada' },
+    campos_mesa: { mesa_oficio_judicial: 'OJ-2023-441', mesa_tipo_intervencion: 'Demandada', mesa_comentarios: '' },
     campos_abogado: {},
     timeline: [
       { fecha: '20/10/2023 · 09:00', tipo: 'RECEPCION',
@@ -246,7 +246,7 @@ const EXPEDIENTES_ABOGADO = [
     abogado: 'Sbarbati, Pablo', linea: null,
     tiene_alerta: false, alerta_msg: null,
     prioridad: 'NORMAL', vinculos: [], intervinientes: [],
-    campos_mesa: { mesa_oficio_judicial: 'OJ-2026-118', mesa_tipo_intervencion: 'Sin intervención' },
+    campos_mesa: { mesa_oficio_judicial: 'OJ-2026-118', mesa_tipo_intervencion: 'Sin intervención', mesa_comentarios: '' },
     campos_abogado: {},
     timeline: [
       { fecha: '15/04/2026 · 10:00', tipo: 'RECEPCION',
