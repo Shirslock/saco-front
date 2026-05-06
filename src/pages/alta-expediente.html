@@ -85,11 +85,11 @@ tailwind.config = {
             <div class="flex p-1 bg-[#e2eff5] rounded-xl gap-1" id="canal-selector">
               <button onclick="setCanal('EE_GDE')"   class="canal-btn flex-1 py-2.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#256386] transition-all" data-val="EE_GDE">EE GDE</button>
               <button onclick="setCanal('MEMO_GDE')" class="canal-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-[#1b3a5c] transition-all" data-val="MEMO_GDE">Memo GDE</button>
-              <button onclick="setCanal('MAIL')"     class="canal-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-[#1b3a5c] transition-all" data-val="MAIL">Mail</button>
+              <button onclick="setCanal('MAIL')"     class="canal-btn flex-1 py-2.5 text-sm font-medium text-[#4f6080] hover:text-[#1b3a5c] transition-all" data-val="MAIL">Otros</button>
             </div>
           </div>
 
-          <!-- Ref EE/Memo/Mail -->
+          <!-- Ref EE/Memo/Otros -->
           <div>
             <label class="field-label field-required" id="ref-label">N° Expediente Electrónico (GDE)</label>
             <input id="ref-input" class="field-input font-mono" placeholder="EX-2026-XXXXXXX-APN-SACO#SOFSE"/>
@@ -444,15 +444,15 @@ function setCanal(c) {
       ${active ? 'font-bold bg-white shadow-sm text-[#256386]' : 'font-medium text-[#4f6080] hover:text-[#1b3a5c]'}`;
   });
 
-  const labels = { EE_GDE: 'N° Expediente Electrónico (GDE)', MEMO_GDE: 'N° de Memo GDE', MAIL: 'Referencia de Mail / SAE' };
-  const placeholders = { EE_GDE: 'EX-2026-XXXXXXX-APN-SACO#SOFSE', MEMO_GDE: 'ME-2026-XXXXXXX-APN-SACO#SOFSE', MAIL: 'MAIL-SAE-2026-XXXX' };
+  const labels = { EE_GDE: 'N° Expediente Electrónico (GDE)', MEMO_GDE: 'N° de Memo GDE', MAIL: 'Referencia / N° de documento' };
+  const placeholders = { EE_GDE: 'EX-2026-XXXXXXX-APN-SACO#SOFSE', MEMO_GDE: 'ME-2026-XXXXXXX-APN-SACO#SOFSE', MAIL: 'SAE-2026-XXXX / Referencia' };
   document.getElementById('ref-label').textContent = labels[c];
   document.getElementById('ref-input').placeholder = placeholders[c];
 
   const infos = {
     EE_GDE:   'Canal Externo: el EE fue creado por Mesa de Entradas General o el organismo notificante. Adjuntá el documento tipo OJ o EE.',
     MEMO_GDE: 'Canal Interno: el Memo GDE fue generado por otra área de SOFSE (SGSySL, GCO, GAJ). Vinculá el número completo.',
-    MAIL:     'Canal Mail: Carta Suceso del sistema SAE de Seguridad. Adjuntá el PDF de la Carta Suceso y las fotos del suceso.',
+    MAIL:     'Canal Otros: Carta Suceso SAE, mails internos u otros documentos no GDE. Adjuntá el PDF correspondiente.',
   };
   document.getElementById('canal-info-text').textContent = infos[c];
   document.getElementById('canal-info').classList.remove('hidden');
@@ -563,7 +563,7 @@ function onTipoChange() {
   // Auto-set canal sugerido por el tipo
   const tipoData = (window.SACO.TIPOS_GESTION[state.area] || []).find(t => t.code === state.tipo);
   if (tipoData && tipoData.canal && tipoData.canal !== state.canal) {
-    const lbls = { EE_GDE: 'EE GDE', MEMO_GDE: 'Memo GDE', MAIL: 'Mail' };
+    const lbls = { EE_GDE: 'EE GDE', MEMO_GDE: 'Memo GDE', MAIL: 'Otros' };
     SACO_UI.showToast(`Canal sugerido para este tipo: ${lbls[tipoData.canal] || tipoData.canal}`, 'info');
     setCanal(tipoData.canal);
   }
@@ -781,7 +781,7 @@ function abrirModalDerivacion() {
   const abogado    = abogSel?.value || '—';
   const caratulaEl = document.getElementById('mesa_caratula');
   const caratula   = caratulaEl?.value?.trim() || '—';
-  const canalLabels = { EE_GDE:'EE GDE', MEMO_GDE:'Memo GDE', MAIL:'Mail SAE' };
+  const canalLabels = { EE_GDE:'EE GDE', MEMO_GDE:'Memo GDE', MAIL:'Otros' };
 
   // Recopilar campos opcionales completados
   const camposExtra = [];
