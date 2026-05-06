@@ -100,7 +100,6 @@ tailwind.config = {
   ═══════════════════════════════════════════════════════════════════════════ -->
   <div id="panel-datos">
 
-    <!-- Datos del expediente — edición inline sin duplicar vista -->
     <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 mb-6">
       <div class="flex items-center justify-between mb-5">
         <h3 class="text-xs font-headline font-black uppercase tracking-widest text-[#4f6080]">Datos del Expediente</h3>
@@ -109,18 +108,23 @@ tailwind.config = {
             class="hidden inline-flex items-center gap-1.5 text-xs font-semibold text-[#4f6080] hover:bg-surface-container border border-[#bcc0c9] rounded-lg px-3 py-1.5 transition-colors">
             Cancelar
           </button>
+          <button id="btn-guardar-datos" onclick="guardarTodosDatos()"
+            class="hidden inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#256386] hover:bg-[#1c4d6e] rounded-lg px-3 py-1.5 transition-colors">
+            <span class="material-symbols-outlined text-[14px]">save</span>
+            Guardar
+          </button>
           <button id="btn-editar-datos" onclick="toggleEditarDatos()"
             class="inline-flex items-center gap-1.5 text-xs font-bold text-[#256386] border border-[#256386]/30 hover:bg-primary-container/40 rounded-lg px-3 py-1.5 transition-colors">
-            <span class="material-symbols-outlined text-[14px]" id="btn-editar-icon">edit</span>
-            <span id="btn-editar-label">Editar</span>
+            <span class="material-symbols-outlined text-[14px]">edit</span>
+            Editar
           </button>
         </div>
       </div>
 
-      <!-- Metadata dinámica -->
-      <div id="metadata-list" class="flex flex-col divide-y divide-outline-variant/10 w-full"></div>
+      <!-- Lista unificada: fijos + mesa SACO + letrado -->
+      <div id="datos-unified-list" class="flex flex-col divide-y divide-outline-variant/10 w-full"></div>
 
-      <!-- causa-edit-mode (oculto por defecto, usado por JS legacy) -->
+      <!-- causa-edit-mode (legacy) -->
       <div id="causa-edit-mode" class="hidden space-y-2 mt-1 max-w-sm">
         <input id="causa-input" oninput="onCausaDetalleChange(this.value)"
           class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
@@ -132,14 +136,6 @@ tailwind.config = {
         </div>
       </div>
     </div><!-- /card datos expediente -->
-
-    <!-- Campos a completar por el letrado (etapa abogado) -->
-    <div id="card-campos-abogado" class="hidden bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 mb-6">
-      <div class="flex items-center justify-between mb-5">
-        <h3 class="text-xs font-headline font-black uppercase tracking-widest text-[#4f6080]">Campos a Completar</h3>
-      </div>
-      <div id="campos-abogado-list" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
-    </div>
 
   </div><!-- /panel-datos -->
 
@@ -340,10 +336,7 @@ function setTabMain(tab) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// METADATA — render grilla de lectura
-// ─────────────────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────────────────
-// METADATA — campos editables inline (sin duplicar vista)
+// DATOS UNIFICADOS — fijos + mesa SACO + letrado en un solo card
 // ─────────────────────────────────────────────────────────────────────────────
 const editableFields = [
   { id: 'ef_causa',     label: 'N° Causa',              key: 'numero_causa',    type: 'text', mono: true },
@@ -362,7 +355,7 @@ const editableFields = [
   { id: 'ef_monto',     label: 'Monto Demanda',         key: 'monto_demanda',   type: 'currency' },
 ];
 
-let editandoDatos = false;
+let modoEdicion = false;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CURRENCY HELPERS
@@ -381,133 +374,184 @@ function onCurrencyInput(input) {
   input.value = formatted;
 }
 
-function renderMetadataList() {
-  const container = document.getElementById('metadata-list');
-  container.innerHTML = editableFields.map(f => {
+function renderDatosUnificados() {
+  const container = document.getElementById('datos-unified-list');
+  if (!container) return;
+  const camposMesa = window.SACO.getCamposFormulario(exp.tipo, 'mesa', exp.area) || [];
+  const camposAbg  = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area) || [];
+  const vmesa = exp.campos_mesa    || {};
+  const vabg  = exp.campos_abogado || {};
+
+  function seccion(label) {
+    return `<div class="pt-4 pb-1"><span class="text-[10px] font-black uppercase tracking-widest text-[#8ca3b5]">${label}</span></div>`;
+  }
+
+  function fila(fieldId, label, dv, inputHtml, extraCls) {
+    const cls = extraCls || '';
+    const ew = inputHtml
+      ? `<div id="editwrap_${fieldId}" class="hidden flex-1 flex justify-end">${inputHtml}</div>`
+      : '';
+    return `<div class="flex items-center py-2 border-b border-outline-variant/10 w-full${cls}" id="fila_${fieldId}"><dt class="text-[11px] font-bold uppercase tracking-wider text-[#4f6080] w-[220px] flex-shrink-0">${label}</dt><dd id="read_${fieldId}" class="text-[12px] font-semibold text-[#1b3a5c] text-right flex-1">${dv}</dd>${ew}</div>`;
+  }
+
+  function buildFijoInput(f, raw) {
+    if (f.type === 'readonly') return '';
+    const mono = f.mono ? ' font-mono' : '';
+    if (f.type === 'currency') {
+      const nv = formatCurrency(raw);
+      return `<div class="flex items-center bg-[#f0f7f8] border border-[#bcc0c9]/80 rounded-md overflow-hidden max-w-[200px] w-full"><span class="px-2 text-[12px] font-semibold text-[#4f6080] select-none flex-shrink-0">$</span><input id="inp_${f.id}" type="text" inputmode="numeric" value="${nv}" oninput="onCurrencyInput(this)" class="text-[12px] text-right font-semibold bg-transparent border-0 px-2 py-1 w-full focus:outline-none focus:ring-0 min-w-0"/></div>`;
+    }
+    return `<input id="inp_${f.id}" type="${f.type === 'date' ? 'date' : 'text'}" value="${raw}" class="text-[12px] font-semibold${mono} bg-[#f0f7f8] border border-[#bcc0c9]/80 rounded-md px-2 py-1 max-w-[300px] w-full focus:outline-none focus:ring-2 focus:ring-[#256386]/20"/>`;
+  }
+
+  function buildFieldInput(c, val, grp) {
+    const mono = c.mono ? ' font-mono' : '';
+    const ch = `onDatoChange('${c.id}',this.value,'${grp}')`;
+    if (c.type === 'select') {
+      const extra = c.onchange === 'onSancionChange'
+        ? ` onchange="onSancionCambio(this.value);${ch}"`
+        : ` onchange="${ch}"`;
+      const opts = (c.options||[]).map(o => typeof o==='string'
+        ? `<option value="${o}"${val===o?' selected':''}>${o}</option>`
+        : `<option value="${o.value}"${val===o.value?' selected':''}>${o.label}</option>`).join('');
+      return `<select id="inp_${c.id}" class="field-input max-w-[300px]"${extra}><option value="">— Seleccioná —</option>${opts}</select>`;
+    }
+    if (c.type === 'money') {
+      return `<div class="relative max-w-[200px]"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium select-none">$</span><input id="inp_${c.id}" class="field-input pl-7${mono}" value="${val}" oninput="${ch}"/></div>`;
+    }
+    if (c.type === 'textarea') {
+      return `<textarea id="inp_${c.id}" class="field-input resize-none max-w-[300px]" rows="2" oninput="${ch}">${val}</textarea>`;
+    }
+    if (c.type === 'date') {
+      return `<input id="inp_${c.id}" type="date" class="field-input max-w-[200px]" value="${val}" onchange="${ch}"/>`;
+    }
+    if (c.type === 'linea') {
+      const opts = (window.SACO.LINEAS_FERROVIARIAS||[]).map(l => `<option value="${l.code}"${val===l.code?' selected':''}>${l.label}</option>`).join('');
+      return `<select id="inp_${c.id}" class="field-input max-w-[300px]" onchange="${ch}"><option value="">— Seleccioná línea —</option>${opts}</select>`;
+    }
+    if (c.type === 'juzgado') {
+      const opts = (window.SACO.JUZGADOS||[]).map(j => `<option value="${j.code}"${val===j.code?' selected':''}>${j.label}</option>`).join('');
+      return `<select id="inp_${c.id}" class="field-input max-w-[300px]" onchange="${ch}"><option value="">— Seleccioná juzgado —</option>${opts}</select>`;
+    }
+    return `<input id="inp_${c.id}" class="field-input${mono} max-w-[300px]" value="${val}" oninput="${ch}"/>`;
+  }
+
+  function getDisplayVal(type, val, options) {
+    if (!val) return '—';
+    if (type === 'select' && options) {
+      const o = options.find(x => (typeof x==='string' ? x : x.value) === val);
+      return o ? (typeof o==='string' ? o : o.label) : val;
+    }
+    return val;
+  }
+
+  let html = '';
+
+  // Campos fijos
+  html += seccion('Expediente');
+  editableFields.forEach(f => {
     const raw = exp[f.key] || '';
-    const monoClass = f.mono ? ' font-mono' : '';
+    const dv  = f.type === 'currency'
+      ? (formatCurrency(raw) ? `$${formatCurrency(raw)}` : '—')
+      : (raw || '—');
+    html += fila(f.id, f.label, dv, buildFijoInput(f, raw));
+  });
 
-    // Valor de lectura — para currency mostramos con $ prefix
-    let displayVal;
-    if (f.type === 'currency') {
-      const num = formatCurrency(raw);
-      displayVal = num ? `$${num}` : '—';
-    } else {
-      displayVal = raw || '—';
-    }
+  // Mesa SACO
+  if (camposMesa.length) {
+    html += seccion('Mesa SACO');
+    camposMesa.forEach(c => {
+      const val = vmesa[c.id] || '';
+      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val, 'mesa'));
+    });
+  }
 
-    // Input de edición
-    let editHtml = '';
-    if (f.type === 'currency') {
-      const numVal = formatCurrency(raw);
-      editHtml = `
-        <div class="hidden ml-auto max-w-[200px] w-full" id="editwrap_${f.id}">
-          <div class="flex items-center bg-[#f0f7f8] border border-[#bcc0c9]/80 rounded-md overflow-hidden">
-            <span class="px-2 text-[12px] font-semibold text-[#4f6080] select-none flex-shrink-0">$</span>
-            <input id="edit_${f.id}"
-              type="text" inputmode="numeric"
-              value="${numVal}"
-              oninput="onCurrencyInput(this)"
-              class="text-[12px] text-right font-semibold bg-transparent border-0 px-2 py-1 w-full focus:outline-none focus:ring-0 min-w-0"/>
-          </div>
-        </div>`;
-    } else if (f.type !== 'readonly') {
-      editHtml = `
-        <input id="edit_${f.id}"
-          type="${f.type === 'date' ? 'date' : 'text'}"
-          value="${raw}"
-          class="hidden text-[12px] text-right font-semibold${monoClass} bg-[#f0f7f8] border border-[#bcc0c9]/80 rounded-md px-2 py-1 w-full max-w-[300px] ml-auto focus:outline-none focus:ring-2 focus:ring-[#256386]/20"/>`;
-    }
+  // Letrado
+  if (camposAbg.length) {
+    html += seccion('Letrado');
+    camposAbg.forEach(c => {
+      const val = vabg[c.id] || '';
+      html += fila(c.id, c.label, getDisplayVal(c.type, val, c.options), buildFieldInput(c, val, 'abg'), c.dependsOn ? ' hidden' : '');
+    });
+  }
 
-    return `
-      <div class="flex items-center py-2 border-b border-outline-variant/10 w-full" id="wrap_${f.id}">
-        <dt class="text-[11px] font-bold uppercase tracking-wider text-[#4f6080] w-[220px] flex-shrink-0">${f.label}</dt>
-        <dd id="read_${f.id}" class="text-[12px] font-semibold text-[#1b3a5c] text-right flex-1${monoClass}">${displayVal}</dd>
-        ${editHtml}
-      </div>
-    `;
-  }).join('');
+  container.innerHTML = html;
+
+  // Wire dependsOn listeners
+  camposAbg.filter(c => c.dependsOn).forEach(c => {
+    const parentEl = document.getElementById(`inp_${c.dependsOn.field}`);
+    const wrapper  = document.getElementById(`fila_${c.id}`);
+    if (!parentEl || !wrapper) return;
+    parentEl.addEventListener('change', () => {
+      wrapper.classList.toggle('hidden', parentEl.value !== c.dependsOn.value);
+    });
+  });
 }
 
 function toggleEditarDatos() {
-  if (!editandoDatos) {
-    abrirEditarDatos();
-  } else {
-    guardarEditarDatos();
-  }
+  modoEdicion = !modoEdicion;
+  aplicarModoEdicion();
 }
 
-function abrirEditarDatos() {
-  editandoDatos = true;
-  document.getElementById('btn-editar-label').textContent = 'Guardar';
-  document.getElementById('btn-editar-icon').textContent = 'save';
-  document.getElementById('btn-cancelar-datos').classList.remove('hidden');
+function aplicarModoEdicion() {
+  document.getElementById('btn-editar-datos').classList.toggle('hidden',  modoEdicion);
+  document.getElementById('btn-guardar-datos').classList.toggle('hidden', !modoEdicion);
+  document.getElementById('btn-cancelar-datos').classList.toggle('hidden', !modoEdicion);
 
+  // Campos fijos
   editableFields.forEach(f => {
     if (f.type === 'readonly') return;
-    const readEl = document.getElementById(`read_${f.id}`);
-    if (readEl) readEl.classList.add('hidden');
+    const readEl  = document.getElementById(`read_${f.id}`);
+    const editwrap = document.getElementById(`editwrap_${f.id}`);
+    if (readEl)   readEl.classList.toggle('hidden',  modoEdicion);
+    if (editwrap) editwrap.classList.toggle('hidden', !modoEdicion);
+  });
 
-    if (f.type === 'currency') {
-      const wrap = document.getElementById(`editwrap_${f.id}`);
-      const editEl = document.getElementById(`edit_${f.id}`);
-      if (wrap) wrap.classList.remove('hidden');
-      if (editEl) editEl.value = formatCurrency(exp[f.key]);
-    } else {
-      const editEl = document.getElementById(`edit_${f.id}`);
-      if (editEl) { editEl.classList.remove('hidden'); editEl.value = exp[f.key] || ''; }
-    }
+  // Mesa SACO + letrado
+  const cm = window.SACO.getCamposFormulario(exp.tipo, 'mesa',    exp.area) || [];
+  const ca = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area) || [];
+  [...cm, ...ca].forEach(c => {
+    const readEl  = document.getElementById(`read_${c.id}`);
+    const editwrap = document.getElementById(`editwrap_${c.id}`);
+    if (readEl)   readEl.classList.toggle('hidden',  modoEdicion);
+    if (editwrap) editwrap.classList.toggle('hidden', !modoEdicion);
   });
 }
 
 function cancelarEditarDatos() {
-  editandoDatos = false;
-  document.getElementById('btn-editar-label').textContent = 'Editar';
-  document.getElementById('btn-editar-icon').textContent = 'edit';
-  document.getElementById('btn-cancelar-datos').classList.add('hidden');
-
-  editableFields.forEach(f => {
-    if (f.type === 'readonly') return;
-    const readEl = document.getElementById(`read_${f.id}`);
-    if (readEl) readEl.classList.remove('hidden');
-
-    if (f.type === 'currency') {
-      const wrap = document.getElementById(`editwrap_${f.id}`);
-      if (wrap) wrap.classList.add('hidden');
-    } else {
-      const editEl = document.getElementById(`edit_${f.id}`);
-      if (editEl) editEl.classList.add('hidden');
-    }
-  });
+  modoEdicion = false;
+  renderDatosUnificados();
 }
 
-function guardarEditarDatos() {
+function guardarTodosDatos() {
+  // Campos fijos
   editableFields.forEach(f => {
     if (f.type === 'readonly') return;
-    const editEl = document.getElementById(`edit_${f.id}`);
-    if (!editEl) return;
-
-    let newVal;
+    const inp = document.getElementById(`inp_${f.id}`);
+    if (!inp) return;
+    let nv;
     if (f.type === 'currency') {
-      const digits = editEl.value.replace(/[^\d]/g, '');
-      if (digits) {
-        const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        newVal = `$${formatted}`;
-      } else {
-        newVal = null;
-      }
+      const digits = inp.value.replace(/[^\d]/g, '');
+      nv = digits ? `$${digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` : null;
     } else {
-      newVal = editEl.value.trim() || null;
+      nv = inp.value.trim() || null;
     }
-
-    exp[f.key] = newVal;
-    const readEl = document.getElementById(`read_${f.id}`);
-    if (readEl) readEl.textContent = newVal || '—';
+    exp[f.key] = nv;
   });
-
-  document.getElementById('h-juzgado').textContent = exp.juzgado || '—';
-  cancelarEditarDatos();
+  if (exp.juzgado) document.getElementById('h-juzgado').textContent = exp.juzgado;
+  modoEdicion = false;
+  renderDatosUnificados();
   SACO_UI.showToast('Datos del expediente actualizados.', 'success');
+}
+
+function onDatoChange(fieldId, valor, grupo) {
+  if (grupo === 'mesa') {
+    if (!exp.campos_mesa) exp.campos_mesa = {};
+    exp.campos_mesa[fieldId] = valor;
+  } else if (grupo === 'abg') {
+    if (!exp.campos_abogado) exp.campos_abogado = {};
+    exp.campos_abogado[fieldId] = valor;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -603,78 +647,8 @@ function guardarNumeroCausa() {
   causaVincularId = null;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CAMPOS ABOGADO (etapa 2 del formulario — completa el letrado)
-// ─────────────────────────────────────────────────────────────────────────────
-function renderCamposAbogado() {
-  const container = document.getElementById('campos-abogado-list');
-  if (!container) return;
-  const campos = window.SACO.getCamposFormulario(exp.tipo, 'abogado', exp.area);
-  if (!campos || campos.length === 0) {
-    container.innerHTML = '';
-    document.getElementById('card-campos-abogado').classList.add('hidden');
-    return;
-  }
-  document.getElementById('card-campos-abogado').classList.remove('hidden');
-  const valores = exp.campos_abogado || {};
-  container.innerHTML = campos.map(c => {
-    const val = valores[c.id] || '';
-    const mono = c.mono ? ' font-mono' : '';
-    const hiddenCls = c.dependsOn ? ' hidden' : '';
-    let inputHtml = '';
-    if (c.type === 'select') {
-      const onchangeAttr = c.onchange === 'onSancionChange' ? ` onchange="onSancionCambio(this.value)"` : '';
-      const opts = (c.options || []).map(o =>
-        typeof o === 'string'
-          ? `<option value="${o}"${val === o ? ' selected' : ''}>${o}</option>`
-          : `<option value="${o.value}"${val === o.value ? ' selected' : ''}>${o.label}</option>`
-      ).join('');
-      inputHtml = `<select id="abg_inp_${c.id}" class="field-input"${onchangeAttr} onchange="guardarCampoAbogado('${c.id}',this.value)"><option value="">— Seleccioná —</option>${opts}</select>`;
-    } else if (c.type === 'money') {
-      inputHtml = `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium select-none">$</span><input id="abg_inp_${c.id}" class="field-input pl-7${mono}" value="${val}" oninput="guardarCampoAbogado('${c.id}',this.value)"/></div>`;
-    } else if (c.type === 'textarea') {
-      inputHtml = `<textarea id="abg_inp_${c.id}" class="field-input resize-none" rows="3" oninput="guardarCampoAbogado('${c.id}',this.value)">${val}</textarea>`;
-    } else if (c.type === 'date') {
-      inputHtml = `<input id="abg_inp_${c.id}" type="date" class="field-input" value="${val}" onchange="guardarCampoAbogado('${c.id}',this.value)"/>`;
-    } else if (c.type === 'linea') {
-      const opts = (window.SACO.LINEAS_FERROVIARIAS || []).map(l =>
-        `<option value="${l.code}"${val === l.code ? ' selected' : ''}>${l.label}</option>`
-      ).join('');
-      inputHtml = `<select id="abg_inp_${c.id}" class="field-input" onchange="guardarCampoAbogado('${c.id}',this.value)"><option value="">— Seleccioná línea —</option>${opts}</select>`;
-    } else if (c.type === 'juzgado') {
-      const opts = (window.SACO.JUZGADOS || []).map(j =>
-        `<option value="${j.code}"${val === j.code ? ' selected' : ''}>${j.label}</option>`
-      ).join('');
-      inputHtml = `<select id="abg_inp_${c.id}" class="field-input" onchange="guardarCampoAbogado('${c.id}',this.value)"><option value="">— Seleccioná juzgado —</option>${opts}</select>`;
-    } else if (c.type === 'causa') {
-      inputHtml = `<input id="abg_inp_${c.id}" class="field-input${mono}" value="${val}" oninput="guardarCampoAbogado('${c.id}',this.value)"/>`;
-    } else {
-      inputHtml = `<input id="abg_inp_${c.id}" class="field-input${mono}" value="${val}" oninput="guardarCampoAbogado('${c.id}',this.value)"/>`;
-    }
-    const fullClass = c.full ? 'md:col-span-2' : '';
-    const labelEl = `<label class="field-label" for="abg_inp_${c.id}">${c.label}</label>`;
-    const hintEl = c.hint ? `<p class="field-hint">${c.hint}</p>` : '';
-    return `<div id="wrap_abg_${c.id}" class="${fullClass}${hiddenCls}">${labelEl}${inputHtml}${hintEl}</div>`;
-  }).join('');
-
-  // Activar dependsOn
-  campos.filter(c => c.dependsOn).forEach(c => {
-    const parentEl = document.getElementById(`abg_inp_${c.dependsOn.field}`);
-    const wrapper = document.getElementById(`wrap_abg_${c.id}`);
-    if (!parentEl || !wrapper) return;
-    parentEl.addEventListener('change', () => {
-      wrapper.classList.toggle('hidden', parentEl.value !== c.dependsOn.value);
-    });
-  });
-}
-
-function guardarCampoAbogado(fieldId, valor) {
-  if (!exp.campos_abogado) exp.campos_abogado = {};
-  exp.campos_abogado[fieldId] = valor;
-}
-
 function onSancionCambio(valor) {
-  const wrap = document.getElementById('wrap_abg_abg_dias_suspension');
+  const wrap = document.getElementById('fila_abg_dias_suspension');
   if (wrap) wrap.classList.toggle('hidden', valor !== 'Suspensión');
 }
 
@@ -1439,8 +1413,7 @@ SACO_SYNC.syncListen(({ type, payload }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // RENDER INICIAL
 // ─────────────────────────────────────────────────────────────────────────────
-renderMetadataList();
-renderCamposAbogado();
+renderDatosUnificados();
 inicializarCausaEditable();
 renderTimeline();
 poblarFiltroEstados();
