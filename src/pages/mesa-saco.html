@@ -84,6 +84,26 @@ tailwind.config = {
           </select>
         </div>
 
+        <!-- Área -->
+        <div class="min-w-[130px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Área</label>
+          <div class="relative">
+            <select id="f-area" onchange="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer">
+              <option value="">Todas</option>
+              <option value="CIVIL">Civil</option>
+              <option value="LABORAL">Laboral</option>
+              <option value="PENAL">Penal</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+          </div>
+        </div>
+
+        <!-- N° Causa -->
+        <div class="min-w-[160px]">
+          <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">N° Causa</label>
+          <input id="f-causa" oninput="applyFilters()" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 px-3 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="N° Causa..."/>
+        </div>
+
         <!-- Referencia GDE -->
         <div class="min-w-[180px]">
           <label class="block text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-1.5">Referencia GDE</label>
@@ -136,6 +156,7 @@ tailwind.config = {
               <tr>
                 <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Interno</th>
                 <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa</th>
+                <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Área</th>
                 <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
                 <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo de Gestión</th>
                 <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Referencia GDE</th>
@@ -216,7 +237,7 @@ function renderTabla(datos) {
   document.getElementById('tabla-count').textContent = `${datos.length} expediente${datos.length !== 1 ? 's' : ''}`;
 
   if (!datos.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros seleccionados.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros seleccionados.</td></tr>`;
     return;
   }
 
@@ -232,6 +253,14 @@ function renderTabla(datos) {
       </td>
       <td class="px-4 py-4">
         <span class="font-mono text-[10px] text-[#4f6080]">${e.numero_causa || '—'}</span>
+      </td>
+      <td class="px-4 py-3.5">
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${
+          e.area === 'CIVIL'   ? 'bg-[#dbeafe] text-[#1e3a5f]' :
+          e.area === 'LABORAL' ? 'bg-[#dcfce7] text-[#14532d]' :
+          e.area === 'PENAL'   ? 'bg-[#fef3c7] text-[#78350f]' :
+          'bg-[#f0f7f8] text-[#4f6080]'
+        }">${e.area || '—'}</span>
       </td>
       <td class="px-4 py-4 max-w-[220px]">
         <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
@@ -260,6 +289,8 @@ function renderTabla(datos) {
 function applyFilters() {
   const search     = document.getElementById('f-search').value.toLowerCase();
   const tipo       = document.getElementById('f-tipo').value;
+  const area       = document.getElementById('f-area').value;
+  const causa      = document.getElementById('f-causa').value.toLowerCase().trim();
   const gde        = document.getElementById('f-gde').value.toLowerCase();
   const abogado    = document.getElementById('f-abogado').value;
   const fechaDesde = document.getElementById('f-fecha-desde').value;
@@ -269,11 +300,13 @@ function applyFilters() {
     if (search && !e.caratula.toLowerCase().includes(search) &&
         !e.id.toLowerCase().includes(search) &&
         !(e.numero_causa || '').toLowerCase().includes(search)) return false;
-    if (tipo    && e.tipo !== tipo)               return false;
+    if (tipo    && e.tipo !== tipo)                                         return false;
+    if (area    && e.area !== area)                                         return false;
+    if (causa   && !(e.numero_causa || '').toLowerCase().includes(causa))   return false;
     if (gde     && !(e.gde || (e.timeline && e.timeline.find(t => t.doc && (t.doc.startsWith('EX-') || t.doc.startsWith('ME-') || t.doc.startsWith('MAIL-'))))?.doc || '').toLowerCase().includes(gde)) return false;
-    if (abogado && e.abogado !== abogado)         return false;
-    if (fechaDesde && e.fecha_recepcion < fechaDesde) return false;
-    if (fechaHasta && e.fecha_recepcion > fechaHasta) return false;
+    if (abogado && e.abogado !== abogado)                                   return false;
+    if (fechaDesde && e.fecha_recepcion < fechaDesde)                       return false;
+    if (fechaHasta && e.fecha_recepcion > fechaHasta)                       return false;
     return true;
   });
 
@@ -281,10 +314,10 @@ function applyFilters() {
 }
 
 function limpiarFiltros() {
-  ['f-search','f-gde','f-fecha-desde','f-fecha-hasta'].forEach(id => {
+  ['f-search','f-causa','f-gde','f-fecha-desde','f-fecha-hasta'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  ['f-tipo','f-abogado'].forEach(id => {
+  ['f-tipo','f-area','f-abogado'].forEach(id => {
     document.getElementById(id).value = '';
   });
   applyFilters();

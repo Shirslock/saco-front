@@ -483,9 +483,15 @@ function setArea(a) {
   // Letrados
   const abogs = window.SACO.ABOGADOS[a] || [];
   const abogSel = document.getElementById('abogado-select');
-  abogSel.innerHTML = abogs.map((ab, i) =>
-    `<option value="${ab}">${ab}${i === 0 ? ' — siguiente en rotación' : ''}</option>`
-  ).join('');
+  if (a === 'PENAL') {
+    abogSel.innerHTML = `<option value="">— Se determina al seleccionar la línea —</option>`;
+    abogSel.disabled = true;
+  } else {
+    abogSel.disabled = false;
+    abogSel.innerHTML = abogs.map((ab, i) =>
+      `<option value="${ab}">${ab}${i === 0 ? ' — siguiente en rotación' : ''}</option>`
+    ).join('');
+  }
 
   // Regla
   const regla = a === 'PENAL'
@@ -605,6 +611,7 @@ function onLineaChange(selectEl) {
   const linea = window.SACO.LINEAS_FERROVIARIAS.find(l => l.code === selectEl.value);
   if (!linea) return;
   const abogSel = document.getElementById('abogado-select');
+  abogSel.disabled = false;
   abogSel.innerHTML = `<option value="${linea.abogado}">${linea.abogado} — Letrado línea ${linea.label}</option>`;
   updateResumen();
 }

@@ -22,7 +22,7 @@ const TIPOS_GESTION = {
   LABORAL: [
     { code: 'OFICIO',            label: 'Oficios',                          canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
     { code: 'CARTA_DOC',         label: 'Carta Documento',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
-    { code: 'SECLO',             label: 'SECLO',                            canal: 'EE_GDE',   canales: ['EE_GDE'] },
+    { code: 'SECLO',             label: 'SECLO',                            canal: 'EE_GDE',   canales: ['EE_GDE','MEMO_GDE'] },
     { code: 'DEMANDA_LABORAL',   label: 'Demanda Laboral',                  canal: 'EE_GDE',   canales: ['EE_GDE'] },
     { code: 'CONSIGNACION',      label: 'Consignaciones',                   canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
     { code: 'DESAFUERO',          label: 'Desafueros',                       canal: 'MEMO_GDE', canales: ['MEMO_GDE'] },
