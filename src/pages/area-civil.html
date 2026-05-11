@@ -70,7 +70,7 @@ tailwind.config = {
   <div class="grid grid-cols-12 gap-7">
 
     <!-- ── Tabla de expedientes civiles ─────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-8 space-y-5">
+    <div class="col-span-12 space-y-5">
 
       <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] overflow-hidden">
         <div class="px-6 py-4 border-b border-[#bcc0c9]/40 flex justify-between items-center">
@@ -100,6 +100,7 @@ tailwind.config = {
                     <th class="px-4 py-3.5 w-10"></th>
                     <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa / Exp</th>
                     <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+                    <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Área</th>
                     <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
                     <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
                     <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
@@ -113,24 +114,6 @@ tailwind.config = {
 
           </div>
         </div>
-      </div>
-
-    </div>
-
-    <!-- ── Sidebar derecho ───────────────────────────────────────────────── -->
-    <div class="col-span-12 lg:col-span-4 space-y-5">
-
-      <!-- Letrados Civil -->
-      <div class="bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-5">
-        <div class="flex items-center gap-2 mb-5">
-          <span class="material-symbols-outlined text-[#256386]">groups</span>
-          <h3 class="font-headline font-bold text-[#1b3a5c] text-sm">Letrados — Área Civil</h3>
-        </div>
-        <div class="space-y-3" id="letrados-civil"></div>
-        <button onclick="SACO_UI.showToast('Rotación de letrados actualizada.','success')" class="w-full mt-5 py-2 border-2 border-dashed border-[#bcc0c9] rounded-xl text-xs font-bold text-[#4f6080] hover:border-[#256386]/50 hover:text-[#256386] transition-all flex items-center justify-center gap-2">
-          <span class="material-symbols-outlined text-[16px]">person_add</span>
-          Gestionar Rotación
-        </button>
       </div>
 
     </div>
@@ -200,12 +183,13 @@ function renderRows() {
 }
 
 function renderCausaRow(item) {
-  const nc = item.numeroCausa;
-  const exps = item.expedientes;
-  const expanded = expandedCausas.has(nc);
+  const nc        = item.numeroCausa;
+  const exps      = item.expedientes;
+  const areas     = [...new Set(exps.map(e => e.area))];
+  const expanded  = expandedCausas.has(nc);
   const hasAlerta = exps.some(e => e.tiene_alerta);
-  const abogados = [...new Set(exps.map(e => e.abogado))];
-  const ncEsc = nc.replace(/'/g, "\\'");
+  const abogados  = [...new Set(exps.map(e => e.abogado))];
+  const ncEsc     = nc.replace(/'/g, "\\'");
 
   let html = `
     <tr class="causa-row bg-[#e8f0f5] border-l-4 border-[#256386]/30 hover:border-[#256386]/60 transition-all" onclick="toggleCausaCivil('${ncEsc}')">
@@ -228,6 +212,11 @@ function renderCausaRow(item) {
       </td>
       <td class="px-4 py-3.5">
         ${hasAlerta ? `<p class="text-[10px] text-[#cd5055] font-semibold">${exps.find(e=>e.tiene_alerta)?.alerta_msg || ''}</p>` : '<span class="text-[10px] text-[#4f6080]">—</span>'}
+      </td>
+      <td class="px-4 py-3.5">
+        <div class="flex flex-wrap gap-1.5">
+          ${areas.map(a => `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${areaColors[a]||''}">${a}</span>`).join('')}
+        </div>
       </td>
       <td class="px-4 py-3.5">
         <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#256386]/10 text-[#256386]">
@@ -254,7 +243,10 @@ function renderCausaRow(item) {
 }
 
 function renderExpRow(e, isChild, isLast) {
-  const sinCausa = !e.numero_causa || e.numero_causa.trim() === '' || e.numero_causa.toUpperCase() === 'SS SOFSE';
+  const numeroCausa = (e?.numero_causa || '').trim();
+  const sinCausa =
+    numeroCausa === '' ||
+    numeroCausa.toUpperCase() === 'SS SOFSE';
   const nombreCorto = (e.abogado || '').replace(/^Dr\. |^Dra\. /, '');
   return `
     <tr class="${isChild ? 'child-row' : 'exp-row'} cursor-pointer ${isChild ? 'border-l-4 border-[#256386]/10' : ''}" onclick="window.location='detalle-expediente.html?id=${e.id}'">
@@ -278,12 +270,24 @@ function renderExpRow(e, isChild, isLast) {
         <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
         ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-0.5">${e.alerta_msg}</p>` : ''}
       </td>
+      <td class="px-4 py-3.5">
+        <div class="flex flex-wrap gap-1.5">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${areaColors[e.area] || ''}">
+            ${e.area}
+          </span>
+        </div>
+      </td>
       <td class="px-4 py-3.5 text-xs text-[#4f6080]">${(e.tipo||'').replace(/_/g,' ')}</td>
       <td class="px-4 py-3.5 text-xs text-[#1b3a5c]">${nombreCorto}</td>
       <td class="px-4 py-3.5">${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
       <td class="px-4 py-3.5 text-xs text-[#4f6080]">${e.fecha_recepcion}</td>
-      <td class="px-4 py-3.5">
-        <a href="detalle-expediente.html?id=${e.id}" onclick="event.stopPropagation()" class="text-[#256386] hover:text-primary-dim font-bold text-xs uppercase tracking-tight">Abrir</a>
+      <td class="px-4 py-3.5 text-right">
+        <div class="relative inline-block" onclick="event.stopPropagation()">
+          <button onclick="toggleMenuCivil('menu-${e.id}', this)"
+            class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#e2eff5] transition-colors text-[#4f6080]">
+            <span class="material-symbols-outlined text-[18px]">more_vert</span>
+          </button>
+        </div>
       </td>
     </tr>`;
 }
@@ -292,6 +296,91 @@ function toggleCausaCivil(nc) {
   if (expandedCausas.has(nc)) expandedCausas.delete(nc);
   else expandedCausas.add(nc);
   renderRows();
+}
+
+function toggleMenuCivil(id, btn) {
+  // cerrar otros
+  document.querySelectorAll('[id^="menu-"]').forEach(m => m.remove());
+
+  const rect = btn.getBoundingClientRect();
+  const menu = document.createElement('div');
+
+  menu.id = id;
+  menu.className =
+    'fixed z-[200] bg-white border border-[#e5e7eb] rounded-xl shadow-lg py-1 min-w-[180px]';
+
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.left = (rect.right - 180) + 'px';
+
+  const esCausa = id.includes('menu-causa-');
+  const itemId = id.replace('menu-causa-', '').replace('menu-', '');
+
+  if (esCausa) {
+    menu.innerHTML = `
+      <button onclick="toggleCausaCivil('${itemId}')"
+        class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-[16px] text-[#4f6080]">
+          unfold_more
+        </span>
+        Expandir / colapsar
+      </button>
+
+      <button onclick="SACO_UI.showToast('Acción pendiente','info')"
+        class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-[16px] text-[#4f6080]">
+          visibility
+        </span>
+        Ver causa
+      </button>
+    `;
+  } else {
+    const exp = window.SACO.EXPEDIENTES_ABOGADO.find(e => e.id == itemId);
+    const tieneCausa =
+      exp?.numero_causa &&
+      exp.numero_causa.trim() !== '' &&
+      exp.numero_causa.toUpperCase() !== 'SS SOFSE';
+
+    menu.innerHTML = `
+      <button onclick="window.location='detalle-expediente.html?id=${itemId}'"
+        class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-[16px] text-[#4f6080]">
+          open_in_new
+        </span>
+        Visualizar
+      </button>
+
+      <button onclick="SACO_UI.showToast('${tieneCausa ? 'Expediente desagrupado' : 'Agrupar expediente'}','info')"
+        class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-[16px] text-[#4f6080]">
+          ${tieneCausa ? 'folder_off' : 'create_new_folder'}
+        </span>
+        ${tieneCausa ? 'Desagrupar' : 'Agrupar'}
+      </button>
+
+      ${puedeReasignar() ? `
+        <button onclick="SACO_UI.showToast('Reasignación iniciada','info')"
+          class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-[16px] text-[#4f6080]">
+            forward
+          </span>
+          Reasignar
+        </button>
+      ` : ''}
+    `;
+  }
+
+  document.body.appendChild(menu);
+
+  setTimeout(() => {
+    document.addEventListener('click', function h() {
+      menu.remove();
+      document.removeEventListener('click', h);
+    });
+  }, 50);
+}
+
+function puedeReasignar() {
+  return SACO_UI.puedeReasignar();
 }
 
 function expandAllCivil() {
@@ -304,24 +393,7 @@ function collapseAllCivil() {
   renderRows();
 }
 
-// ── Letrados civil ─────────────────────────────────────────────────────────
-function renderLetradosCivil() {
-  const letrados = window.SACO.ABOGADOS.CIVIL;
-  document.getElementById('letrados-civil').innerHTML = letrados.map(l => {
-    const causas = window.SACO.EXPEDIENTES_ABOGADO.filter(e => e.area === 'CIVIL' && e.abogado === l).length;
-    return `
-    <div class="flex items-center justify-between p-3 bg-[#f0f7f8] rounded-xl hover:bg-surface-container transition-colors cursor-pointer">
-      <div>
-        <p class="text-xs font-bold text-[#1b3a5c]">${l}</p>
-        <p class="text-[11px] text-[#4f6080]">Área Civil — FIFO</p>
-      </div>
-      <span class="text-[10px] font-bold px-2 py-0.5 bg-[#e2eff5] text-[#4f6080] rounded-full">${causas} causas</span>
-    </div>`;
-  }).join('');
-}
-
 renderTablaCivil();
-renderLetradosCivil();
 
 SACO_SYNC.syncListen(({ type, payload }) => {
   if (type === 'ESTADO_CAMBIADO' || type === 'EXPEDIENTE_ASIGNADO') {

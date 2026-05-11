@@ -88,6 +88,18 @@ tailwind.config = {
           placeholder="Buscar por carátula, N° causa..."/>
       </div>
 
+      <!-- Área -->
+      <div class="relative">
+        <select id="f-area" onchange="applyFilters()"
+          class="bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none appearance-none cursor-pointer min-w-[120px]">
+          <option value="">Área: Todas</option>
+          <option value="CIVIL">Civil</option>
+          <option value="LABORAL">Laboral</option>
+          <option value="PENAL">Penal</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[#4f6080] text-[16px] pointer-events-none">expand_more</span>
+      </div>
+
       <!-- Tipo de gestión -->
       <div class="relative">
         <select id="f-tipo" onchange="applyFilters()"
@@ -167,8 +179,9 @@ tailwind.config = {
         <thead>
           <tr class="bg-[#f0f7f8]">
             <th class="px-4 py-3.5 w-10"></th>
-            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° / Causa</th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">N° Causa / Expediente </th>
             <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Carátula</th>
+            <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Área</th>
             <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Tipo</th>
             <th id="th-letrado" class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Letrado</th>
             <th class="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#4f6080]">Estado</th>
@@ -319,6 +332,7 @@ function poblarFiltroEstado() {
 function renderChipsFiltros() {
   const chips  = [];
   const tipo   = document.getElementById('f-tipo').value;
+  const area = document.getElementById('f-area').value;
   const estado = document.getElementById('f-estado').value;
   const search = document.getElementById('search-input').value;
   const desde  = document.getElementById('f-fecha-desde').value;
@@ -326,6 +340,7 @@ function renderChipsFiltros() {
   const alerta = document.getElementById('f-urgente').checked;
 
   if (tipo)   chips.push({ label: tipo.replace(/_/g,' '),   clear: () => { document.getElementById('f-tipo').value=''; applyFilters(); } });
+  if (area)   chips.push({ label: area,                     clear: () => { document.getElementById('f-area').value=''; applyFilters(); } });
   if (estado) chips.push({ label: estado.replace(/_/g,' '), clear: () => { document.getElementById('f-estado').value=''; applyFilters(); } });
   if (search) chips.push({ label: `"${search}"`,            clear: () => { document.getElementById('search-input').value=''; applyFilters(); } });
   if (desde)  chips.push({ label: `Desde ${desde}`,         clear: () => { document.getElementById('f-fecha-desde').value=''; applyFilters(); } });
@@ -360,6 +375,7 @@ function clearChip(i) {
 // ─────────────────────────────────────────────────────────────────────────────
 function applyFilters() {
   const tipo       = document.getElementById('f-tipo')?.value || '';
+  const area       = document.getElementById('f-area')?.value || '';
   const estado     = document.getElementById('f-estado')?.value || '';
   const fechaDesde = document.getElementById('f-fecha-desde')?.value;
   const fechaHasta = document.getElementById('f-fecha-hasta')?.value;
@@ -372,6 +388,7 @@ function applyFilters() {
     if (currentTab === 'urgentes' && e.prioridad !== 'ALTA') return false;
     if (currentTab === 'activos'  && e.estado === 'CUMPLIDO') return false;
     if (urgente && !e.tiene_alerta) return false;
+    if (area && e.area !== area) return false;
     if (letrado && e.abogado !== letrado) return false;
     if (tipo   && e.tipo   !== tipo)   return false;
     if (estado && e.estado !== estado) return false;
@@ -395,6 +412,7 @@ function applyFilters() {
 
 function limpiarFiltros() {
   document.getElementById('search-input').value = '';
+  document.getElementById('f-area').value = '';
   document.getElementById('f-urgente').checked  = false;
   document.getElementById('f-tipo').value        = '';
   document.getElementById('f-estado').value      = '';
@@ -422,7 +440,7 @@ function renderTabla(items) {
   document.getElementById('showing-count').textContent = items.length;
 
   if (!items.length) {
-    const colspan = SHOW_ABOGADO ? 8 : 7;
+    const colspan = SHOW_ABOGADO ? 9 : 8;
     tbody.innerHTML = `<tr><td colspan="${colspan}" class="px-6 py-12 text-center text-[#4f6080] text-sm">No hay expedientes que coincidan con los filtros.</td></tr>`;
     return;
   }
@@ -467,6 +485,9 @@ function renderCausaRow(item, showAbogado = false) {
             <p class="text-[10px] text-[#4f6080] mt-0.5">${exps.length} expediente${exps.length !== 1 ? 's' : ''} vinculado${exps.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
+      </td>
+      <td class="px-4 py-3.5">
+        ---
       </td>
       <td class="px-4 py-3.5">
         <div class="flex flex-wrap gap-1.5">
@@ -547,24 +568,27 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
       <td class="px-4 py-3.5" ${tdGs}>
         <div class="flex flex-col gap-0.5">
           <span class="font-mono text-xs font-bold text-[#1b3a5c]">${e.id}</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded font-bold w-fit ${areaColors[e.area]||''}">${e.area}</span>
           ${esPrincipal ? `
             <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 w-fit bg-emerald-100 text-emerald-700 border border-emerald-200/60">
               <span class="material-symbols-outlined text-[10px]">hub</span>
               Principal · PJN
             </span>` : ''}
           ${sinCausa && !isChild ? `
-            <button onclick="event.stopPropagation();abrirModalAgrupar('${e.id}')"
-              class="mt-0.5 text-[9px] font-bold text-[#4f6080] flex items-center gap-0.5 hover:text-[#256386] hover:underline transition-colors">
+            <pan class="mt-0.5 text-[9px] font-bold text-[#4f6080] flex items-center gap-0.5">
               <span class="material-symbols-outlined text-[11px]">folder_off</span>
-              Sin causa · Agrupar
-            </button>` : ''}
+              Sin causa
+            </span>` : ''}
         </div>
       </td>
       <td class="px-4 py-3.5 max-w-xs" ${tdGs}>
         <p class="text-sm font-semibold text-[#1b3a5c] line-clamp-2 leading-snug">${e.caratula}</p>
         <p class="font-mono text-[10px] text-[#4f6080] mt-0.5">${e.numero_causa||''}</p>
         ${e.tiene_alerta ? `<p class="text-[10px] text-[#cd5055] font-semibold mt-1">${e.alerta_msg}</p>` : ''}
+      </td>
+      <td class="px-4 py-3.5" ${tdGs}>
+        <div class="flex flex-col gap-0.5">
+          <span class="text-[10px] px-1.5 py-0.5 rounded font-bold w-fit ${areaColors[e.area]||''}">${e.area}</span>
+        </div>
       </td>
       <td class="px-4 py-3.5 text-xs text-[#4f6080] font-medium" ${tdGs}>${(e.tipo||'').replace(/_/g,' ')}</td>
       ${showAbogado ? `
@@ -573,20 +597,67 @@ function renderExpedienteRow(e, isChild = false, isLast = false, showAbogado = f
       </td>` : ''}
       <td class="px-4 py-3.5" ${tdGs}>${SACO_UI.estadoBadge(e.estado, (e.estadoLabel || e.estado.replace(/_/g,' ')))}</td>
       <td class="px-4 py-3.5 text-xs text-[#4f6080]" ${tdGs}>${e.fecha_recepcion}</td>
-      <td class="px-4 py-3.5 text-right" ${tdGs}>
-        <div class="flex items-center gap-3 justify-end">
-          ${isChild ? `
-          <button onclick="event.stopPropagation();desagrupar('${e.id}')"
-            class="text-[9px] font-bold text-[#4f6080] hover:text-[#cd5055] flex items-center gap-0.5 hover:underline transition-colors">
-            <span class="material-symbols-outlined text-[11px]">link_off</span>
-            Desagrupar
-          </button>` : ''}
-          <button onclick="event.stopPropagation();verDetalle('${e.id}')" class="text-[#256386] hover:text-primary-dim font-bold text-xs uppercase tracking-tight transition-colors">
-            Abrir
+      <td class="px-4 py-3.5 text-right">
+        <div class="relative inline-block" onclick="event.stopPropagation()">
+          <button onclick="toggleMenu('menu-${e.id}', this)"
+            class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#e2eff5] transition-colors text-[#4f6080]">
+            <span class="material-symbols-outlined text-[18px]">more_vert</span>
           </button>
         </div>
       </td>
     </tr>`;
+}
+
+function toggleMenu(id, btn) {
+  // Cerrar cualquier menú abierto
+  document.querySelectorAll('[id^="menu-"]').forEach(m => m.remove());
+
+  const exp = window.SACO.getExpedienteById(id.replace('menu-', ''));
+  const sinCausa = !exp?.numero_causa || exp.numero_causa.trim() === '' || exp.numero_causa.trim().toUpperCase() === 'SS SOFSE';
+
+  const rect = btn.getBoundingClientRect();
+  const menu = document.createElement('div');
+  menu.id = id;
+  menu.className = 'fixed z-[200] bg-white border border-[#e5e7eb] rounded-xl shadow-lg py-1 min-w-[160px]';
+  menu.style.top  = (rect.bottom + 4) + 'px';
+  menu.style.left = (rect.right - 160) + 'px';
+
+  const expId = id.replace('menu-', '');
+  menu.innerHTML = `
+    <button onclick="verDetalle('${expId}')"
+      class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+      <span class="material-symbols-outlined text-[16px] text-[#4f6080]">open_in_new</span>
+      Visualizar
+    </button>
+    ${sinCausa ? `
+    <button onclick="abrirModalAgrupar('${expId}')"
+      class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+      <span class="material-symbols-outlined text-[16px] text-[#4f6080]">folder_open</span>
+      Agrupar a causa
+    </button>` : `
+    <button onclick="desagrupar('${expId}')"
+      class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+      <span class="material-symbols-outlined text-[16px] text-[#4f6080]">link_off</span>
+      Desagrupar
+    </button>`}
+    ${puedeReasignar() ? `
+    <div class="border-t border-[#f0f7f8] my-1"></div>
+    <button onclick="SACO_UI.showToast('Reasignación iniciada.','info')"
+      class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+      <span class="material-symbols-outlined text-[16px] text-[#4f6080]">forward</span>
+      Reasignar
+    </button>` : ''}`;
+
+  document.body.appendChild(menu);
+
+  setTimeout(() => document.addEventListener('click', function h() {
+    menu.remove();
+    document.removeEventListener('click', h);
+  }), 50);
+}
+
+function puedeReasignar() {
+  return SACO_UI.puedeReasignar();
 }
 
 function verDetalle(id) {

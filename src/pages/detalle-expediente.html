@@ -65,23 +65,60 @@ tailwind.config = {
       <p class="text-[#4f6080] text-sm" id="h-juzgado">—</p>
     </div>
 
-    <!-- Botones del header: Iniciar Juicio + Cambiar Estado + Reasignar -->
-    <div class="flex flex-wrap gap-2 flex-shrink-0" id="header-actions">
-      <!-- Iniciar Juicio — visible para ABOGADO y REFERENTE -->
-      <button id="btn-iniciar-juicio" onclick="abrirModalIniciarJuicio()"
-        class="hidden inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-[#1b3a5c] text-sm font-semibold rounded-xl shadow-sm border border-[#bcc0c9]/60 hover:bg-surface-container-low transition-colors">
-        <span class="material-symbols-outlined text-[16px] text-[#256386]">gavel</span> Iniciar Juicio
+    <!-- Menú de acciones "+" -->
+    <div class="relative flex-shrink-0" id="header-actions">
+      <button id="btn-acciones" onclick="toggleAccionesMenu()"
+        class="w-11 h-11 flex items-center justify-center
+              rounded-full
+              bg-[#dbeafe] hover:bg-[#c5e0ea]
+              text-[#256386]
+              shadow-md hover:shadow-lg
+              transition-all active:scale-95">
+
+        <span class="material-symbols-outlined text-[22px] font-bold">
+          add
+        </span>
       </button>
-      <!-- Cambiar Estado -->
-      <button onclick="abrirModalCambioEstado()"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-[#1b3a5c] text-sm font-semibold rounded-xl shadow-sm border border-[#bcc0c9]/60 hover:bg-surface-container-low transition-colors">
-        <span class="material-symbols-outlined text-[16px]">swap_horiz</span> Cambiar Estado
-      </button>
-      <!-- Reasignar — solo para quienes tienen permiso -->
-      <button id="btn-reasignar" onclick="SACO_UI.showToast('Reasignación iniciada.','info')"
-        class="hidden inline-flex items-center gap-2 px-5 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-xl shadow-md hover:brightness-105 transition-all">
-        <span class="material-symbols-outlined text-[16px]">forward</span> Reasignar
-      </button>
+
+      <div id="acciones-menu"
+        class="hidden absolute right-0 mt-2 w-52 bg-white border border-[#e5e7eb] rounded-xl shadow-lg py-1 z-[200]">
+
+        <!-- Iniciar Juicio -->
+        <button id="btn-iniciar-juicio" onclick="toggleAccionesMenu();abrirModalIniciarJuicio()"
+          class="hidden w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+          <span class="material-symbols-outlined text-[16px] text-[#256386]">gavel</span>
+          Iniciar Juicio
+        </button>
+
+        <!-- Cambiar Estado -->
+        <button onclick="toggleAccionesMenu();abrirModalCambioEstado()"
+          class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+          <span class="material-symbols-outlined text-[16px] text-[#4f6080]">swap_horiz</span>
+          Cambiar Estado
+        </button>
+
+        <!-- Agrupar / Desagrupar causa -->
+        <button id="btn-agrupar-exp" onclick="toggleAccionesMenu();abrirModalAgruparDesdeDetalle()"
+          class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+          <span class="material-symbols-outlined text-[16px] text-[#4f6080]">folder_open</span>
+          Agrupar a Causa
+        </button>
+        <button id="btn-desagrupar-exp" onclick="toggleAccionesMenu();desagruparDesdeDetalle()"
+          class="hidden w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+          <span class="material-symbols-outlined text-[16px] text-[#4f6080]">link_off</span>
+          Desagrupar
+        </button>
+
+        <!-- Reasignar — solo coordinador / referente -->
+        <div id="btn-reasignar-wrap" class="hidden border-t border-[#f0f7f8] mt-1 pt-1">
+          <button id="btn-reasignar" onclick="toggleAccionesMenu();SACO_UI.showToast('Reasignación iniciada.','info')"
+            class="w-full text-left px-4 py-2.5 text-sm text-[#1b3a5c] hover:bg-[#f0f7f8] flex items-center gap-2.5 transition-colors">
+            <span class="material-symbols-outlined text-[16px] text-[#4f6080]">forward</span>
+            Reasignar
+          </button>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -793,33 +830,81 @@ function abrirModalIniciarJuicio() {
         <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1;">warning</span>
         <div>
           <p class="text-sm font-bold text-amber-800">Confirmar inicio de acción judicial</p>
-          <p class="text-xs text-amber-700 mt-0.5">Esta acción registrará el inicio del proceso judicial para el expediente <span class="font-mono font-bold">${exp.id}</span>.</p>
+          <p class="text-xs text-amber-700 mt-0.5">Esta acción registrará el inicio del proceso judicial para <span class="font-mono font-bold">${exp.id}</span>.</p>
         </div>
       </div>
-      <div>
-        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de acción judicial</label>
-        <select id="juicio-tipo" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20">
-          <option value="DEMANDA">Presentación de Demanda</option>
-          <option value="QUERELLA">Presentación de Querella</option>
-          <option value="RECONVENCION">Reconvención</option>
-          <option value="OTRO">Otro</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Juzgado / Tribunal</label>
-        <input id="juicio-juzgado" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20" placeholder="Ej: Juzgado Federal Civil N°5 — Secretaría 10" value="${exp.juzgado||''}"/>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">N° de Causa Judicial</label>
-        <input id="juicio-causa" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20" placeholder="FSM-XXXXX/2026"/>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Fecha de presentación</label>
-        <input id="juicio-fecha" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20" value="${new Date().toISOString().split('T')[0]}"/>
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Observaciones</label>
-        <textarea id="juicio-obs" rows="3" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm resize-none focus:ring-2 focus:ring-[#256386]/20" placeholder="Detalles del inicio del juicio..."></textarea>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Oficio Judicial (OJ)</label>
+          <input id="juicio-oj" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="OJ-2026-XXXX"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de Intervención <span class="text-[#cd5055]">*</span></label>
+          <select id="juicio-tipo-intervencion" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">— Seleccioná —</option>
+            <option value="Actora">Actora</option>
+            <option value="Demandada">Demandada</option>
+            <option value="Sin intervención">Sin intervención</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Secretaría</label>
+          <input id="juicio-secretaria" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Ej: Secretaría N°3"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">N° de Causa <span class="text-[#cd5055]">*</span></label>
+          <input id="juicio-causa" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="FSM-XXXXX/2026"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Juzgado</label>
+          <select id="juicio-juzgado" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">— Seleccioná juzgado —</option>
+            ${(window.SACO.JUZGADOS||[]).map(j => `<option value="${j.code}">${j.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Carátula</label>
+          <input id="juicio-caratula" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Carátula de la demanda" value="${exp.caratula||''}"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Abogado de la contraria <span class="text-[#cd5055]">*</span></label>
+          <input id="juicio-abog-contr" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Dr. Apellido, Nombre"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Parte Actora <span class="text-[#cd5055]">*</span></label>
+          <input id="juicio-actora" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Nombre del actor"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Parte Demandada <span class="text-[#cd5055]">*</span></label>
+          <input id="juicio-demandada" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="SOFSE"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Coactores</label>
+          <input id="juicio-coactores" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Si corresponde"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Codemandados</label>
+          <input id="juicio-codemandados" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="Si corresponde"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Fecha de inicio <span class="text-[#cd5055]">*</span></label>
+          <input id="juicio-fecha" type="date" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" value="${new Date().toISOString().split('T')[0]}"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Tipo de Juicio <span class="text-[#cd5055]">*</span></label>
+          <select id="juicio-tipo-juicio" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none">
+            <option value="">— Seleccioná —</option>
+            ${(window.SACO.OPCIONES.TIPO_JUICIO||[]).map(o => `<option value="${o}">${o}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">Monto de la demanda <span class="text-[#cd5055]">*</span></label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4f6080] font-medium select-none">$</span>
+            <input id="juicio-monto" class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 pl-7 pr-4 text-sm focus:ring-2 focus:ring-[#256386]/20 focus:outline-none" placeholder="0" oninput="onCurrencyInput(this)"/>
+          </div>
+        </div>
       </div>
     </div>`,
     `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg transition-colors">Cancelar</button>
@@ -830,15 +915,40 @@ function abrirModalIniciarJuicio() {
 }
 
 function confirmarInicioJuicio() {
-  const tipo  = document.getElementById('juicio-tipo').value;
-  const causa = document.getElementById('juicio-causa').value.trim();
-  const obs   = document.getElementById('juicio-obs').value.trim();
-  const fecha = document.getElementById('juicio-fecha').value;
+  const oj              = document.getElementById('juicio-oj').value.trim();
+  const tipoIntervencion = document.getElementById('juicio-tipo-intervencion').value;
+  const causa           = document.getElementById('juicio-causa').value.trim();
+  const secretaria      = document.getElementById('juicio-secretaria').value.trim();
+  const abogContr       = document.getElementById('juicio-abog-contr').value.trim();
+  const actora          = document.getElementById('juicio-actora').value.trim();
+  const demandada       = document.getElementById('juicio-demandada').value.trim();
+  const fecha           = document.getElementById('juicio-fecha').value;
+  const tipoJuicio      = document.getElementById('juicio-tipo-juicio').value;
+  const monto           = document.getElementById('juicio-monto').value.trim();
 
-  if (!causa) { SACO_UI.showToast('Ingresá el N° de causa judicial.', 'warn'); return; }
+  if (!tipoIntervencion) { SACO_UI.showToast('Seleccioná el tipo de intervención.', 'warn'); return; }
+  if (!causa)            { SACO_UI.showToast('Ingresá el N° de causa judicial.', 'warn'); return; }
+  if (!abogContr)        { SACO_UI.showToast('Ingresá el abogado de la contraria.', 'warn'); return; }
+  if (!actora)           { SACO_UI.showToast('Ingresá la parte actora.', 'warn'); return; }
+  if (!demandada)        { SACO_UI.showToast('Ingresá la parte demandada.', 'warn'); return; }
+  if (!tipoJuicio)       { SACO_UI.showToast('Seleccioná el tipo de juicio.', 'warn'); return; }
+  if (!monto)            { SACO_UI.showToast('Ingresá el monto de la demanda.', 'warn'); return; }
 
-  // Actualizar N° de causa si se ingresó
-  if (causa) { exp.numero_causa = causa; document.getElementById('causa-valor').textContent = causa; }
+  if (causa) exp.numero_causa = causa;
+  if (!exp.campos_mesa) exp.campos_mesa = {};
+  exp.campos_mesa.mesa_oficio_judicial    = oj;
+  exp.campos_mesa.mesa_tipo_intervencion  = tipoIntervencion;
+  exp.campos_mesa.mesa_num_causa          = causa;
+  exp.campos_mesa.mesa_juzgado            = document.getElementById('juicio-juzgado').value;
+  exp.campos_mesa.mesa_secretaria         = secretaria;
+  exp.campos_mesa.mesa_caratula           = document.getElementById('juicio-caratula').value.trim();
+  exp.campos_mesa.mesa_abogado_contr      = abogContr;
+  exp.campos_mesa.mesa_parte_actora       = actora;
+  exp.campos_mesa.mesa_parte_dem          = demandada;
+  exp.campos_mesa.mesa_codemandados       = document.getElementById('juicio-codemandados').value.trim();
+  exp.campos_mesa.mesa_fecha_inicio       = fecha;
+  exp.campos_mesa.mesa_tipo_juicio        = tipoJuicio;
+  exp.campos_mesa.mesa_monto              = monto;
 
   // Registrar en timeline
   if (!exp.timeline) exp.timeline = [];
@@ -848,7 +958,7 @@ function confirmarInicioJuicio() {
     tipo: 'MOVIMIENTO',
     titulo: `Inicio de Juicio — ${tipo.replace(/_/g,' ')}`,
     estadoExpediente: estadoActual,
-    desc: obs || `Se inicia acción judicial tipo ${tipo.replace(/_/g,' ')}.${causa ? ` Causa: ${causa}.` : ''}`,
+    desc: `Juicio iniciado. Causa: ${causa}. Actor: ${actora} c/ ${demandada}. Tipo: ${tipoJuicio}. Monto: $${monto}.`,
     doc: null, activo: true, subMovimientos: [],
   });
 
@@ -1382,22 +1492,149 @@ function eliminarInterviniente(index) {
 // ─────────────────────────────────────────────────────────────────────────────
 // VISIBILIDAD DE BOTONES SEGÚN ROL
 // ─────────────────────────────────────────────────────────────────────────────
+// ── Toggle menú acciones ──────────────────────────────────────────────────
+function toggleAccionesMenu() {
+  const menu    = document.getElementById('acciones-menu');
+  const chevron = document.getElementById('acciones-chevron');
+  const open    = !menu.classList.contains('hidden');
+  menu.classList.toggle('hidden', open);
+  if (chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+  if (!open) {
+    setTimeout(() => document.addEventListener('click', function h(e) {
+      if (!document.getElementById('header-actions')?.contains(e.target)) {
+        document.getElementById('acciones-menu')?.classList.add('hidden');
+        if (chevron) chevron.style.transform = '';
+        document.removeEventListener('click', h);
+      }
+    }), 50);
+  }
+}
+
+// ── Agrupar desde detalle (igual que bandeja) ─────────────────────────────
+function abrirModalAgruparDesdeDetalle() {
+  const todasLasCausas = [...new Set(
+    window.SACO.EXPEDIENTES_ABOGADO
+      .filter(e => e.numero_causa && e.numero_causa.trim() && e.id !== exp.id)
+      .map(e => e.numero_causa.trim())
+  )].sort();
+
+  SACO_UI.showModal('Agrupar a Causa', `
+    <div class="space-y-4">
+      <div class="p-3 bg-[#f0f7f8] rounded-xl">
+        <p class="text-xs font-bold text-[#1b3a5c]">${exp.id}</p>
+        <p class="text-xs text-[#4f6080] mt-0.5 line-clamp-2">${exp.caratula}</p>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-[#4f6080] uppercase tracking-wider mb-2">N° de Causa Judicial</label>
+        <input id="modal-causa-input-det" oninput="onModalCausaInputDet(this.value)"
+          class="w-full bg-[#f0f7f8] border border-[#bcc0c9] rounded-lg py-3 px-4 text-sm font-mono focus:ring-2 focus:ring-[#256386]/20 focus:outline-none"
+          placeholder="FSM-XXXXX/2026"/>
+        <p class="text-[10px] text-[#4f6080] mt-1">Ingresá el número o seleccioná una causa existente.</p>
+      </div>
+      ${todasLasCausas.length ? `
+        <div>
+          <p class="text-[10px] font-bold text-[#4f6080] uppercase tracking-wider mb-2">Causas existentes en el sistema</p>
+          <div class="space-y-1.5 max-h-40 overflow-y-auto">
+            ${todasLasCausas.map(nc => {
+              const expsGrupo = window.SACO.EXPEDIENTES_ABOGADO.filter(e => (e.numero_causa||'').trim() === nc);
+              const areas = [...new Set(expsGrupo.map(e => e.area))].join(' · ');
+              return `<button onclick="document.getElementById('modal-causa-input-det').value='${nc}';onModalCausaInputDet('${nc}')"
+                class="w-full text-left p-3 bg-[#f0f7f8] rounded-lg hover:bg-[#e2eff5] transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[#256386] text-[14px]" style="font-variation-settings:'FILL' 1;">folder</span>
+                    <span class="font-mono text-xs font-bold text-[#256386]">${nc}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] text-[#4f6080]">${expsGrupo.length} exp.</span>
+                    <span class="text-[10px] text-[#4f6080]">${areas}</span>
+                  </div>
+                </div>
+              </button>`;
+            }).join('')}
+          </div>
+        </div>` : `
+        <div class="p-3 bg-[#f0f7f8] rounded-xl text-center">
+          <p class="text-xs text-[#4f6080]">No hay causas existentes. Ingresá un número nuevo.</p>
+        </div>`}
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg">Cancelar</button>
+     <button onclick="confirmarAgruparDetalle()" class="px-6 py-2 bg-[#256386] hover:bg-[#1d4e6b] text-white text-sm font-bold rounded-lg">Agrupar</button>`
+  );
+}
+
+function onModalCausaInputDet(val) {}
+
+function confirmarAgruparDetalle() {
+  const nc = (document.getElementById('modal-causa-input-det').value || '').trim();
+  if (!nc) { SACO_UI.showToast('Ingresá un número de causa.', 'warn'); return; }
+  const exps = window.SACO.EXPEDIENTES_ABOGADO;
+  const yaExistePrincipal = exps.some(e =>
+    e.id !== exp.id && (e.numero_causa||'').trim() === nc && e.es_principal === true
+  );
+  exp.numero_causa = nc;
+  exp.es_principal = !yaExistePrincipal;
+  document.getElementById('h-num').textContent = exp.id;
+  SACO_UI.closeModal();
+  renderDatosUnificados();
+  updateBotonesAgrupar();
+  SACO_UI.showToast(`${exp.id} agrupado a causa ${nc}.`, 'success');
+}
+
+function desagruparDesdeDetalle() {
+  SACO_UI.showModal('Desagrupar expediente', `
+    <div class="space-y-3">
+      <div class="p-3 bg-[#f0f7f8] rounded-xl">
+        <p class="text-xs font-bold text-[#1b3a5c]">${exp.id}</p>
+        <p class="text-xs text-[#4f6080] mt-0.5 line-clamp-2">${exp.caratula}</p>
+      </div>
+      <p class="text-sm text-[#4f6080]">Este expediente quedará suelto y podrá reagruparse a otra causa.</p>
+      <p class="text-xs font-bold text-[#cd5055]">N° de causa actual: ${exp.numero_causa}</p>
+    </div>`,
+    `<button onclick="SACO_UI.closeModal()" class="px-4 py-2 text-sm font-semibold text-[#4f6080] hover:bg-surface-container rounded-lg">Cancelar</button>
+     <button onclick="confirmarDesagruparDetalle()" class="px-6 py-2 bg-[#cd5055] hover:bg-red-700 text-white text-sm font-bold rounded-lg">Desagrupar</button>`
+  );
+}
+
+function confirmarDesagruparDetalle() {
+  const causaAnterior = exp.numero_causa;
+  exp.numero_causa = null;
+  exp.es_principal = false;
+  SACO_UI.closeModal();
+  renderDatosUnificados();
+  updateBotonesAgrupar();
+  SACO_UI.showToast(`${exp.id} desagrupado de ${causaAnterior}.`, 'info');
+}
+
+function updateBotonesAgrupar() {
+  const sinCausa = !exp.numero_causa || exp.numero_causa.trim() === '' || exp.numero_causa.trim().toUpperCase() === 'SS SOFSE';
+  document.getElementById('btn-agrupar-exp')?.classList.toggle('hidden', !sinCausa);
+  document.getElementById('btn-desagrupar-exp')?.classList.toggle('hidden', sinCausa);
+}
+
+// ── Visibilidad de botones según rol ──────────────────────────────────────
 function updateBotonesRol() {
   const u = window.SACO.CURRENT_USER;
   const accesos = u ? window.SACO.getAccesos(u) : null;
+  const rol = (u?.rol || '').toUpperCase();
 
-  // Reasignar — solo si tiene permiso
-  const btnReasignar = document.getElementById('btn-reasignar');
-  if (btnReasignar) {
-    btnReasignar.classList.toggle('hidden', !(accesos && accesos.puedeReasignar));
+  // Reasignar
+  const reasignarWrap = document.getElementById('btn-reasignar-wrap');
+  if (reasignarWrap) {
+    const puede = accesos?.puedeReasignar === true;
+    reasignarWrap.classList.toggle('hidden', !puede);
   }
 
-  // Iniciar Juicio — solo ABOGADO y REFERENTE
+  // Iniciar juicio
   const btnJuicio = document.getElementById('btn-iniciar-juicio');
   if (btnJuicio) {
-    const puedeIniciar = !u || u.rol === 'ABOGADO' || u.rol === 'REFERENTE' || u.rol === 'COORDINADOR';
+    const puedeIniciar =
+      ['ABOGADO', 'REFERENTE', 'COORDINADOR'].includes(rol);
+
     btnJuicio.classList.toggle('hidden', !puedeIniciar);
   }
+
+  updateBotonesAgrupar();
 }
 
 updateBotonesRol();
