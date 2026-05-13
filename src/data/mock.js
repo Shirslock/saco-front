@@ -841,7 +841,7 @@ const USUARIOS = [
 // Accesos por rol — nav visible, permisos y página de inicio
 const ROL_ACCESOS = {
   REFERENTE: {
-    nav: ['dashboard','bandeja-abogado','area-civil','area-laboral','gestion-penal','reports'],
+    nav: ['dashboard','bandeja-abogado','bandeja-area','reports'],
     puedeReasignar: true, verTodaBandeja: true, inicio: 'dashboard',
   },
   ADMINISTRATIVO: {
@@ -849,14 +849,14 @@ const ROL_ACCESOS = {
     puedeReasignar: false, verTodaBandeja: false, inicio: 'mesa-saco',
   },
   COORDINADOR: {
-    CIVIL:   { nav: ['dashboard','bandeja-abogado','area-civil','reports'],    puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-civil'    },
-    LABORAL: { nav: ['dashboard','bandeja-abogado','area-laboral','reports'],  puedeReasignar: true,  verTodaBandeja: true,  inicio: 'area-laboral'  },
-    PENAL:   { nav: ['dashboard','bandeja-abogado','gestion-penal','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'gestion-penal' },
+    CIVIL:   { nav: ['dashboard','bandeja-abogado','bandeja-area','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'bandeja-area' },
+    LABORAL: { nav: ['dashboard','bandeja-abogado','bandeja-area','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'bandeja-area' },
+    PENAL:   { nav: ['dashboard','bandeja-abogado','bandeja-area','reports'], puedeReasignar: true,  verTodaBandeja: true,  inicio: 'bandeja-area' },
   },
   ABOGADO: {
-    CIVIL:   { nav: ['bandeja-abogado','area-civil'],    puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
-    LABORAL: { nav: ['bandeja-abogado','area-laboral'],  puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
-    PENAL:   { nav: ['bandeja-abogado','gestion-penal'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    CIVIL:   { nav: ['bandeja-abogado','bandeja-area'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    LABORAL: { nav: ['bandeja-abogado','bandeja-area'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
+    PENAL:   { nav: ['bandeja-abogado','bandeja-area'], puedeReasignar: false, verTodaBandeja: false, inicio: 'bandeja-abogado' },
   },
 };
 
