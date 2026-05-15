@@ -147,21 +147,36 @@ tailwind.config = {
           <div class="step-badge bg-[#c5e0ea] text-[#256386]">3</div>
           <h3 class="text-base font-headline font-bold text-[#1b3a5c]">Asignación de Letrado</h3>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="asignacion-grid">
+
+          <!-- Campo línea (solo visible en PENAL) -->
+          <div id="linea-field" class="hidden">
+            <label class="field-label">Línea Ferroviaria <span class="text-[#cd5055]">*</span></label>
+            <select id="linea-select" class="field-input" onchange="onLineaChange(this)">
+              <option value="">— Seleccioná la línea —</option>
+            </select>
+            <p class="text-[10px] text-[#4f6080] mt-1">La línea determina los letrados disponibles.</p>
+          </div>
+
+          <!-- Campo letrado -->
+          <div id="abogado-field">
             <label class="field-label">Letrado Asignado</label>
             <select id="abogado-select" class="field-input" onchange="updateResumen()">
               <option value="">— Seleccioná área primero —</option>
             </select>
             <p class="text-[10px] text-[#4f6080] mt-1" id="asignacion-regla"></p>
           </div>
-          <div class="p-4 bg-[#f0f7f8] rounded-xl flex items-start gap-3">
+
+          <!-- Card informativa -->
+          <div class="p-4 bg-[#f0f7f8] rounded-xl flex items-start gap-3 md:col-span-2">
             <span class="material-symbols-outlined text-[#256386] text-2xl mt-0.5" style="font-variation-settings:'FILL' 1;">info</span>
             <div id="asignacion-info">
               <p class="text-xs font-bold text-[#4f6080] uppercase tracking-tight">Regla de asignación</p>
               <p class="text-[11px] text-[#4f6080] mt-1">Seleccioná el área para ver la regla aplicable.</p>
             </div>
           </div>
+
         </div>
 
         <div id="reincidencia-alert" class="hidden mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 flex items-start gap-3">
@@ -469,6 +484,9 @@ function setCanal(c) {
 // ÁREA
 // ─────────────────────────────────────────────────────────────────────────────
 function setArea(a) {
+  const lineaSelPrev = document.getElementById('linea-select');
+  if (lineaSelPrev) lineaSelPrev.value = '';
+
   state.area = a;
   state.tipo = '';
 
@@ -480,22 +498,34 @@ function setArea(a) {
 
   poblarTipos(a, state.canal);
 
-  // Letrados
-  const abogs = window.SACO.ABOGADOS[a] || [];
-  const abogSel = document.getElementById('abogado-select');
+  // Mostrar/ocultar campo de línea según área
+  const lineaField   = document.getElementById('linea-field');
+  const abogadoField = document.getElementById('abogado-field');
+  const abogSel      = document.getElementById('abogado-select');
+  const lineaSel     = document.getElementById('linea-select');
+
   if (a === 'PENAL') {
-    abogSel.innerHTML = `<option value="">— Se determina al seleccionar la línea —</option>`;
+    lineaField.classList.remove('hidden');
+    lineaSel.innerHTML =
+      '<option value="">— Seleccioná la línea —</option>' +
+      window.SACO.LINEAS_FERROVIARIAS.map(l =>
+        `<option value="${l.code}">${l.label}</option>`
+      ).join('');
+    abogSel.innerHTML = '<option value="">— Seleccioná la línea primero —</option>';
     abogSel.disabled = true;
   } else {
+    lineaField.classList.add('hidden');
+    lineaSel.value = '';
     abogSel.disabled = false;
+    const abogs = window.SACO.ABOGADOS[a] || [];
     abogSel.innerHTML = abogs.map((ab, i) =>
       `<option value="${ab}">${ab}${i === 0 ? ' — siguiente en rotación' : ''}</option>`
     ).join('');
   }
 
-  // Regla
+  // Regla de asignación
   const regla = a === 'PENAL'
-    ? 'Asignación por línea ferroviaria — el letrado se determina al seleccionar la línea.'
+    ? 'Asignación por línea ferroviaria — seleccioná la línea para ver los letrados disponibles.'
     : 'Asignación secuencial FIFO — se sugiere el siguiente letrado disponible en el área.';
   document.getElementById('asignacion-regla').textContent = regla;
   document.getElementById('asignacion-info').innerHTML = `
@@ -608,11 +638,34 @@ function onTipoChange() {
 // ─────────────────────────────────────────────────────────────────────────────
 function onLineaChange(selectEl) {
   if (state.area !== 'PENAL') return;
-  const linea = window.SACO.LINEAS_FERROVIARIAS.find(l => l.code === selectEl.value);
+
+  const abogSel   = document.getElementById('abogado-select');
+  const lineaCode = selectEl.value;
+
+  if (!lineaCode) {
+    abogSel.innerHTML = '<option value="">— Seleccioná la línea primero —</option>';
+    abogSel.disabled = true;
+    updateResumen();
+    return;
+  }
+
+  const linea = window.SACO.LINEAS_FERROVIARIAS.find(l => l.code === lineaCode);
   if (!linea) return;
-  const abogSel = document.getElementById('abogado-select');
+
+  const abogados = linea.abogados || [linea.abogado];
+
   abogSel.disabled = false;
-  abogSel.innerHTML = `<option value="${linea.abogado}">${linea.abogado} — Letrado línea ${linea.label}</option>`;
+  abogSel.innerHTML = abogados.map((ab, i) =>
+    `<option value="${ab}">${ab}${i === 0 ? ' — letrado principal' : ''}</option>`
+  ).join('');
+
+  const info = document.getElementById('asignacion-info');
+  if (info) {
+    info.innerHTML = `
+      <p class="text-xs font-bold text-[#4f6080] uppercase tracking-tight">Letrados disponibles — ${linea.label}</p>
+      <p class="text-[11px] text-[#4f6080] mt-1">${abogados.length} letrado${abogados.length !== 1 ? 's' : ''} asignado${abogados.length !== 1 ? 's' : ''} a esta línea. Podés seleccionar cualquiera.</p>`;
+  }
+
   updateResumen();
 }
 
@@ -892,6 +945,9 @@ function confirmarDerivacion() {
   const refVal   = (document.getElementById('ref-input')?.value || '').trim();
   const abogSel  = document.getElementById('abogado-select');
   const abogado  = abogSel?.value || '—';
+  const linea    = state.area === 'PENAL'
+    ? (document.getElementById('linea-select')?.value || null)
+    : null;
   const tipoSel  = document.getElementById('tipo-select');
   const tipoLabel = tipoSel?.options[tipoSel.selectedIndex]?.text || state.tipo;
   const estadoInicial = window.SACO.getEstadosPorTipo(state.tipo)[0] || 'Recepcionado';
@@ -913,7 +969,7 @@ function confirmarDerivacion() {
     }
   }
 
-  SACO_SYNC.syncEmit('EXPEDIENTE_ASIGNADO', { id: numInterno, area: state.area, abogado });
+  SACO_SYNC.syncEmit('EXPEDIENTE_ASIGNADO', { id: numInterno, area: state.area, abogado, linea });
   SACO_UI.closeModal();
   SACO_UI.showToast(`Expediente ${numInterno} derivado a ${abogado}.`, 'success');
   setTimeout(() => { window.location.href = 'mesa-saco.html'; }, 1500);

@@ -14,7 +14,12 @@
       "Bash(tail -n +947 src/data/mock.js)",
       "Read(//tmp/**)",
       "Bash(head -n 432 src/pages/alta-expediente.html)",
-      "Bash(tail -n +649 src/pages/alta-expediente.html)"
+      "Bash(tail -n +649 src/pages/alta-expediente.html)",
+      "Bash(gh api *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git reset *)",
+      "Bash(git fetch *)"
     ]
   }
 }

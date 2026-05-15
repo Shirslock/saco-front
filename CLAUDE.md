@@ -631,35 +631,6 @@ Las siguientes páginas están diseñadas funcionalmente pero no codificadas aú
 - Selector de nuevo letrado + campo de justificación obligatorio
 - Al confirmar: actualiza `abogado` en el expediente y agrega movimiento tipo `DERIVACION`
 
-### P3 — `control-trimestral.html` (Media prioridad)
-**Rol:** Coordinador / Subgerente
-**Funcionalidades:**
-- Lista de sorteos trimestrales por abogado (3 causas por abogado)
-- Estado de cada control: CONFORME / INCONSISTENCIA
-- Si INCONSISTENCIA: campo de detalle + fecha límite regularización (+5 días)
-- Vista de progreso por abogado: % de causas conformes
-
-### P4 — `login.html` (Media prioridad)
-**Rol:** Todos
-**Funcionalidades:**
-- Formulario email + contraseña
-- Selector de rol simulado (Administrativo / Abogado / Coordinador / Referente)
-- Al hacer login: guarda `currentUser` en `window.SACO` y redirige según rol:
-  - Administrativo → `mesa-saco.html`
-  - Abogado → `bandeja-abogado.html`
-  - Coordinador Penal → `gestion-penal.html`
-  - Referente → `dashboard.html`
-- No hay validación real de credenciales — cualquier input funciona
-
-### P5 — `recupero-dano.html` (Baja prioridad)
-**Rol:** Abogado Civil
-**Funcionalidades:**
-- Formulario de carga de carpeta de recupero (se abre desde detalle de expediente tipo RECUPERO)
-- Checklist de los 10 ítems obligatorios según el procedimiento SGSySL→SACO
-- Carga de presupuestos por categoría: material rodante, infraestructura, lucro cesante
-- Estado de la carpeta: COMPLETA / INCOMPLETA (con campo motivo devolución)
-- Datos del conductor/vehículo causante
-
 ---
 
 ## 11. Cómo modificar páginas existentes
@@ -812,19 +783,8 @@ Claude Code verifica estos puntos antes de considerar una tarea completada:
 
 ## 16. Historial de implementación
 
-| Versión | Fecha | Qué se hizo |
-|---------|-------|-------------|
-| v0.1 | Abr 2026 | Análisis de prototipos Stitch — 5 pantallas base identificadas |
-| v0.2 | Abr 2026 | Design System Sovereign Ledger definido y comparado con branding TA |
-| v1.0 | Abr 2026 | 5 páginas implementadas: dashboard-mesa, alta-expediente, bandeja-abogado, detalle-expediente, gestion-penal |
-| v1.0 | Abr 2026 | shared.js (sidebar, topbar, toast, modal, badges) + mock.js (datos de negocio reales) |
-| v1.1 | Abr 2026 | detalle-expediente: panel izquierdo convertido a 3 tabs (Datos/Vínculos/Estados), sistema de vínculos entre expedientes, timeline agrupado por estado procesal (estadoExpediente), eliminación del box de Observaciones |
-| v1.2 | Abr 2026 | detalle-expediente: layout fullwidth v2 — 4 tabs principales (Datos/Timeline/Docs/Previsión), sub-tabs Información/Vínculos, filtro de estado integrado en Timeline, uid string para movimientos |
-| v1.3 | Abr 2026 | mock.js: ESTADOS_POR_TIPO (catálogo completo por tipo de gestión) + getEstadosPorTipo(); shared.js: estadoBadgeCustom(); detalle: modal cambio de estado filtrado por tipo; alta: campo estado inicial dinámico; labels TIPOS_GESTION actualizados |
-| v1.4 | Abr 2026 | N° causa opcional + detección de duplicado con vinculación bidireccional: mock.js (buscarPorNumeroCausa, getExpedienteById, abrirExpediente, intervinientes[] y vinculos[] bidireccionales en los 3 expedientes demo); alta: alerta duplicado con selección de vínculo + vinculación automática al crear; detalle: N° causa editable inline (#causa-editable-wrap) con alerta de duplicado y vinculación bidireccional; tab Intervinientes con CRUD + badge "Mismo siniestro" + navegación entre expedientes vinculados |
-| v1.5 | Abr 2026 | Matriz_Actualizada.xlsx: TIPOS_GESTION redefinido (CIVIL 12, LABORAL 8, PENAL 7); campo canal[] + canales[]; ESTADOS_POR_TIPO ampliado (BENEFICIO_LITIGAR, LANZAMIENTO, DEMANDA_CIVIL, DEMANDA_LABORAL, PEDIDO_CAUSA_PENAL); alta-expediente: tipos sin filtro por canal, auto-set canal al seleccionar tipo, estado-inicial-wrap, compatibilidad canal toast |
 | v1.6 | Abr 2026 | mock.js: EXPEDIENTES_ABOGADO reemplazado por 6 expedientes demo (2 causas + 1 suelto); bandeja-abogado: filtros horizontales + chips, tabs Activos/Urgentes, agrupar/desagrupar causa en runtime, "Ver todo" navega a causa-detalle; causa-detalle.html: nueva página timeline unificado por causa; CLAUDE.md actualizado |
 
 ---
 
-*Mantenido por: Arquitectura Taligent — actualizar con cada sprint.*
+*Mantenido por: Gil Cristian-Feinsilber Naiara — actualizar con cada sprint.*

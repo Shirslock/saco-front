@@ -75,14 +75,66 @@ const JUZGADOS = [
 ];
 
 const LINEAS_FERROVIARIAS = [
-  { code: 'LIN_001', label: 'Roca',            abogado: 'Desideri, Gustavo' },
-  { code: 'LIN_002', label: 'San Martín',      abogado: 'Biondi, Walter' },
-  { code: 'LIN_003', label: 'Sarmiento',       abogado: 'Prinotti, Maximiliano' },
-  { code: 'LIN_004', label: 'Mitre',           abogado: 'Desideri, Gustavo' },
-  { code: 'LIN_005', label: 'Belgrano Sur',    abogado: 'Biondi, Walter' },
-  { code: 'LIN_006', label: 'Regionales',      abogado: 'Prinotti, Maximiliano' },
-  { code: 'LIN_007', label: 'Larga Distancia', abogado: 'Desideri, Gustavo' },
-  { code: 'LIN_008', label: 'Central',         abogado: 'Biondi, Walter' },
+  {
+    code: 'LIN_001',
+    label: 'Roca',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis', 'Fisicaro, Narella'],
+  },
+  {
+    code: 'LIN_002',
+    label: 'San Martín',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis', 'Biondi, Walter', 'Prinotti, Maximiliano'],
+  },
+  {
+    code: 'LIN_003',
+    label: 'Sarmiento',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis'],
+  },
+  {
+    code: 'LIN_004',
+    label: 'Mitre',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis', 'Desideri, Gustavo'],
+  },
+  {
+    code: 'LIN_005',
+    label: 'Belgrano Sur',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis', 'Biondi, Walter'],
+  },
+  {
+    code: 'LIN_006',
+    label: 'Regionales',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis'],
+  },
+  {
+    code: 'LIN_007',
+    label: 'Larga Distancia',
+    abogado: 'Dantiochia, Luis',
+    abogados: [
+      'Dantiochia, Luis',
+      'Desideri, Gustavo',
+      'Biondi, Walter',
+      'Prinotti, Maximiliano',
+      'Fisicaro, Narella',
+    ],
+  },
+  {
+    code: 'LIN_008',
+    label: 'Central',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis'],
+  },
+  {
+    code: 'LIN_009',
+    label: 'Tren de la Costa',
+    abogado: 'Dantiochia, Luis',
+    abogados: ['Dantiochia, Luis', 'Desideri, Gustavo'],
+  },
 ];
 
 const ABOGADOS = {
@@ -109,8 +161,10 @@ const ABOGADOS = {
     'Wilson, Eduardo',
   ],
   PENAL: [
+    'Dantiochia, Luis',
     'Biondi, Walter',
     'Desideri, Gustavo',
+    'Fisicaro, Narella',
     'Prinotti, Maximiliano',
   ],
 };
